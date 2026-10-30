@@ -1,0 +1,18 @@
+{
+  "verified_at_utc": "2026-10-30T15:35:02.707425+00:00",
+  "public_url": "https://rohith-pipefoundry.vercel.app",
+  "scope": "Actual protected feature calls through the public production hostname; credentials excluded",
+  "checks": {
+    "anonymous_denied": true,
+    "unchanged_action": "no-op",
+    "schedule_change_action": "update",
+    "changes": [
+      {
+        "path": "config.schedule",
+        "kind": "changed"
+      }
+    ],
+    "invalid_input_sanitized_422": true,
+    "durable_audit_unchanged": true
+  }
+}

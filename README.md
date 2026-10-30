@@ -136,7 +136,7 @@ API port 8094 and PostgreSQL port 55435 bind to localhost. For direct developmen
 | Capability | Public deployment | Reproducible local execution | Artifact / external prerequisite |
 |---|---|---|---|
 | Synthetic ingestion, quality, two backfills and rollback | Real PostgreSQL receipts on the console | CLI/Compose worker and SQL tests | Public reads are deliberately read-only |
-| Preview and lifecycle API | Authenticated operator routes | CLI and API tests, including cold-root PostgreSQL | New preview ships with the next deployment; see commit verification |
+| Preview and lifecycle API | Authenticated operator routes | CLI and API tests, including cold-root PostgreSQL | Preview verified over public HTTPS; see [feature proof](evidence/review-public-feature.json) |
 | Approved HTTPS → PostgreSQL | Connector available to the operator | Ephemeral TLS server → real subprocess → PostgreSQL acceptance test | An actual upstream URL/CA/allowlist and DSN are operator settings |
 | Spark JSON → partitioned Parquet | Excluded from the minimal API image | Separately verified Linux Spark container | Java 17+ and optional locked Spark dependencies |
 | Kubernetes / Helm | No hosted cluster execution | Generated artifacts and external-tool boundary tests | Real cluster, namespace, PVC, secrets, kubectl and worker image required |
@@ -184,7 +184,7 @@ The control API is synchronous. Each worker/date can consume up to five minutes,
 .venv\Scripts\python -m bandit -r src
 ```
 
-Real PostgreSQL tests opt in with `PIPEFOUNDRY_POSTGRES_DSN`; Spark and container identity tests have separate runtime opt-ins. [Verification](docs/verification.md) records exact commands, passing counts, skips and historical evidence. GitHub Actions is configured but execution is blocked by an account-level runner restriction; no hosted CI pass is claimed. The preview revision has been verified locally before publication. Public-hosting, image scans and earlier Spark results are dated evidence with their own scope.
+Real PostgreSQL tests opt in with `PIPEFOUNDRY_POSTGRES_DSN`; Spark and container identity tests have separate runtime opt-ins. [Verification](docs/verification.md) records exact commands, passing counts, skips and historical evidence. GitHub Actions is configured but execution is blocked by an account-level runner restriction; no hosted CI pass is claimed. The preview revision was verified locally and over the public production hostname, including no-op/update behavior and unchanged durable audit history. Public-hosting, image scans and earlier Spark results are dated evidence with their own scope.
 
 For a focused code review or interview discussion:
 
@@ -197,3 +197,5 @@ For a focused code review or interview discussion:
 | [Architecture decisions](docs/architecture.md) → [runbook](docs/runbook.md) | Which failures need retry, rollback, data restoration or explicit reconciliation? |
 
 Useful next exercises are adding an asynchronous operation receipt, an optimistic revision precondition on deploy, an actual on-cluster NetworkPolicy denial test, and a manifest-based atomic publish protocol for object storage. Each addresses a stated boundary rather than expanding the technology list.
+
+The current operational feature also has [actual public HTTPS verification](evidence/review-public-feature.json) and a [fresh all-severity runtime image scan](evidence/review-image-scan.json). These complement the dated local experiments; they do not establish a production SLA.
