@@ -1,5 +1,13 @@
 # Ephemeral container hosting
 
+The live free-tier deployment is the
+[PipeFoundry HTML console](https://rohith-pipefoundry.vercel.app), with
+[JSON receipts](https://rohith-pipefoundry.vercel.app/demo) and
+[readiness](https://rohith-pipefoundry.vercel.app/health/ready). Vercel runs the
+actual OCI Docker container and Neon provides persistent PostgreSQL. Free
+hosting can scale to zero; startup and database wake-up add latency. No cloud
+Kubernetes execution is implied by this hosted demo.
+
 The normal CLI/Compose profile keeps SQLite control-plane state on a persistent
 local volume. An opt-in hosted profile stores metadata, audit records, operation
 locks, immutable artifact bytes, checksums and bounded worker logs in PostgreSQL.
@@ -26,6 +34,18 @@ verification. Metadata and output may share an isolated project database for a
 small demo, with distinct fixed `pf_*` metadata tables. Production roles should
 have only the database and table permissions they need. Revoke public database
 access and test that unrelated project roles cannot connect.
+
+The deployed DSNs require `sslmode=verify-full`,
+`sslrootcert=/etc/ssl/certs/ca-certificates.crt` and `channel_binding=require`.
+This verifies the server identity and requires channel binding rather than
+merely requesting encrypted transport. The isolated `app_pipefoundry` role owns
+only its project database and has NOSUPERUSER, NOCREATEDB, NOCREATEROLE and
+NOREPLICATION. Database PUBLIC access was revoked. Actual connection attempts
+from unrelated project roles were denied with PostgreSQL SQLSTATE 42501.
+Role defaults bound statements to 15 seconds, lock waits to 10 seconds and idle
+transactions to 30 seconds. The metadata adapter uses a five-second connection
+timeout and a stricter ten-second statement timeout. These provider-side grants
+and settings must be reprovisioned explicitly in a new environment.
 
 The Docker image listens on port 8080. Configure the host's target port to 8080.
 It runs as UID 10001 without a shell, package manager or kubectl. Run it with a
@@ -91,7 +111,17 @@ against real PostgreSQL. Replacing that container with an empty tmpfs preserved
 revision 3, its artifact checksum, four audit events and both backfill receipts;
 private listing without a token returned 401. Receipts are recorded in
 `evidence/hosted-http-before.json` and `evidence/hosted-http-after.json`.
-Browser automation had no available browser in this verification environment;
+Browser automation had no available browser in the implementation subagent;
 HTML escaping, pending state, authentication and CSP were checked by tests and
-HTTP. Hosted production connectivity and the rendered public page must also be
-verified after deployment by the deploying operator.
+HTTP. The deploying operator then verified the actual public HTML in a browser
+and checked live readiness and PostgreSQL receipts. Anonymous private reads and
+mutations returned 401, while an authenticated operational read returned 200.
+The public result contains revision 3, three rows, zero invalid rows, two
+backfills and four successful audit events including rollback. Strict database
+TLS and cross-project connection denial were independently verified. Evidence:
+[public release verification](../evidence/public-release-verification.json).
+
+Twelve sequential warm public HTTPS requests from India measured p50 419.385 ms,
+p95 2175.270 ms and p99 2175.270 ms using nearest rank. This is a small observed
+sample, not a concurrency/load test, service objective or cold-start benchmark.
+The two upper percentiles select the same maximum in a twelve-request sample.

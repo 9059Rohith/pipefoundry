@@ -4,6 +4,15 @@
 
 Hosted CI is currently blocked by an account-level runner restriction. [Executed local verification](docs/verification.md) is recorded separately; no hosted pass is claimed.
 
+**Live app:** [PipeFoundry console](https://rohith-pipefoundry.vercel.app) ·
+[JSON execution receipts](https://rohith-pipefoundry.vercel.app/demo) ·
+[Readiness](https://rohith-pipefoundry.vercel.app/health/ready).
+The free Vercel Docker deployment uses durable Neon PostgreSQL. Its public,
+read-only console shows real synthetic ingestion, SQL quality checks, two
+backfills and a rollback; operations require a private bearer token. See the
+[hosted runbook](docs/hosted-profile.md) and
+[public verification evidence](evidence/public-release-verification.json).
+
 A self-service data pipeline platform for the **OpenFX Data Engineering + DevOps
 Intern** portfolio. Submit a bounded YAML specification, validate it, create a
 versioned deployment bundle, execute the pipeline locally or apply its Kubernetes

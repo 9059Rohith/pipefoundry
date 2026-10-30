@@ -1,0 +1,87 @@
+{
+  "verified_at": "2026-10-30T14:53:31.130296+00:00",
+  "base": "https://rohith-pipefoundry.vercel.app",
+  "checks": {
+    "/health/live": 200,
+    "/health/ready": 200,
+    "/demo": 200,
+    "/pipelines": 401,
+    "unauthenticated_mutation": 401,
+    "authenticated_operational_read": 200
+  },
+  "summary": {
+    "service": "PipeFoundry",
+    "read_only": true,
+    "data_source": "synthetic fixtures executed by a real Python worker and PostgreSQL",
+    "execution_mode": "on-demand; cron artifacts are rendered but not scheduled by this host",
+    "pipeline": {
+      "name": "demo-orders",
+      "revision": 3,
+      "status": "succeeded",
+      "executor": "local",
+      "created": "2026-10-30T14:51:46.577174+00:00",
+      "schedule": "0 0 * * *"
+    },
+    "workload": {
+      "rows": 3,
+      "invalid_rows": 0
+    },
+    "backfill": [
+      {
+        "date": "2026-01-10",
+        "rows": 3,
+        "invalid_rows": 0
+      },
+      {
+        "date": "2026-01-11",
+        "rows": 3,
+        "invalid_rows": 0
+      }
+    ],
+    "artifact": {
+      "sha256": "be6e6265bae7c3b794e64aef9c1ec560aa6c58df6b53cfc953bb470be0d9243e",
+      "files": 9,
+      "storage": "PostgreSQL BYTEA"
+    },
+    "events": [
+      {
+        "revision": 1,
+        "action": "deploy",
+        "outcome": "succeeded",
+        "created": "2026-10-30T14:51:39.452826+00:00"
+      },
+      {
+        "revision": 2,
+        "action": "deploy",
+        "outcome": "succeeded",
+        "created": "2026-10-30T14:51:42.416787+00:00"
+      },
+      {
+        "revision": 2,
+        "action": "backfill",
+        "outcome": "succeeded",
+        "created": "2026-10-30T14:51:45.496013+00:00"
+      },
+      {
+        "revision": 3,
+        "action": "rollback",
+        "outcome": "succeeded",
+        "created": "2026-10-30T14:51:48.649533+00:00"
+      }
+    ],
+    "observed_at": "2026-10-30T14:53:21.395110+00:00"
+  },
+  "request_measurement": {
+    "samples": 12,
+    "method": "nearest rank; sequential warm public HTTPS requests from India; not a load test",
+    "p50_ms": 419.385,
+    "p95_ms": 2175.27,
+    "p99_ms": 2175.27
+  },
+  "security": {
+    "database_identity_verified_tls": true,
+    "database_role": "isolated non-superuser",
+    "cross_project_connect_denied": true,
+    "administrative_token_public": false
+  }
+}

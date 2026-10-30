@@ -10,6 +10,15 @@ demo execution/backfill/rollback survived a cold container replacement. See
 [hosted runbook](hosted-profile.md) for exact scope, skips and limits. The
 separate private Spark image is not covered by the public runtime scan result.
 
+The public Vercel Docker/Neon deployment was subsequently verified at
+[rohith-pipefoundry.vercel.app](https://rohith-pipefoundry.vercel.app): actual
+HTML, readiness, three SQL rows, zero invalid rows, two backfills and the
+rollback audit were observed. Anonymous private access returned 401 and a
+valid-token operational read returned 200. Provider database identity TLS,
+channel binding and cross-project CONNECT denial were verified. The
+[public release evidence](../evidence/public-release-verification.json) includes
+twelve warm sequential HTTPS measurements with their limited sampling scope.
+
 Verification ran locally on Windows with Python 3.12, Docker Desktop 28.5.1 and
 Java 17, plus a real Linux Spark container. These are observed results; cloud
 provisioning, live Kubernetes and remote CI are separate acceptance boundaries.
