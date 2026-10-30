@@ -1,0 +1,18 @@
+Collecting httpx2
+  Using cached httpx2-2.16.0-py3-none-any.whl.metadata (10 kB)
+Requirement already satisfied: anyio>=4.10 in c:\users\bhavichasvi\downloads\cyber_projects\pipefoundry\.venv\lib\site-packages (from httpx2) (4.15.1)
+Collecting httpcore2==2.16.0 (from httpx2)
+  Using cached httpcore2-2.16.0-py3-none-any.whl.metadata (27 kB)
+Requirement already satisfied: idna>=3.18 in c:\users\bhavichasvi\downloads\cyber_projects\pipefoundry\.venv\lib\site-packages (from httpx2) (3.20)
+Collecting truststore>=0.10 (from httpx2)
+  Using cached truststore-0.10.5-py3-none-any.whl.metadata (4.5 kB)
+Requirement already satisfied: typing-extensions>=4.5.0 in c:\users\bhavichasvi\downloads\cyber_projects\pipefoundry\.venv\lib\site-packages (from httpx2) (4.16.0)
+Requirement already satisfied: h11>=0.16 in c:\users\bhavichasvi\downloads\cyber_projects\pipefoundry\.venv\lib\site-packages (from httpcore2==2.16.0->httpx2) (0.16.0)
+Using cached httpx2-2.16.0-py3-none-any.whl (97 kB)
+Using cached httpcore2-2.16.0-py3-none-any.whl (85 kB)
+Using cached truststore-0.10.5-py3-none-any.whl (19 kB)
+Installing collected packages: truststore, httpcore2, httpx2
+Successfully installed httpcore2-2.16.0 httpx2-2.16.0 truststore-0.10.5
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.2
+[notice] To update, run: C:\Users\BhaviChasvi\Downloads\cyber_projects\pipefoundry\.venv\Scripts\python.exe -m pip install --upgrade pip

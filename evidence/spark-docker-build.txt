@@ -1,0 +1,86 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.spark-verify
+#1 transferring dockerfile: 710B 0.0s done
+#1 DONE 0.1s
+
+#2 [context spark] load .dockerignore
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/maven:3.9.11-eclipse-temurin-17
+#3 ...
+
+#2 [context spark] load .dockerignore
+#2 transferring spark: 2B 0.0s done
+#2 DONE 0.1s
+
+#4 [context py4j] load .dockerignore
+#4 transferring py4j: 2B 0.0s done
+#4 DONE 0.1s
+
+#5 [internal] load metadata for docker.io/library/pipefoundry:0.1.0
+#5 DONE 0.3s
+
+#3 [internal] load metadata for docker.io/library/maven:3.9.11-eclipse-temurin-17
+#3 DONE 0.3s
+
+#6 [internal] load .dockerignore
+#6 transferring context: 150B 0.0s done
+#6 DONE 0.1s
+
+#7 [context spark] load from client
+#7 DONE 0.0s
+
+#8 [context py4j] load from client
+#8 DONE 0.0s
+
+#9 [internal] load build context
+#9 transferring context: 1.09kB 0.0s done
+#9 DONE 0.1s
+
+#8 [context py4j] load from client
+#8 transferring py4j: 3.68kB 0.0s done
+#8 DONE 0.1s
+
+#7 [context spark] load from client
+#7 ...
+
+#10 [java 1/1] FROM docker.io/library/maven:3.9.11-eclipse-temurin-17@sha256:e4a7ace3dc0d645ed97f8d9ad0b0d3f0b14fa8d150138f27f116d7105a639b82
+#10 resolve docker.io/library/maven:3.9.11-eclipse-temurin-17@sha256:e4a7ace3dc0d645ed97f8d9ad0b0d3f0b14fa8d150138f27f116d7105a639b82 0.2s done
+#10 CACHED
+
+#7 [context spark] load from client
+#7 ...
+
+#11 [stage-1 1/5] FROM docker.io/library/pipefoundry:0.1.0@sha256:687afa5fe4976c097d050d3a8db9e6d196c3238916a565c12538f35ccc2c9d61
+#11 resolve docker.io/library/pipefoundry:0.1.0@sha256:687afa5fe4976c097d050d3a8db9e6d196c3238916a565c12538f35ccc2c9d61 0.2s done
+#11 DONE 0.7s
+
+#7 [context spark] load from client
+#7 transferring spark: 89.70kB 0.2s done
+#7 DONE 0.4s
+
+#12 [stage-1 2/5] COPY --from=java /opt/java/openjdk /opt/java/openjdk
+#12 DONE 5.4s
+
+#13 [stage-1 3/5] COPY --from=spark / /opt/python/pyspark/
+#13 DONE 5.8s
+
+#14 [stage-1 4/5] COPY --from=py4j / /opt/python/py4j/
+#14 DONE 0.2s
+
+#15 [stage-1 5/5] COPY scripts/verify_spark_container.py /app/verify_spark_container.py
+#15 DONE 0.1s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 30.3s done
+#16 exporting manifest sha256:b58572488e526543c193aa660306f27aaf488cf83ecead9d542b76d07d77dac1 0.0s done
+#16 exporting config sha256:047bd8a495f0f9892dc5941ef92c99762ec07aa133970043240df50a557eb65d 0.0s done
+#16 exporting attestation manifest sha256:77da4fe053049ecc2127c6e622e94e138beb572cd90823eb5655195fcd159417
+#16 exporting attestation manifest sha256:77da4fe053049ecc2127c6e622e94e138beb572cd90823eb5655195fcd159417 0.1s done
+#16 exporting manifest list sha256:4a7016f149712f313fb726268666503dfc8d18b1787f727de5ec5d81b0e15ae1 0.0s done
+#16 naming to docker.io/library/pipefoundry:spark-verify done
+#16 unpacking to docker.io/library/pipefoundry:spark-verify
+#16 unpacking to docker.io/library/pipefoundry:spark-verify 13.7s done
+#16 DONE 44.3s

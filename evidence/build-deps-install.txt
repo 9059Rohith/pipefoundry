@@ -1,0 +1,12 @@
+Collecting setuptools
+  Using cached setuptools-84.2.1-py3-none-any.whl.metadata (6.6 kB)
+Collecting wheel
+  Using cached wheel-0.48.0-py3-none-any.whl.metadata (2.3 kB)
+Requirement already satisfied: packaging>=24.0 in c:\users\bhavichasvi\downloads\cyber_projects\pipefoundry\.venv\lib\site-packages (from wheel) (26.3)
+Using cached setuptools-84.2.1-py3-none-any.whl (876 kB)
+Using cached wheel-0.48.0-py3-none-any.whl (33 kB)
+Installing collected packages: wheel, setuptools
+Successfully installed setuptools-84.2.1 wheel-0.48.0
+
+[notice] A new release of pip is available: 25.0.1 -> 26.2.2
+[notice] To update, run: C:\Users\BhaviChasvi\Downloads\cyber_projects\pipefoundry\.venv\Scripts\python.exe -m pip install --upgrade pip

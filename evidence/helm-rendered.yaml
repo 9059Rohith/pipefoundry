@@ -1,0 +1,136 @@
+---
+# Source: pipefoundry/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: pipefoundry-api}
+spec:
+  podSelector:
+    matchLabels: {app: pipefoundry-api}
+  policyTypes: [Ingress, Egress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: "ingress-nginx"
+      ports: [{port: 8080, protocol: TCP}]
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+          podSelector:
+            matchLabels: {k8s-app: kube-dns}
+      ports: [{port: 53, protocol: UDP}, {port: 53, protocol: TCP}]
+    - to:
+        - podSelector:
+            matchLabels: {app: pipefoundry-postgres}
+      ports: [{port: 5432, protocol: TCP}]
+---
+# Source: pipefoundry/templates/networkpolicy.yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: pipefoundry-workers}
+spec:
+  podSelector:
+    matchLabels: {app.kubernetes.io/name: pipefoundry-worker}
+  policyTypes: [Ingress, Egress]
+  ingress: []
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels: {kubernetes.io/metadata.name: kube-system}
+          podSelector:
+            matchLabels: {k8s-app: kube-dns}
+      ports: [{port: 53, protocol: UDP}, {port: 53, protocol: TCP}]
+    - to:
+        - podSelector:
+            matchLabels: {app: pipefoundry-postgres}
+      ports: [{port: 5432, protocol: TCP}]
+---
+# Source: pipefoundry/templates/storage.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pipefoundry-data
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: {storage: 2Gi}
+---
+# Source: pipefoundry/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: pipefoundry-api
+spec:
+  type: ClusterIP
+  selector: {app: pipefoundry-api}
+  ports: [{name: http, port: 8080, targetPort: http}]
+---
+# Source: pipefoundry/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipefoundry-api
+  labels: {app: pipefoundry-api}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: pipefoundry-api}
+  template:
+    metadata:
+      labels: {app: pipefoundry-api}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: api
+          image: "pipefoundry:0.1.0"
+          imagePullPolicy: IfNotPresent
+          ports: [{name: http, containerPort: 8080}]
+          env:
+            - name: PIPEFOUNDRY_API_TOKEN
+              valueFrom:
+                secretKeyRef: {name: "pipefoundry-api", key: token}
+            - name: PIPEFOUNDRY_STATE_DIR
+              value: /state
+          envFrom:
+            - secretRef: {name: "pipefoundry-connectors", optional: true}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: http}
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health/live, port: http}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          startupProbe:
+            httpGet: {path: /health/live, port: http}
+            failureThreshold: 20
+            periodSeconds: 3
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: state, mountPath: /state}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: state
+          persistentVolumeClaim: {claimName: pipefoundry-data}
+        - name: tmp
+          emptyDir: {sizeLimit: 256Mi}

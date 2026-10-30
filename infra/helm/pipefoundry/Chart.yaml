@@ -1,0 +1,6 @@
+apiVersion: v2
+name: pipefoundry
+description: Authenticated self-service pipeline control plane
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

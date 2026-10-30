@@ -1,0 +1,13 @@
+.venv
+.runtime
+.pytest_cache
+.ruff_cache
+.git
+.pipefoundry
+evidence
+tests
+data
+dist
+build
+**/__pycache__
+.env

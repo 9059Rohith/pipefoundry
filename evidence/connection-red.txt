@@ -1,0 +1,10 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______________ test_metadata_connections_close_after_transaction ______________
+tests\test_security.py:61: in test_metadata_connections_close_after_transaction
+    with pytest.raises(sqlite3.ProgrammingError, match="closed"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ProgrammingError
+=========================== short test summary info ===========================
+FAILED tests/test_security.py::test_metadata_connections_close_after_transaction
+1 failed in 2.32s

@@ -1,0 +1,35 @@
+{
+  "api": "real HTTP",
+  "sink": "real PostgreSQL",
+  "deployment": {
+    "name": "compose-smoke",
+    "revision": 7,
+    "status": "succeeded",
+    "executor": "local",
+    "created": "2026-10-30T13:19:39.074683+00:00",
+    "cluster_targets": []
+  },
+  "backfill": {
+    "name": "compose-smoke",
+    "partitions": 2,
+    "start": "2026-01-10",
+    "end": "2026-01-11"
+  },
+  "rollback": {
+    "name": "compose-smoke",
+    "revision": 9,
+    "status": "succeeded",
+    "executor": "local",
+    "created": "2026-10-30T13:19:45.428832+00:00",
+    "cluster_targets": []
+  },
+  "teardown": {
+    "name": "compose-smoke",
+    "revision": 9,
+    "status": "torn_down",
+    "executor": "local",
+    "created": "2026-10-30T13:19:45.428832+00:00",
+    "cluster_targets": []
+  },
+  "audit_events": 15
+}

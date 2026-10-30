@@ -1,0 +1,10 @@
+name: orders-postgres
+schedule: "0 * * * *"
+input:
+  connector: orders_api
+transform: normalize_orders
+output:
+  connector: postgres
+resources:
+  cpu_millis: 250
+  memory_mib: 256

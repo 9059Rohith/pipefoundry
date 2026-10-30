@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___________ test_benchmark_measures_each_stage_and_persists_samples ___________
+tests\test_benchmark.py:12: in test_benchmark_measures_each_stage_and_persists_samples
+    assert result.returncode == 0, result.stderr
+E   AssertionError: C:\Users\BhaviChasvi\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe: can't open file 'C:\\Users\\BhaviChasvi\\Downloads\\cyber_projects\\pipefoundry\\scripts\\benchmark.py': [Errno 2] No such file or directory
+E
+E   assert 2 == 0
+E    +  where 2 = CompletedProcess(args=['C:\\Users\\BhaviChasvi\\Downloads\\cyber_projects\\pipefoundry\\.venv\\Scripts\\python.exe', '...asvi\\\\Downloads\\\\cyber_projects\\\\pipefoundry\\\\scripts\\\\benchmark.py': [Errno 2] No such file or directory\n").returncode
+=========================== short test summary info ===========================
+FAILED tests/test_benchmark.py::test_benchmark_measures_each_stage_and_persists_samples
+1 failed in 0.61s

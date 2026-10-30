@@ -1,0 +1,3 @@
+# Optional tested Spark/Java17 runtime. This is not part of the API image.
+pyspark==4.0.1
+py4j==0.10.9.9

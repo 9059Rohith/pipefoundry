@@ -1,0 +1,60 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pipefoundry-api
+  labels: {app: pipefoundry-api}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector:
+    matchLabels: {app: pipefoundry-api}
+  template:
+    metadata:
+      labels: {app: pipefoundry-api}
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports: [{name: http, containerPort: 8080}]
+          env:
+            - name: PIPEFOUNDRY_API_TOKEN
+              valueFrom:
+                secretKeyRef: {name: {{ .Values.apiTokenSecret | quote }}, key: token}
+            - name: PIPEFOUNDRY_STATE_DIR
+              value: /state
+          envFrom:
+            - secretRef: {name: {{ .Values.connectorSecret | quote }}, optional: true}
+          readinessProbe:
+            httpGet: {path: /health/ready, port: http}
+            initialDelaySeconds: 3
+            periodSeconds: 5
+          livenessProbe:
+            httpGet: {path: /health/live, port: http}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          startupProbe:
+            httpGet: {path: /health/live, port: http}
+            failureThreshold: 20
+            periodSeconds: 3
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          volumeMounts:
+            - {name: state, mountPath: /state}
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: state
+          persistentVolumeClaim: {claimName: pipefoundry-data}
+        - name: tmp
+          emptyDir: {sizeLimit: 256Mi}

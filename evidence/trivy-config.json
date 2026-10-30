@@ -1,0 +1,73 @@
+2026-10-30T12:55:28Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-10-30T12:55:28Z	INFO	[checks-client] No downloadable checks were loaded as --skip-check-update is enabled, loading from existing cache...
+2026-10-30T12:55:28Z	ERROR	[misconfig] Falling back to embedded checks	err="failed to check cache: cache does not exist at \"/root/.cache/trivy/policy/content\""
+2026-10-30T12:55:34Z	INFO	[terraform scanner] Scanning root module	file_path="terraform"
+2026-10-30T12:55:35Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="cluster_admin_principal_arn"
+2026-10-30T12:55:35Z	INFO	Detected config files	num=7
+{
+  "SchemaVersion": 2,
+  "Trivy": {
+    "Version": "0.76.0"
+  },
+  "ReportID": "01a18ce1-440c-70e4-839f-b326f1b436da",
+  "CreatedAt": "2026-10-30T12:55:35.692065225Z",
+  "ArtifactName": "/src/infra",
+  "ArtifactType": "filesystem",
+  "Results": [
+    {
+      "Target": "helm/pipefoundry/templates/deployment.yaml",
+      "Class": "config",
+      "Type": "helm",
+      "MisconfSummary": {
+        "Successes": 22,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "helm/pipefoundry/templates/networkpolicy.yaml",
+      "Class": "config",
+      "Type": "helm",
+      "MisconfSummary": {
+        "Successes": 10,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "helm/pipefoundry/templates/service.yaml",
+      "Class": "config",
+      "Type": "kubernetes",
+      "MisconfSummary": {
+        "Successes": 11,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "helm/pipefoundry/templates/storage.yaml",
+      "Class": "config",
+      "Type": "helm",
+      "MisconfSummary": {
+        "Successes": 10,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "terraform",
+      "Class": "config",
+      "Type": "terraform",
+      "MisconfSummary": {
+        "Successes": 35,
+        "Failures": 0
+      }
+    },
+    {
+      "Target": "terraform/modules/eks/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    },
+    {
+      "Target": "terraform/modules/network/main.tf",
+      "Class": "config",
+      "Type": "terraform"
+    }
+  ]
+}

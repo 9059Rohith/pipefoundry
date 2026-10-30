@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pipefoundry"
+version = "0.1.0"
+description = "An auditable self-service data pipeline control plane"
+requires-python = ">=3.12"
+dependencies = ["fastapi>=0.121", "uvicorn>=0.38", "pydantic>=2.12", "PyYAML>=6.0.3", "croniter>=6.0", "httpx>=0.28", "psycopg[binary]>=3.2.12"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.4", "httpx2>=2.16", "ruff>=0.14", "bandit>=1.8", "pip-audit>=2.9", "build>=1.3"]
+spark = ["pyspark==4.0.1"]
+
+[project.scripts]
+pipefoundry = "pipefoundry.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["postgres: requires PIPEFOUNDRY_POSTGRES_DSN", "spark: requires PySpark and Java runtime"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

@@ -1,0 +1,12 @@
+name: orders-parquet
+schedule: "0 2 * * *"
+input:
+  connector: spark_json
+  path: orders.json
+transform: normalize_orders
+output:
+  connector: parquet
+  path: orders-parquet
+resources:
+  cpu_millis: 1000
+  memory_mib: 2048

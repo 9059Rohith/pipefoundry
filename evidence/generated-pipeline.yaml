@@ -1,0 +1,106 @@
+---
+# Source: orders-demo/templates/workload.yaml
+apiVersion: v1
+data:
+  pipeline.json: "{\n  \"name\": \"orders-demo\",\n  \"schedule\": \"0 * * * *\",\n\
+    \  \"input\": {\n    \"connector\": \"fixture\",\n    \"path\": \"orders.json\"\
+    \n  },\n  \"transform\": \"normalize_orders\",\n  \"output\": {\n    \"connector\"\
+    : \"sqlite\",\n    \"path\": \"orders.db\"\n  },\n  \"resources\": {\n    \"cpu_millis\"\
+    : 100,\n    \"memory_mib\": 128\n  }\n}"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: pipefoundry-worker
+    pipeline: orders-demo
+  name: orders-demo-r1
+---
+# Source: orders-demo/templates/workload.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels: &id001
+    app.kubernetes.io/name: pipefoundry-worker
+    pipeline: orders-demo
+  name: orders-demo
+spec:
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 2
+      template:
+        metadata:
+          labels: *id001
+        spec:
+          automountServiceAccountToken: false
+          containers:
+          - args:
+            - --config
+            - /config/pipeline.json
+            - --root
+            - /state
+            command:
+            - python
+            - -m
+            - pipefoundry.worker
+            env:
+            - name: PYTHONDONTWRITEBYTECODE
+              value: '1'
+            - name: TMPDIR
+              value: /scratch
+            - name: SPARK_LOCAL_DIRS
+              value: /scratch
+            - name: JAVA_TOOL_OPTIONS
+              value: -Djava.io.tmpdir=/scratch
+            envFrom:
+            - secretRef:
+                name: pipefoundry-connectors
+                optional: true
+            image: pipefoundry:0.1.0
+            imagePullPolicy: IfNotPresent
+            name: worker
+            resources:
+              limits:
+                cpu: 100m
+                memory: 128Mi
+              requests:
+                cpu: 100m
+                memory: 128Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop:
+                - ALL
+              readOnlyRootFilesystem: true
+            volumeMounts:
+            - mountPath: /config
+              name: config
+              readOnly: true
+            - mountPath: /state
+              name: state
+            - mountPath: /scratch
+              name: tmp
+          restartPolicy: Never
+          securityContext:
+            fsGroup: 10001
+            runAsGroup: 10001
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          volumes:
+          - configMap:
+              name: orders-demo-r1
+            name: config
+          - name: state
+            persistentVolumeClaim:
+              claimName: pipefoundry-data
+          - emptyDir:
+              sizeLimit: 256Mi
+            name: tmp
+      ttlSecondsAfterFinished: 86400
+  schedule: 0 * * * *
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 2
+  timeZone: Etc/UTC

@@ -1,0 +1,279 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________________ test_spark_real_json_to_parquet _______________________
+tests\test_workloads.py:92: in test_spark_real_json_to_parquet
+    result = transform(source, tmp_path / "parquet")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\pipefoundry\spark_job.py:19: in transform
+    .getOrCreate()
+     ^^^^^^^^^^^^^
+.venv\Lib\site-packages\pyspark\sql\session.py:556: in getOrCreate
+    sc = SparkContext.getOrCreate(sparkConf)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pyspark\core\context.py:523: in getOrCreate
+    SparkContext(conf=conf or SparkConf())
+.venv\Lib\site-packages\pyspark\core\context.py:207: in __init__
+    self._do_init(
+.venv\Lib\site-packages\pyspark\core\context.py:300: in _do_init
+    self._jsc = jsc or self._initialize_context(self._conf._jconf)
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\pyspark\core\context.py:429: in _initialize_context
+    return self._jvm.JavaSparkContext(jconf)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\py4j\java_gateway.py:1627: in __call__
+    return_value = get_return_value(
+.venv\Lib\site-packages\py4j\protocol.py:327: in get_return_value
+    raise Py4JJavaError(
+E   py4j.protocol.Py4JJavaError: An error occurred while calling None.org.apache.spark.api.java.JavaSparkContext.
+E   : java.lang.IllegalStateException: failed to create a child event loop
+
+E   	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:88)
+
+E   	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:60)
+
+E   	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:49)
+
+E   	at io.netty.channel.MultithreadEventLoopGroup.<init>(MultithreadEventLoopGroup.java:59)
+
+E   	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:87)
+
+E   	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:82)
+
+E   	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:69)
+
+E   	at org.apache.spark.network.util.NettyUtils.createEventLoop(NettyUtils.java:69)
+
+E   	at org.apache.spark.network.client.TransportClientFactory.<init>(TransportClientFactory.java:112)
+
+E   	at org.apache.spark.network.TransportContext.createClientFactory(TransportContext.java:158)
+
+E   	at org.apache.spark.rpc.netty.NettyRpcEnv.<init>(NettyRpcEnv.scala:80)
+
+E   	at org.apache.spark.rpc.netty.NettyRpcEnvFactory.create(NettyRpcEnv.scala:499)
+
+E   	at org.apache.spark.rpc.RpcEnv$.create(RpcEnv.scala:58)
+
+E   	at org.apache.spark.SparkEnv$.create(SparkEnv.scala:351)
+
+E   	at org.apache.spark.SparkEnv$.createDriverEnv(SparkEnv.scala:283)
+
+E   	at org.apache.spark.SparkContext.createSparkEnv(SparkContext.scala:294)
+
+E   	at org.apache.spark.SparkContext.<init>(SparkContext.scala:495)
+
+E   	at org.apache.spark.api.java.JavaSparkContext.<init>(JavaSparkContext.scala:59)
+
+E   	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+
+E   	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+
+E   	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+
+E   	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
+
+E   	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:481)
+
+E   	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:247)
+
+E   	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+
+E   	at py4j.Gateway.invoke(Gateway.java:238)
+
+E   	at py4j.commands.ConstructorCommand.invokeConstructor(ConstructorCommand.java:80)
+
+E   	at py4j.commands.ConstructorCommand.execute(ConstructorCommand.java:69)
+
+E   	at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)
+
+E   	at py4j.ClientServerConnection.run(ClientServerConnection.java:108)
+
+E   	at java.base/java.lang.Thread.run(Thread.java:840)
+
+E   Caused by: io.netty.channel.ChannelException: failed to open a new selector
+
+E   	at io.netty.channel.nio.NioEventLoop.openSelector(NioEventLoop.java:179)
+
+E   	at io.netty.channel.nio.NioEventLoop.<init>(NioEventLoop.java:146)
+
+E   	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:183)
+
+E   	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:38)
+
+E   	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:84)
+
+E   	... 30 more
+
+E   Caused by: java.io.IOException: Unable to establish loopback connection
+
+E   	at java.base/sun.nio.ch.PipeImpl$Initializer.run(PipeImpl.java:103)
+
+E   	at java.base/sun.nio.ch.PipeImpl$Initializer.run(PipeImpl.java:67)
+
+E   	at java.base/java.security.AccessController.doPrivileged(AccessController.java:569)
+
+E   	at java.base/sun.nio.ch.PipeImpl.<init>(PipeImpl.java:198)
+
+E   	at java.base/sun.nio.ch.WEPollSelectorImpl.<init>(WEPollSelectorImpl.java:78)
+
+E   	at java.base/sun.nio.ch.WEPollSelectorProvider.openSelector(WEPollSelectorProvider.java:33)
+
+E   	at io.netty.channel.nio.NioEventLoop.openSelector(NioEventLoop.java:177)
+
+E   	... 34 more
+
+E   Caused by: java.net.SocketException: Invalid argument: connect
+
+E   	at java.base/sun.nio.ch.UnixDomainSockets.connect0(Native Method)
+
+E   	at java.base/sun.nio.ch.UnixDomainSockets.connect(UnixDomainSockets.java:148)
+
+E   	at java.base/sun.nio.ch.UnixDomainSockets.connect(UnixDomainSockets.java:144)
+
+E   	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:851)
+
+E   	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:285)
+
+E   	at java.base/sun.nio.ch.PipeImpl$Initializer$LoopbackConnector.run(PipeImpl.java:133)
+
+E   	at java.base/sun.nio.ch.PipeImpl$Initializer.run(PipeImpl.java:85)
+
+E   	... 40 more
+---------------------------- Captured stderr call -----------------------------
+WARNING: Using incubator modules: jdk.incubator.vector
+
+26/10/30 18:34:55 WARN Shell: Did not find winutils.exe: java.io.FileNotFoundException: java.io.FileNotFoundException: HADOOP_HOME and hadoop.home.dir are unset. -see https://cwiki.apache.org/confluence/display/HADOOP2/WindowsProblems
+
+Using Spark's default log4j profile: org/apache/spark/log4j2-defaults.properties
+
+Setting default log level to "WARN".
+To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+
+26/10/30 18:34:56 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+
+26/10/30 18:34:58 ERROR SparkContext: Error initializing SparkContext.
+
+java.lang.IllegalStateException: failed to create a child event loop
+
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:88)
+
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:60)
+
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:49)
+
+	at io.netty.channel.MultithreadEventLoopGroup.<init>(MultithreadEventLoopGroup.java:59)
+
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:87)
+
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:82)
+
+	at io.netty.channel.nio.NioEventLoopGroup.<init>(NioEventLoopGroup.java:69)
+
+	at org.apache.spark.network.util.NettyUtils.createEventLoop(NettyUtils.java:69)
+
+	at org.apache.spark.network.client.TransportClientFactory.<init>(TransportClientFactory.java:112)
+
+	at org.apache.spark.network.TransportContext.createClientFactory(TransportContext.java:158)
+
+	at org.apache.spark.rpc.netty.NettyRpcEnv.<init>(NettyRpcEnv.scala:80)
+
+	at org.apache.spark.rpc.netty.NettyRpcEnvFactory.create(NettyRpcEnv.scala:499)
+
+	at org.apache.spark.rpc.RpcEnv$.create(RpcEnv.scala:58)
+
+	at org.apache.spark.SparkEnv$.create(SparkEnv.scala:351)
+
+	at org.apache.spark.SparkEnv$.createDriverEnv(SparkEnv.scala:283)
+
+	at org.apache.spark.SparkContext.createSparkEnv(SparkContext.scala:294)
+
+	at org.apache.spark.SparkContext.<init>(SparkContext.scala:495)
+
+	at org.apache.spark.api.java.JavaSparkContext.<init>(JavaSparkContext.scala:59)
+
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+
+	at java.base/jdk.internal.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:77)
+
+	at java.base/jdk.internal.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+
+	at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:500)
+
+	at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:481)
+
+	at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:247)
+
+	at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:374)
+
+	at py4j.Gateway.invoke(Gateway.java:238)
+
+	at py4j.commands.ConstructorCommand.invokeConstructor(ConstructorCommand.java:80)
+
+	at py4j.commands.ConstructorCommand.execute(ConstructorCommand.java:69)
+
+	at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:184)
+
+	at py4j.ClientServerConnection.run(ClientServerConnection.java:108)
+
+	at java.base/java.lang.Thread.run(Thread.java:840)
+
+Caused by: io.netty.channel.ChannelException: failed to open a new selector
+
+	at io.netty.channel.nio.NioEventLoop.openSelector(NioEventLoop.java:179)
+
+	at io.netty.channel.nio.NioEventLoop.<init>(NioEventLoop.java:146)
+
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:183)
+
+	at io.netty.channel.nio.NioEventLoopGroup.newChild(NioEventLoopGroup.java:38)
+
+	at io.netty.util.concurrent.MultithreadEventExecutorGroup.<init>(MultithreadEventExecutorGroup.java:84)
+
+	... 30 more
+
+Caused by: java.io.IOException: Unable to establish loopback connection
+
+	at java.base/sun.nio.ch.PipeImpl$Initializer.run(PipeImpl.java:103)
+
+	at java.base/sun.nio.ch.PipeImpl$Initializer.run(PipeImpl.java:67)
+
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:569)
+
+	at java.base/sun.nio.ch.PipeImpl.<init>(PipeImpl.java:198)
+
+	at java.base/sun.nio.ch.WEPollSelectorImpl.<init>(WEPollSelectorImpl.java:78)
+
+	at java.base/sun.nio.ch.WEPollSelectorProvider.openSelector(WEPollSelectorProvider.java:33)
+
+	at io.netty.channel.nio.NioEventLoop.openSelector(NioEventLoop.java:177)
+
+	... 34 more
+
+Caused by: java.net.SocketException: Invalid argument: connect
+
+	at java.base/sun.nio.ch.UnixDomainSockets.connect0(Native Method)
+
+	at java.base/sun.nio.ch.UnixDomainSockets.connect(UnixDomainSockets.java:148)
+
+	at java.base/sun.nio.ch.UnixDomainSockets.connect(UnixDomainSockets.java:144)
+
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:851)
+
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:285)
+
+	at java.base/sun.nio.ch.PipeImpl$Initializer$LoopbackConnector.run(PipeImpl.java:133)
+
+	at java.base/sun.nio.ch.PipeImpl$Initializer.run(PipeImpl.java:85)
+
+	... 40 more
+
+=========================== short test summary info ===========================
+FAILED tests/test_workloads.py::test_spark_real_json_to_parquet - py4j.protoc...
+1 failed in 21.30s
+ERROR: The process with PID 12952 (child process of PID 47336) could not be terminated.
+Reason: The operation attempted is not supported.
+
+ERROR: The process with PID 47336 (child process of PID 30696) could not be terminated.
+Reason: The operation attempted is not supported.
+
+ERROR: The process with PID 30696 (child process of PID 54900) could not be terminated.
+Reason: The operation attempted is not supported.

@@ -1,0 +1,47 @@
+name: pipefoundry
+services:
+  postgres:
+    image: ${POSTGRES_IMAGE:-postgres:17.6-alpine}
+    environment:
+      POSTGRES_USER: pipefoundry
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your environment}
+      POSTGRES_DB: pipefoundry
+    ports:
+      - "127.0.0.1:55435:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pipefoundry -d pipefoundry"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 1
+  api:
+    image: pipefoundry:0.1.0
+    build: .
+    environment:
+      PIPEFOUNDRY_API_TOKEN: ${PIPEFOUNDRY_API_TOKEN:?Set a random token of at least 32 characters}
+      PIPEFOUNDRY_STATE_DIR: /state
+      PIPEFOUNDRY_POSTGRES_DSN: postgresql://pipefoundry:${POSTGRES_PASSWORD}@postgres:5432/pipefoundry
+    ports:
+      - "127.0.0.1:8094:8080"
+    volumes:
+      - pipeline-state:/state
+    depends_on:
+      postgres: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    cpus: 1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health/live', timeout=2)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  postgres-data:
+  pipeline-state:

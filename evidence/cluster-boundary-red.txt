@@ -1,0 +1,10 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_cluster_status_and_logs_read_live_state_with_bounded_arguments _____
+tests\test_cluster_boundary.py:24: in test_cluster_status_and_logs_read_live_state_with_bounded_arguments
+    status = platform.status("orders-demo", refresh=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: Platform.status() got an unexpected keyword argument 'refresh'
+=========================== short test summary info ===========================
+FAILED tests/test_cluster_boundary.py::test_cluster_status_and_logs_read_live_state_with_bounded_arguments
+1 failed in 5.72s

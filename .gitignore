@@ -1,0 +1,16 @@
+.venv/
+.runtime/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.pipefoundry/
+dist/
+build/
+.env
+*.tfstate*
+.terraform/
+*.tfplan
+data/
+!examples/data/

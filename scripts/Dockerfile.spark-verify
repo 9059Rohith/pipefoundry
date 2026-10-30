@@ -1,0 +1,13 @@
+# Avoid a second 434MB download: installed PySpark/py4j are pure Python + JARs.
+# Build with named contexts spark and py4j pointing at the installed package dirs.
+FROM maven:3.9.11-eclipse-temurin-17 AS java
+FROM pipefoundry:0.1.0
+USER root
+COPY --from=java /opt/java/openjdk /opt/java/openjdk
+COPY --from=spark / /opt/python/pyspark/
+COPY --from=py4j / /opt/python/py4j/
+COPY scripts/verify_spark_container.py /app/verify_spark_container.py
+ENV JAVA_HOME=/opt/java/openjdk PATH=/opt/java/openjdk/bin:$PATH \
+    PYTHONPATH=/opt/python SPARK_HOME=/opt/python/pyspark SPARK_LOCAL_IP=127.0.0.1
+USER 10001:10001
+CMD ["python", "/app/verify_spark_container.py"]

@@ -1,0 +1,36 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_ test_teardown_removes_prior_cluster_resources_after_latest_revision_changes[render] _
+tests\test_cluster_boundary.py:88: in test_teardown_removes_prior_cluster_resources_after_latest_revision_changes
+    assert deletes == [[
+E   AssertionError: assert [] == [['kubectl', ...', '-l', ...]]
+E
+E     Right contains one more item: ['kubectl', '-n', 'team-original', 'delete', 'cronjob,job,configmap', '-l', ...]
+E     Use -v to get more diff
+_ test_teardown_removes_prior_cluster_resources_after_latest_revision_changes[local] _
+tests\test_cluster_boundary.py:88: in test_teardown_removes_prior_cluster_resources_after_latest_revision_changes
+    assert deletes == [[
+E   AssertionError: assert [] == [['kubectl', ...', '-l', ...]]
+E
+E     Right contains one more item: ['kubectl', '-n', 'team-original', 'delete', 'cronjob,job,configmap', '-l', ...]
+E     Use -v to get more diff
+_ test_teardown_removes_prior_cluster_resources_after_latest_revision_changes[failed] _
+tests\test_cluster_boundary.py:88: in test_teardown_removes_prior_cluster_resources_after_latest_revision_changes
+    assert deletes == [[
+E   AssertionError: assert [] == [['kubectl', ...', '-l', ...]]
+E
+E     Right contains one more item: ['kubectl', '-n', 'team-original', 'delete', 'cronjob,job,configmap', '-l', ...]
+E     Use -v to get more diff
+____________ test_non_ascii_bearer_fails_auth_without_server_error ____________
+tests\test_security.py:24: in test_non_ascii_bearer_fails_auth_without_server_error
+    assert client.get(
+E   AssertionError: assert 500 == 401
+E    +  where 500 = <Response [500 Internal Server Error]>.status_code
+E    +    where <Response [500 Internal Server Error]> = get('/pipelines', headers=[(b'authorization', b'Bearer \xff\xfe')])
+E    +      where get = <starlette.testclient.TestClient object at 0x00000188C9A8B9B0>.get
+=========================== short test summary info ===========================
+FAILED tests/test_cluster_boundary.py::test_teardown_removes_prior_cluster_resources_after_latest_revision_changes[render]
+FAILED tests/test_cluster_boundary.py::test_teardown_removes_prior_cluster_resources_after_latest_revision_changes[local]
+FAILED tests/test_cluster_boundary.py::test_teardown_removes_prior_cluster_resources_after_latest_revision_changes[failed]
+FAILED tests/test_security.py::test_non_ascii_bearer_fails_auth_without_server_error
+4 failed in 9.34s

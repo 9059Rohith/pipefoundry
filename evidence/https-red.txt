@@ -1,0 +1,15 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_______________ test_real_https_api_to_postgres_through_worker ________________
+tests\test_workloads.py:165: in test_real_https_api_to_postgres_through_worker
+    assert platform.deploy(config)["status"] == "succeeded"
+           ^^^^^^^^^^^^^^^^^^^^^^^
+src\pipefoundry\engine.py:252: in deploy
+    self._run(config.name, revision, executor)
+src\pipefoundry\engine.py:203: in _run
+    return json.loads(self._execute(args, log, 300))
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\pipefoundry\engine.py:156: in _execute
+    raise RuntimeError(f"executor exited {result.returncode}; inspect pipeline logs")
+E   RuntimeError: executor exited 1; inspect pipeline logs
+1 failed in 5.70s

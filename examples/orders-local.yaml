@@ -1,0 +1,11 @@
+name: orders-demo
+schedule: "0 * * * *"
+input:
+  connector: fixture
+transform: normalize_orders
+output:
+  connector: sqlite
+  path: orders.db
+resources:
+  cpu_millis: 100
+  memory_mib: 128

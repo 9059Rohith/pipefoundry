@@ -1,0 +1,60 @@
+* Getting build dependencies for wheel...
+running egg_info
+writing src\pipefoundry.egg-info\PKG-INFO
+writing dependency_links to src\pipefoundry.egg-info\dependency_links.txt
+writing entry points to src\pipefoundry.egg-info\entry_points.txt
+writing requirements to src\pipefoundry.egg-info\requires.txt
+writing top-level names to src\pipefoundry.egg-info\top_level.txt
+reading manifest file 'src\pipefoundry.egg-info\SOURCES.txt'
+writing manifest file 'src\pipefoundry.egg-info\SOURCES.txt'
+* Building wheel...
+running bdist_wheel
+running build
+running build_py
+copying src\pipefoundry\api.py -> build\lib\pipefoundry
+copying src\pipefoundry\engine.py -> build\lib\pipefoundry
+running egg_info
+writing src\pipefoundry.egg-info\PKG-INFO
+writing dependency_links to src\pipefoundry.egg-info\dependency_links.txt
+writing entry points to src\pipefoundry.egg-info\entry_points.txt
+writing requirements to src\pipefoundry.egg-info\requires.txt
+writing top-level names to src\pipefoundry.egg-info\top_level.txt
+reading manifest file 'src\pipefoundry.egg-info\SOURCES.txt'
+writing manifest file 'src\pipefoundry.egg-info\SOURCES.txt'
+installing to build\bdist.win-amd64\wheel
+running install
+running install_lib
+creating build\bdist.win-amd64\wheel
+creating build\bdist.win-amd64\wheel\pipefoundry
+copying build\lib\pipefoundry\api.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\cli.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\engine.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\models.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\render.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\spark_job.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\worker.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\workloads.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\__init__.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+copying build\lib\pipefoundry\__main__.py -> build\bdist.win-amd64\wheel\.\pipefoundry
+running install_egg_info
+Copying src\pipefoundry.egg-info to build\bdist.win-amd64\wheel\.\pipefoundry-0.1.0-py3.12.egg-info
+running install_scripts
+creating build\bdist.win-amd64\wheel\pipefoundry-0.1.0.dist-info\WHEEL
+creating 'C:\\Users\\BhaviChasvi\\Downloads\\cyber_projects\\pipefoundry\\dist\\.tmp-gkfh7ivz\\pipefoundry-0.1.0-py3-none-any.whl' and adding 'build\\bdist.win-amd64\\wheel' to it
+adding 'pipefoundry/__init__.py'
+adding 'pipefoundry/__main__.py'
+adding 'pipefoundry/api.py'
+adding 'pipefoundry/cli.py'
+adding 'pipefoundry/engine.py'
+adding 'pipefoundry/models.py'
+adding 'pipefoundry/render.py'
+adding 'pipefoundry/spark_job.py'
+adding 'pipefoundry/worker.py'
+adding 'pipefoundry/workloads.py'
+adding 'pipefoundry-0.1.0.dist-info/METADATA'
+adding 'pipefoundry-0.1.0.dist-info/WHEEL'
+adding 'pipefoundry-0.1.0.dist-info/entry_points.txt'
+adding 'pipefoundry-0.1.0.dist-info/top_level.txt'
+adding 'pipefoundry-0.1.0.dist-info/RECORD'
+removing build\bdist.win-amd64\wheel
+Successfully built pipefoundry-0.1.0-py3-none-any.whl

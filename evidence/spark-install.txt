@@ -1,0 +1,22 @@
+Processing .\.runtime\pyspark-4.0.1.tar.gz
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Collecting py4j==0.10.9.9 (from pyspark==4.0.1)
+  Downloading py4j-0.10.9.9-py2.py3-none-any.whl.metadata (1.3 kB)
+Downloading py4j-0.10.9.9-py2.py3-none-any.whl (203 kB)
+Building wheels for collected packages: pyspark
+  Building wheel for pyspark (pyproject.toml): started
+  Building wheel for pyspark (pyproject.toml): still running...
+  Building wheel for pyspark (pyproject.toml): still running...
+  Building wheel for pyspark (pyproject.toml): still running...
+  Building wheel for pyspark (pyproject.toml): finished with status 'done'
+  Created wheel for pyspark: filename=pyspark-4.0.1-py2.py3-none-any.whl size=434813898 sha256=4acef736b8b7be5a4bfbf8e57cc9aa368fcf0420e7e8762360dfaff7e0311a7a
+  Stored in directory: c:\users\bhavichasvi\appdata\local\pip\cache\wheels\d4\d2\49\ed3fc0c883dc3c82508973ead5665cd802254736246522a880
+Successfully built pyspark
+Installing collected packages: py4j, pyspark
+
+Successfully installed py4j-0.10.9.9 pyspark-4.0.1
