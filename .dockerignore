@@ -3,6 +3,7 @@
 .pytest_cache
 .ruff_cache
 .git
+.vercel
 .pipefoundry
 evidence
 tests
@@ -10,4 +11,7 @@ data
 dist
 build
 **/__pycache__
-.env
+.env*
+**/.env*
+**/*.key
+**/*.pfx

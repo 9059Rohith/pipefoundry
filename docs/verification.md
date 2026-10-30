@@ -1,5 +1,15 @@
 # Verification evidence — 2026-10-30
 
+The later public-hosting hardening pass supersedes the original image finding
+counts below: **42 host tests passed**, **40 Python 3.15 runtime tests passed**,
+and the full fresh-database image scan found **zero vulnerabilities at every
+severity and zero secrets**, with no advisory exclusions. Source Bandit and
+runtime pip-audit found no issues. Durable PostgreSQL artifacts/audit and genuine
+demo execution/backfill/rollback survived a cold container replacement. See
+[dated summary](../evidence/public-hardening-summary.json) and the
+[hosted runbook](hosted-profile.md) for exact scope, skips and limits. The
+separate private Spark image is not covered by the public runtime scan result.
+
 Verification ran locally on Windows with Python 3.12, Docker Desktop 28.5.1 and
 Java 17, plus a real Linux Spark container. These are observed results; cloud
 provisioning, live Kubernetes and remote CI are separate acceptance boundaries.

@@ -3,12 +3,19 @@
 ## Trust and access
 
 The API is a single trusted-operator service. A bearer token of at least 32
-characters is required on all lifecycle/read endpoints; missing/short token
+characters is required on all private lifecycle/read endpoints; missing/short token
 configuration fails closed. Token comparison is constant-time and credentials
 are read from environment variables. Health endpoints expose no configuration.
 Run behind TLS, request timeouts and per-token rate limits; localhost binding in
 Compose is for development. There is no end-user identity, per-pipeline ACL,
 tenant isolation, token rotation protocol or distributed admission controller.
+
+The explicit `PUBLIC_DEMO=true` profile exposes only a fixed synthetic pipeline's
+HTML/JSON receipts, without records, raw logs, credentials or private pipeline
+information. Public access defaults off. See [hosted boundaries](hosted-profile.md).
+Authentication occurs before reading request bodies; uploads are limited to
+32 KiB and a five-second total deadline. The public HTML has no JavaScript/forms
+and a restrictive Content-Security-Policy. Health endpoints expose no DSNs.
 
 The CLI has the caller's filesystem and Kubernetes privileges. Do not expose its
 state directory to untrusted users or mount a Docker socket in the API container.
@@ -43,6 +50,21 @@ keys) using an external secret manager. EKS encryption is configured, but worklo
 IAM, PostgreSQL TLS/user grants and key rotation require operator integration.
 
 ## Security verification
+
+The current public API image uses digest-pinned supported Chainguard/Wolfi Python
+builder/runtime stages. It removes the Debian utility packages responsible for
+the previous 44 HIGH findings rather than hiding advisories. The installed OS
+package database remains present and Trivy identifies 30 Wolfi packages plus
+Python distributions. No shell, mount/nsenter, Perl, package manager or pip
+executable is present. Python SSL/SQLite/PostgreSQL and real worker behavior pass
+runtime tests. The separately provided Spark development image is outside this
+public-runtime scan result and must be maintained/scanned independently.
+
+With the freshly downloaded advisory database (UpdatedAt
+2026-10-30T13:06:28Z), the full image vulnerability and secret scan reports zero
+findings at all severities, with no ignored CVEs or severity filter. Scan files,
+package inventories and before/after evidence are in `evidence/security-*`.
+Zero known findings is a dated observation, not a guarantee of no vulnerabilities.
 
 Tests cover config injection, unknown URL/script fields, path traversal, absolute
 paths, resource limits, invalid cron, fail-closed auth, oversize bodies, redirect

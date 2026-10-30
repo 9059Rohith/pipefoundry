@@ -1,0 +1,543 @@
+{
+  "python": "3.12.15 (main, Oct  6 2026, 02:02:22) [GCC 14.2.0]",
+  "openssl": "OpenSSL 3.5.7 9 Jun 2026",
+  "sqlite": "3.46.1",
+  "uid": 10001,
+  "yaml_native_extension": true,
+  "os_packages": [
+    {
+      "name": "adduser",
+      "version": "3.152"
+    },
+    {
+      "name": "apt",
+      "version": "3.0.3"
+    },
+    {
+      "name": "base-files",
+      "version": "13.8+deb13u7"
+    },
+    {
+      "name": "base-passwd",
+      "version": "3.6.7"
+    },
+    {
+      "name": "bash",
+      "version": "5.2.37-2+b10"
+    },
+    {
+      "name": "bsdutils",
+      "version": "1:2.41.5-0+deb13u1"
+    },
+    {
+      "name": "ca-certificates",
+      "version": "20250419"
+    },
+    {
+      "name": "coreutils",
+      "version": "9.7-3"
+    },
+    {
+      "name": "dash",
+      "version": "0.5.12-12"
+    },
+    {
+      "name": "debconf",
+      "version": "1.5.91"
+    },
+    {
+      "name": "debian-archive-keyring",
+      "version": "2025.1"
+    },
+    {
+      "name": "debianutils",
+      "version": "5.23.2"
+    },
+    {
+      "name": "diffutils",
+      "version": "1:3.10-4"
+    },
+    {
+      "name": "dpkg",
+      "version": "1.22.22"
+    },
+    {
+      "name": "findutils",
+      "version": "4.10.0-3"
+    },
+    {
+      "name": "gcc-14-base:amd64",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "grep",
+      "version": "3.11-4"
+    },
+    {
+      "name": "gzip",
+      "version": "1.13-1+deb13u1"
+    },
+    {
+      "name": "hostname",
+      "version": "3.25"
+    },
+    {
+      "name": "init-system-helpers",
+      "version": "1.69~deb13u1"
+    },
+    {
+      "name": "libacl1:amd64",
+      "version": "2.3.2-2+b1"
+    },
+    {
+      "name": "libapt-pkg7.0:amd64",
+      "version": "3.0.3"
+    },
+    {
+      "name": "libattr1:amd64",
+      "version": "1:2.5.2-3"
+    },
+    {
+      "name": "libaudit-common",
+      "version": "1:4.0.2-2+deb13u1"
+    },
+    {
+      "name": "libaudit1:amd64",
+      "version": "1:4.0.2-2+deb13u1"
+    },
+    {
+      "name": "libblkid1:amd64",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "libbsd0:amd64",
+      "version": "0.12.2-2"
+    },
+    {
+      "name": "libbz2-1.0:amd64",
+      "version": "1.0.8-6"
+    },
+    {
+      "name": "libc-bin",
+      "version": "2.41-12+deb13u4"
+    },
+    {
+      "name": "libc6:amd64",
+      "version": "2.41-12+deb13u4"
+    },
+    {
+      "name": "libcap-ng0:amd64",
+      "version": "0.8.5-4+b1"
+    },
+    {
+      "name": "libcap2:amd64",
+      "version": "1:2.75-10+deb13u1+b3"
+    },
+    {
+      "name": "libcrypt1:amd64",
+      "version": "1:4.4.38-1"
+    },
+    {
+      "name": "libdb5.3t64:amd64",
+      "version": "5.3.28+dfsg2-9"
+    },
+    {
+      "name": "libdebconfclient0:amd64",
+      "version": "0.280"
+    },
+    {
+      "name": "libffi8:amd64",
+      "version": "3.4.8-2"
+    },
+    {
+      "name": "libgcc-s1:amd64",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libgdbm6t64:amd64",
+      "version": "1.24-2"
+    },
+    {
+      "name": "libgmp10:amd64",
+      "version": "2:6.3.0+dfsg-3"
+    },
+    {
+      "name": "libhogweed6t64:amd64",
+      "version": "3.10.1-1"
+    },
+    {
+      "name": "liblastlog2-2:amd64",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "liblz4-1:amd64",
+      "version": "1.10.0-4"
+    },
+    {
+      "name": "liblzma5:amd64",
+      "version": "5.8.1-1+deb13u1"
+    },
+    {
+      "name": "libmd0:amd64",
+      "version": "1.1.0-2+b1"
+    },
+    {
+      "name": "libmount1:amd64",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "libncursesw6:amd64",
+      "version": "6.5+20250216-2"
+    },
+    {
+      "name": "libnettle8t64:amd64",
+      "version": "3.10.1-1"
+    },
+    {
+      "name": "libpam-modules:amd64",
+      "version": "1.7.0-5"
+    },
+    {
+      "name": "libpam-modules-bin",
+      "version": "1.7.0-5"
+    },
+    {
+      "name": "libpam-runtime",
+      "version": "1.7.0-5"
+    },
+    {
+      "name": "libpam0g:amd64",
+      "version": "1.7.0-5"
+    },
+    {
+      "name": "libpcre2-8-0:amd64",
+      "version": "10.46-1~deb13u3"
+    },
+    {
+      "name": "libreadline8t64:amd64",
+      "version": "8.2-6"
+    },
+    {
+      "name": "libseccomp2:amd64",
+      "version": "2.6.0-2"
+    },
+    {
+      "name": "libselinux1:amd64",
+      "version": "3.8.1-1"
+    },
+    {
+      "name": "libsemanage-common",
+      "version": "3.8.1-1"
+    },
+    {
+      "name": "libsemanage2:amd64",
+      "version": "3.8.1-1"
+    },
+    {
+      "name": "libsepol2:amd64",
+      "version": "3.8.1-1"
+    },
+    {
+      "name": "libsmartcols1:amd64",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "libsqlite3-0:amd64",
+      "version": "3.46.1-7+deb13u2"
+    },
+    {
+      "name": "libssl3t64:amd64",
+      "version": "3.5.7-1~deb13u3"
+    },
+    {
+      "name": "libstdc++6:amd64",
+      "version": "14.2.0-19"
+    },
+    {
+      "name": "libsystemd0:amd64",
+      "version": "257.13-1~deb13u1"
+    },
+    {
+      "name": "libtinfo6:amd64",
+      "version": "6.5+20250216-2"
+    },
+    {
+      "name": "libudev1:amd64",
+      "version": "257.13-1~deb13u1"
+    },
+    {
+      "name": "libuuid1:amd64",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "libxxhash0:amd64",
+      "version": "0.8.3-2"
+    },
+    {
+      "name": "libzstd1:amd64",
+      "version": "1.5.7+dfsg-1"
+    },
+    {
+      "name": "login",
+      "version": "1:4.16.0-2+really2.41.5-0+deb13u1"
+    },
+    {
+      "name": "login.defs",
+      "version": "1:4.17.4-2"
+    },
+    {
+      "name": "mawk",
+      "version": "1.3.4.20250131-1"
+    },
+    {
+      "name": "mount",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "ncurses-base",
+      "version": "6.5+20250216-2"
+    },
+    {
+      "name": "ncurses-bin",
+      "version": "6.5+20250216-2"
+    },
+    {
+      "name": "netbase",
+      "version": "6.5"
+    },
+    {
+      "name": "openssl",
+      "version": "3.5.7-1~deb13u3"
+    },
+    {
+      "name": "openssl-provider-legacy",
+      "version": "3.5.7-1~deb13u3"
+    },
+    {
+      "name": "passwd",
+      "version": "1:4.17.4-2"
+    },
+    {
+      "name": "perl-base",
+      "version": "5.40.1-6+deb13u1"
+    },
+    {
+      "name": "readline-common",
+      "version": "8.2-6"
+    },
+    {
+      "name": "sed",
+      "version": "4.9-2+deb13u1"
+    },
+    {
+      "name": "sqv",
+      "version": "1.3.0-3+b2"
+    },
+    {
+      "name": "sysvinit-utils",
+      "version": "3.14-4"
+    },
+    {
+      "name": "tar",
+      "version": "1.35+dfsg-3.1"
+    },
+    {
+      "name": "tzdata",
+      "version": "2026c-0+deb13u1"
+    },
+    {
+      "name": "util-linux",
+      "version": "2.41.5-0+deb13u1"
+    },
+    {
+      "name": "zlib1g:amd64",
+      "version": "1:1.3.dfsg+really1.3.1-1+b1"
+    }
+  ],
+  "loaded_shared_objects": [
+    "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+    "/usr/lib/x86_64-linux-gnu/libbz2.so.1.0.4",
+    "/usr/lib/x86_64-linux-gnu/libc.so.6",
+    "/usr/lib/x86_64-linux-gnu/libcrypto.so.3",
+    "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+    "/usr/lib/x86_64-linux-gnu/libffi.so.8.1.4",
+    "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+    "/usr/lib/x86_64-linux-gnu/liblzma.so.5.8.1",
+    "/usr/lib/x86_64-linux-gnu/libm.so.6",
+    "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+    "/usr/lib/x86_64-linux-gnu/libresolv.so.2",
+    "/usr/lib/x86_64-linux-gnu/librt.so.1",
+    "/usr/lib/x86_64-linux-gnu/libsqlite3.so.0.8.6",
+    "/usr/lib/x86_64-linux-gnu/libssl.so.3",
+    "/usr/lib/x86_64-linux-gnu/libuuid.so.1.3.0",
+    "/usr/lib/x86_64-linux-gnu/libz.so.1.3.1",
+    "/usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7",
+    "/usr/local/lib/libpython3.12.so.1.0",
+    "/usr/local/lib/python3.12/lib-dynload/_asyncio.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_bisect.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_blake2.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_bz2.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_contextvars.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_csv.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_ctypes.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_datetime.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_decimal.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_hashlib.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_heapq.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_json.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_lzma.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_opcode.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_pickle.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_posixsubprocess.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_queue.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_random.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_sha2.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_socket.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_sqlite3.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_ssl.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_struct.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_uuid.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/_zoneinfo.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/array.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/binascii.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/fcntl.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/math.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/select.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/lib-dynload/zlib.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libcom_err-2abe824b.so.2.1",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libcrypt-bc2db45e.so.1",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libcrypto-2d1629ee.so.3",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libgssapi_krb5-497db0c6.so.2.2",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libk5crypto-b1f99d5c.so.3.1",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libkeyutils-dfe70bd6.so.1.5",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libkrb5-fcafa220.so.3.3",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libkrb5support-d0bcff84.so.0.1",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/liblber-a44a5afb.so.2.0.200",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libldap-7c3a4b12.so.2.0.200",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libpcre-9513aab5.so.1.2.0",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libpq-e9b5c9ac.so.5.18",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libsasl2-84219a89.so.3.0.0",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libselinux-0922c95c.so.1",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary.libs/libssl-8bd944e8.so.3",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary/_psycopg.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/site-packages/psycopg_binary/pq.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/site-packages/pydantic_core/_pydantic_core.cpython-312-x86_64-linux-gnu.so",
+    "/usr/local/lib/python3.12/site-packages/yaml/_yaml.cpython-312-x86_64-linux-gnu.so"
+  ],
+  "python_packages": [
+    [
+      "PyYAML",
+      "6.0.3"
+    ],
+    [
+      "annotated-doc",
+      "0.0.5"
+    ],
+    [
+      "annotated-types",
+      "0.8.0"
+    ],
+    [
+      "anyio",
+      "4.15.1"
+    ],
+    [
+      "certifi",
+      "2026.10.23"
+    ],
+    [
+      "click",
+      "8.5.0"
+    ],
+    [
+      "croniter",
+      "6.2.4"
+    ],
+    [
+      "fastapi",
+      "0.162.0"
+    ],
+    [
+      "h11",
+      "0.16.0"
+    ],
+    [
+      "httpcore",
+      "1.0.9"
+    ],
+    [
+      "httpx",
+      "0.28.1"
+    ],
+    [
+      "idna",
+      "3.20"
+    ],
+    [
+      "opentelemetry-api",
+      "1.45.2"
+    ],
+    [
+      "pipefoundry",
+      "0.1.0"
+    ],
+    [
+      "psycopg",
+      "3.3.6"
+    ],
+    [
+      "psycopg-binary",
+      "3.3.6"
+    ],
+    [
+      "pydantic",
+      "2.14.2"
+    ],
+    [
+      "pydantic_core",
+      "2.50.2"
+    ],
+    [
+      "python-dateutil",
+      "3.0.0"
+    ],
+    [
+      "six",
+      "1.17.0"
+    ],
+    [
+      "starlette",
+      "1.10.0"
+    ],
+    [
+      "typing-inspection",
+      "0.4.4"
+    ],
+    [
+      "typing_extensions",
+      "4.16.0"
+    ],
+    [
+      "tzdata",
+      "2026.6"
+    ],
+    [
+      "uvicorn",
+      "0.54.0"
+    ]
+  ],
+  "commands": {
+    "sh": "/usr/bin/sh",
+    "bash": "/usr/bin/bash",
+    "mount": "/usr/bin/mount",
+    "umount": "/usr/bin/umount",
+    "nsenter": "/usr/bin/nsenter",
+    "infocmp": "/usr/bin/infocmp",
+    "perl": "/usr/bin/perl",
+    "apt": "/usr/bin/apt",
+    "apk": null,
+    "pip": null
+  },
+  "systemd_homed_present": false,
+  "perl_archive_tar_present": false
+}

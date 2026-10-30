@@ -28,7 +28,7 @@ flowchart LR
   CLI --> V[Typed config and connector allowlist]
   API --> V
   V --> R[Immutable revisions + SHA256 manifest]
-  R --> M[(SQLite metadata / audit / operation locks)]
+  R --> M[(SQLite or PostgreSQL metadata / audit / locks / artifacts)]
   R --> L[Bounded local worker subprocess]
   R --> K[Kubernetes CronJob / Helm bundle]
   R --> A[Airflow DAG artifact]
@@ -41,7 +41,8 @@ flowchart LR
 
 ## Run locally
 
-Python 3.12 is required. These commands use PowerShell; on Linux use
+Python 3.12 is supported locally; the pinned minimal API container uses Python
+3.15 and is separately tested. These commands use PowerShell; on Linux use
 `.venv/bin/python` and `.venv/bin/pipefoundry`.
 
 ```powershell
@@ -66,6 +67,11 @@ Airflow. The fixture has three orders totaling 4,250 cents; duplicate runs for
 the same date retain three rows. Backfill accepts at most 31 inclusive dates.
 
 ## Configure a pipeline
+
+For an ephemeral container host, PostgreSQL can persist control-plane state,
+artifact bytes and worker logs. The opt-in public HTML console displays real
+synthetic execution, backfill and rollback receipts while private APIs retain
+bearer authentication. See the [hosted profile and runbook](docs/hosted-profile.md).
 
 ```yaml
 name: orders-demo

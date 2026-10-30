@@ -1,0 +1,10 @@
+name: hosted-orders
+schedule: "0 * * * *"
+input:
+  connector: fixture
+transform: normalize_orders
+output:
+  connector: postgres
+resources:
+  cpu_millis: 100
+  memory_mib: 128

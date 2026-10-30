@@ -1,0 +1,18 @@
+{
+  "verified_date": "2026-10-30",
+  "host_tests": {"passed": 42, "skipped": 1, "seconds": 149.58},
+  "python315_container_tests": {"passed": 40, "skipped": 3, "seconds": 52.84},
+  "image_manifest": "sha256:ed36ea380b472a1438c647c8557369433f6a9d4616be2e4c9acd268b03b6a493",
+  "image_config": "sha256:cc1f99a5518e5d785f74e56c835ab1215ae6968635ff289a5c95eb5ab4bb7f59",
+  "scanner": "Trivy 0.76.0; vulnerability and secret scanners; all severities; no ignores",
+  "advisory_database_updated_at": "2026-10-30T13:06:28.139593044Z",
+  "before": {"HIGH": 44, "MEDIUM": 58, "LOW": 61, "UNKNOWN": 4},
+  "after": {"vulnerabilities_all_severities": 0, "secrets": 0, "wolfi_packages": 30},
+  "pip_audit_runtime_dependencies": "No known vulnerabilities found",
+  "bandit_source_findings": 0,
+  "cold_container_restart": "same revision 3, artifact checksum and four audit events; three real rows with zero invalid rows; two backfill receipts",
+  "anonymous_private_endpoint": 401,
+  "browser_verification": "unavailable: CUA browser inventory empty; HTML/CSP/escaping/HTTP covered",
+  "external_production_deployment": "handled and verified independently by deploying operator",
+  "private_spark_image": "separate image; not covered by this public API zero-finding claim"
+}

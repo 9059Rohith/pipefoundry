@@ -1,0 +1,14 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+________ test_console_escapes_receipts_and_has_only_read_only_controls ________
+tests\test_console.py:2: in test_console_escapes_receipts_and_has_only_read_only_controls
+    from pipefoundry.console import render_console
+E   ModuleNotFoundError: No module named 'pipefoundry.console'
+___________ test_pending_console_never_fabricates_execution_counts ____________
+tests\test_console.py:22: in test_pending_console_never_fabricates_execution_counts
+    from pipefoundry.console import render_console
+E   ModuleNotFoundError: No module named 'pipefoundry.console'
+=========================== short test summary info ===========================
+FAILED tests/test_console.py::test_console_escapes_receipts_and_has_only_read_only_controls
+FAILED tests/test_console.py::test_pending_console_never_fabricates_execution_counts
+2 failed in 0.22s

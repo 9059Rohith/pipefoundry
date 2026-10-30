@@ -1,0 +1,20 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+______ test_synthetic_demo_seed_is_real_idempotent_and_survives_restart _______
+tests\test_durable_metadata.py:83: in test_synthetic_demo_seed_is_real_idempotent_and_survives_restart
+    from pipefoundry.demo import demo_receipt, seed_demo
+E   ModuleNotFoundError: No module named 'pipefoundry.demo'
+___ test_demo_seed_recovers_real_failed_worker_without_fabricating_success ____
+tests\test_durable_metadata.py:104: in test_demo_seed_recovers_real_failed_worker_without_fabricating_success
+    from pipefoundry.demo import demo_receipt, seed_demo
+E   ModuleNotFoundError: No module named 'pipefoundry.demo'
+_____ test_public_demo_endpoints_do_not_expose_private_api_or_credentials _____
+tests\test_durable_metadata.py:130: in test_public_demo_endpoints_do_not_expose_private_api_or_credentials
+    with TestClient(create_app(tmp_path, demo_name=name, demo_key=key)) as client:
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: create_app() got an unexpected keyword argument 'demo_name'
+=========================== short test summary info ===========================
+FAILED tests/test_durable_metadata.py::test_synthetic_demo_seed_is_real_idempotent_and_survives_restart
+FAILED tests/test_durable_metadata.py::test_demo_seed_recovers_real_failed_worker_without_fabricating_success
+FAILED tests/test_durable_metadata.py::test_public_demo_endpoints_do_not_expose_private_api_or_credentials
+3 failed, 4 deselected in 3.48s

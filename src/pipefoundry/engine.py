@@ -17,18 +17,30 @@ from contextlib import contextmanager
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 
+import psycopg
 import yaml
 
-from pipefoundry.models import Pipeline, valid_name
+from pipefoundry.metadata import PostgresConnection
+from pipefoundry.models import Pipeline, relative_path, valid_name
 from pipefoundry.render import render
+
+MAX_REVISION_ARTIFACTS = 128
+MAX_ARTIFACT_BYTES = 131072
+METADATA_SCHEMA_LOCK = 1346785350
 
 
 class Platform:
-    def __init__(self, root: str | Path):
+    def __init__(self, root: str | Path, metadata_dsn: str | None = None):
         self.root = Path(root).resolve()
         self.root.mkdir(parents=True, exist_ok=True)
         self._lock = threading.RLock()
+        self._metadata_dsn = metadata_dsn or os.environ.get("PIPEFOUNDRY_METADATA_DSN")
+        self.durable = bool(self._metadata_dsn)
         with self.connect() as db:
+            if self.durable:
+                # Transaction-scoped locks work with Neon/PgBouncer pooling and
+                # serialize fresh-schema creation across simultaneous cold starts.
+                db.execute("SELECT pg_advisory_xact_lock(?,1)", (METADATA_SCHEMA_LOCK,))
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS revisions (
                   name TEXT NOT NULL, revision INTEGER NOT NULL, config TEXT NOT NULL,
@@ -43,10 +55,24 @@ class Platform:
                   name TEXT NOT NULL, namespace TEXT NOT NULL,
                   revision INTEGER NOT NULL, active INTEGER NOT NULL CHECK(active IN (0,1)),
                   PRIMARY KEY(name, namespace));
+                CREATE TABLE IF NOT EXISTS artifacts (
+                  name TEXT NOT NULL, revision INTEGER NOT NULL, path TEXT NOT NULL,
+                  contents BLOB NOT NULL CHECK(length(contents)<=131072),
+                  PRIMARY KEY(name,revision,path));
+                CREATE TABLE IF NOT EXISTS demo_seed (
+                  seed_key TEXT PRIMARY KEY, pipeline_name TEXT NOT NULL,
+                  owner TEXT NOT NULL, lease_until TEXT NOT NULL,
+                  completed INTEGER NOT NULL DEFAULT 0, last_error TEXT NOT NULL DEFAULT '');
             """)
 
     @contextmanager
     def connect(self):
+        if self.durable:
+            with psycopg.connect(
+                self._metadata_dsn, connect_timeout=5, options="-c statement_timeout=10000"
+            ) as connection:
+                yield PostgresConnection(connection)
+            return
         connection = sqlite3.connect(self.root / "metadata.db", timeout=10)
         connection.row_factory = sqlite3.Row
         connection.execute("PRAGMA journal_mode=WAL")
@@ -56,6 +82,76 @@ class Platform:
                 yield connection
         finally:
             connection.close()
+
+    def _store_file(self, db, name: str, revision: int, path: Path, directory: Path):
+        relative = path.relative_to(directory).as_posix()
+        self._store_bytes(db, name, revision, relative, path.read_bytes())
+
+    def _store_bytes(self, db, name: str, revision: int, relative: str, contents: bytes):
+        relative_path(relative)
+        if len(contents) > MAX_ARTIFACT_BYTES:
+            raise ValueError("revision artifact exceeds 128 KiB")
+        budget = db.execute(
+            "SELECT COUNT(*),COALESCE(MAX(CASE WHEN path=? THEN 1 ELSE 0 END),0) "
+            "FROM artifacts WHERE name=? AND revision=?",
+            (relative, name, revision),
+        ).fetchone()
+        if budget[0] >= MAX_REVISION_ARTIFACTS and not budget[1]:
+            raise ValueError("revision artifact limit reached; deploy a new revision")
+        db.execute(
+            "INSERT INTO artifacts(name,revision,path,contents) VALUES(?,?,?,?) "
+            "ON CONFLICT(name,revision,path) DO UPDATE SET contents=excluded.contents",
+            (name, revision, relative, contents),
+        )
+
+    def _restore_revision(self, name: str, revision: int):
+        if not self.durable:
+            return
+        directory = self.revision_dir(name, revision)
+        with self.connect() as db:
+            records = list(
+                db.execute(
+                    "SELECT path,contents FROM artifacts WHERE name=? AND revision=? LIMIT ?",
+                    (name, revision, MAX_REVISION_ARTIFACTS + 1),
+                )
+            )
+        if not records:
+            raise ValueError("revision artifacts are not committed")
+        if len(records) > MAX_REVISION_ARTIFACTS:
+            raise ValueError("stored revision artifact limit exceeded")
+        # Validate the entire set before writing any bytes into the scratch root.
+        checked = []
+        for record in records:
+            relative = relative_path(record["path"])
+            target = (directory / relative).resolve()
+            if not target.is_relative_to(directory):
+                raise ValueError("stored artifact path escapes revision")
+            contents = bytes(record["contents"])
+            if len(contents) > MAX_ARTIFACT_BYTES:
+                raise ValueError("stored revision artifact exceeds 128 KiB")
+            checked.append((target, contents))
+        for target, contents in checked:
+            if not target.exists() or target.suffix == ".log":
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(contents)
+
+    def _write_log(self, path: Path, text: str):
+        text = text.encode("utf-8")[:65536].decode("utf-8", errors="ignore")
+        if self.durable:
+            relative = path.resolve().relative_to((self.root / "revisions").resolve())
+            name, revision = relative.parts[:2]
+            valid_name(name)
+            directory = self.revision_dir(name, int(revision))
+            with self.connect() as db:
+                self._store_bytes(
+                    db,
+                    name,
+                    int(revision),
+                    path.relative_to(directory).as_posix(),
+                    text.encode("utf-8"),
+                )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
 
     @contextmanager
     def operation(self, name: str):
@@ -113,6 +209,10 @@ class Platform:
             render(config, number, directory)
             checksum = hashlib.sha256((directory / "checksums.json").read_bytes()).hexdigest()
             with self.connect() as db:
+                if self.durable:
+                    for artifact in sorted(directory.rglob("*")):
+                        if artifact.is_file():
+                            self._store_file(db, config.name, number, artifact, directory)
                 db.execute(
                     "UPDATE revisions SET checksum=?, status='rendered' "
                     "WHERE name=? AND revision=?",
@@ -157,13 +257,13 @@ class Platform:
                     shell=False,
                 )  # noqa: S603
             except (OSError, subprocess.TimeoutExpired) as exc:
-                log.write_text(f"executor failed: {type(exc).__name__}\n", encoding="utf-8")
+                self._write_log(log, f"executor failed: {type(exc).__name__}\n")
                 raise RuntimeError("executor unavailable or timed out") from None
             output.seek(0)
             text = output.read(65536).decode("utf-8", errors="replace")
         # Known workers only emit sanitized diagnostics. kubectl diagnostics may
         # include server endpoints, so cluster error output remains operator-only.
-        log.write_text(text, encoding="utf-8")
+        self._write_log(log, text)
         if result.returncode:
             raise RuntimeError(f"executor exited {result.returncode}; inspect pipeline logs")
         return text
@@ -182,6 +282,7 @@ class Platform:
             ).fetchone()
         if row is None:
             raise ValueError("revision not found")
+        self._restore_revision(name, revision)
         payload = (directory / "pipeline.json").read_bytes()
         checksum_bytes = (directory / "checksums.json").read_bytes()
         if hashlib.sha256(checksum_bytes).hexdigest() != row["checksum"]:
@@ -262,6 +363,8 @@ class Platform:
         raise ValueError("pipeline is not deployed")
 
     def deploy(self, config: Pipeline, executor: str = "local", action: str = "deploy") -> dict:
+        if self.durable and executor == "local" and config.output.connector != "postgres":
+            raise ValueError("hosted local execution requires PostgreSQL output")
         with self.operation(config.name):
             result = self._new_revision(config, executor)
             revision = result["revision"]
@@ -334,6 +437,7 @@ class Platform:
 
     def logs(self, name: str) -> list[str]:
         status = self.status(name)
+        self._restore_revision(name, status["revision"])
         directory = self.revision_dir(name, status["revision"])
         logs = []
         for target in status["cluster_targets"]:

@@ -1,0 +1,12 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_demo_recovers_only_expired_synthetic_seed_and_records_interruption ___
+tests\test_durable_metadata.py:190: in test_demo_recovers_only_expired_synthetic_seed_and_records_interruption
+    assert db.execute("SELECT status FROM revisions WHERE name=? AND revision=1",
+E   AssertionError: assert 'running' == 'failed'
+E
+E     - failed
+E     + running
+=========================== short test summary info ===========================
+FAILED tests/test_durable_metadata.py::test_demo_recovers_only_expired_synthetic_seed_and_records_interruption
+1 failed in 14.61s

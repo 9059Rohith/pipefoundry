@@ -1,0 +1,28 @@
+FFFF                                                                     [100%]
+================================== FAILURES ===================================
+_ test_postgres_state_artifacts_logs_and_rollback_survive_fresh_scratch_roots _
+tests\test_durable_metadata.py:22: in test_postgres_state_artifacts_logs_and_rollback_survive_fresh_scratch_roots
+    first = Platform(tmp_path / "first", metadata_dsn=DSN)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: Platform.__init__() got an unexpected keyword argument 'metadata_dsn'
+___________ test_postgres_mutation_lock_spans_independent_platforms ___________
+tests\test_durable_metadata.py:41: in test_postgres_mutation_lock_spans_independent_platforms
+    first = Platform(tmp_path / "first", metadata_dsn=DSN)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: Platform.__init__() got an unexpected keyword argument 'metadata_dsn'
+_________ test_hosted_local_execution_rejects_ephemeral_data_outputs __________
+tests\test_durable_metadata.py:50: in test_hosted_local_execution_rejects_ephemeral_data_outputs
+    platform = Platform(tmp_path, metadata_dsn=DSN)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: Platform.__init__() got an unexpected keyword argument 'metadata_dsn'
+_________ test_corrupt_stored_artifact_cannot_escape_rehydration_root _________
+tests\test_durable_metadata.py:64: in test_corrupt_stored_artifact_cannot_escape_rehydration_root
+    Platform(tmp_path / "first", metadata_dsn=DSN).deploy(config)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: Platform.__init__() got an unexpected keyword argument 'metadata_dsn'
+=========================== short test summary info ===========================
+FAILED tests/test_durable_metadata.py::test_postgres_state_artifacts_logs_and_rollback_survive_fresh_scratch_roots
+FAILED tests/test_durable_metadata.py::test_postgres_mutation_lock_spans_independent_platforms
+FAILED tests/test_durable_metadata.py::test_hosted_local_execution_rejects_ephemeral_data_outputs
+FAILED tests/test_durable_metadata.py::test_corrupt_stored_artifact_cannot_escape_rehydration_root
+4 failed in 1.59s

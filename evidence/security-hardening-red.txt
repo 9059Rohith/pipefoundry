@@ -1,0 +1,24 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+___________ test_unauthorized_requests_do_not_read_an_attacker_body ___________
+tests\test_public_boundary.py:34: in test_unauthorized_requests_do_not_read_an_attacker_body
+    assert reads == 0
+E   assert 1 == 0
+___________ test_authenticated_slow_body_has_a_total_read_deadline ____________
+tests\test_public_boundary.py:47: in test_authenticated_slow_body_has_a_total_read_deadline
+    assert exchange(api.create_app(tmp_path), receive, b"Bearer " + b"t" * 32) == 408
+E   AssertionError: assert 422 == 408
+E    +  where 422 = exchange(<fastapi.applications.FastAPI object at 0x0000019826A0E390>, <function test_authenticated_slow_body_has_a_total_read_deadline.<locals>.receive at 0x00000198269EA200>, (b'Bearer ' + (b't' * 32)))
+E    +    where <fastapi.applications.FastAPI object at 0x0000019826A0E390> = <function create_app at 0x00000198268998A0>(WindowsPath('C:/Users/BhaviChasvi/AppData/Local/Temp/pytest-of-BhaviChasvi/pytest-1805/test_authenticated_slow_body_h0'))
+E    +      where <function create_app at 0x00000198268998A0> = <module 'pipefoundry.api' from 'C:\\Users\\BhaviChasvi\\Downloads\\cyber_projects\\pipefoundry\\src\\pipefoundry\\api.py'>.create_app
+___ test_runtime_retains_python_sql_tls_but_removes_shells_and_mount_tools ____
+tests\test_runtime_image.py:31: in test_runtime_retains_python_sql_tls_but_removes_shells_and_mount_tools
+    assert all(path is None for path in report["binaries"].values()), report
+E   AssertionError: {'binaries': {'sh': '/usr/bin/sh', 'bash': '/usr/bin/bash', 'mount': '/usr/bin/mount', 'umount': '/usr/bin/umount', ...}, 'rows': 3, 'tls': 'OpenSSL 3.5.7 9 Jun 2026', 'sqlite': '3.46.1'}
+E   assert False
+E    +  where False = all(<generator object test_runtime_retains_python_sql_tls_but_removes_shells_and_mount_tools.<locals>.<genexpr> at 0x00000198260D8790>)
+=========================== short test summary info ===========================
+FAILED tests/test_public_boundary.py::test_unauthorized_requests_do_not_read_an_attacker_body
+FAILED tests/test_public_boundary.py::test_authenticated_slow_body_has_a_total_read_deadline
+FAILED tests/test_runtime_image.py::test_runtime_retains_python_sql_tls_but_removes_shells_and_mount_tools
+3 failed in 6.52s

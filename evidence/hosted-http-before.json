@@ -1,0 +1,62 @@
+{
+  "service": "PipeFoundry",
+  "read_only": true,
+  "data_source": "synthetic fixtures executed by a real Python worker and PostgreSQL",
+  "execution_mode": "on-demand; cron artifacts are rendered but not scheduled by this host",
+  "pipeline": {
+    "name": "demo-orders",
+    "revision": 3,
+    "status": "succeeded",
+    "executor": "local",
+    "created": "2026-10-30T14:49:59.838282+00:00",
+    "schedule": "0 0 * * *"
+  },
+  "workload": {
+    "rows": 3,
+    "invalid_rows": 0
+  },
+  "backfill": [
+    {
+      "date": "2026-01-10",
+      "rows": 3,
+      "invalid_rows": 0
+    },
+    {
+      "date": "2026-01-11",
+      "rows": 3,
+      "invalid_rows": 0
+    }
+  ],
+  "artifact": {
+    "sha256": "be6e6265bae7c3b794e64aef9c1ec560aa6c58df6b53cfc953bb470be0d9243e",
+    "files": 9,
+    "storage": "PostgreSQL BYTEA"
+  },
+  "events": [
+    {
+      "revision": 1,
+      "action": "deploy",
+      "outcome": "succeeded",
+      "created": "2026-10-30T14:49:56.401604+00:00"
+    },
+    {
+      "revision": 2,
+      "action": "deploy",
+      "outcome": "succeeded",
+      "created": "2026-10-30T14:49:57.830141+00:00"
+    },
+    {
+      "revision": 2,
+      "action": "backfill",
+      "outcome": "succeeded",
+      "created": "2026-10-30T14:49:59.559349+00:00"
+    },
+    {
+      "revision": 3,
+      "action": "rollback",
+      "outcome": "succeeded",
+      "created": "2026-10-30T14:50:00.828171+00:00"
+    }
+  ],
+  "observed_at": "2026-10-30T14:50:15.625197+00:00"
+}

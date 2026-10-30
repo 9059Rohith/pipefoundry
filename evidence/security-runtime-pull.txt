@@ -1,0 +1,37 @@
+latest: Pulling from chainguard/python
+7a4877cecca8: Pulling fs layer
+2ef7ab293d9c: Pulling fs layer
+4b77722400ca: Pulling fs layer
+51b61fb7fba2: Pulling fs layer
+5febae4700f2: Pulling fs layer
+39d9af6dbee0: Pulling fs layer
+5995e63edd58: Pulling fs layer
+411ece58c9aa: Pulling fs layer
+72f154a025dd: Pulling fs layer
+c4465eb757c6: Pulling fs layer
+7ebb6e9cac1b: Pulling fs layer
+2ef7ab293d9c: Download complete
+72f154a025dd: Download complete
+5995e63edd58: Download complete
+4b77722400ca: Download complete
+5febae4700f2: Download complete
+39d9af6dbee0: Download complete
+c4465eb757c6: Download complete
+51b61fb7fba2: Download complete
+7a4877cecca8: Download complete
+7ebb6e9cac1b: Download complete
+411ece58c9aa: Download complete
+7a4877cecca8: Pull complete
+7ebb6e9cac1b: Pull complete
+411ece58c9aa: Pull complete
+39d9af6dbee0: Pull complete
+4b77722400ca: Pull complete
+5febae4700f2: Pull complete
+51b61fb7fba2: Pull complete
+72f154a025dd: Pull complete
+5995e63edd58: Pull complete
+c4465eb757c6: Pull complete
+2ef7ab293d9c: Pull complete
+Digest: sha256:bf06e09413bec94d6489f0be783b8f9349339907b89e0f759d190d0b95ab2d8f
+Status: Downloaded newer image for cgr.dev/chainguard/python:latest
+cgr.dev/chainguard/python:latest

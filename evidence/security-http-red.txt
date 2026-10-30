@@ -1,0 +1,24 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+___________ test_unauthorized_requests_do_not_read_an_attacker_body ___________
+tests\test_public_boundary.py:34: in test_unauthorized_requests_do_not_read_an_attacker_body
+    assert reads == 0
+E   assert 1 == 0
+___________ test_authenticated_slow_body_has_a_total_read_deadline ____________
+tests\test_public_boundary.py:47: in test_authenticated_slow_body_has_a_total_read_deadline
+    assert exchange(api.create_app(tmp_path), receive, b"Bearer " + b"t" * 32) == 408
+E   AssertionError: assert 422 == 408
+E    +  where 422 = exchange(<fastapi.applications.FastAPI object at 0x000002695576E330>, <function test_authenticated_slow_body_has_a_total_read_deadline.<locals>.receive at 0x0000026955749BC0>, (b'Bearer ' + (b't' * 32)))
+E    +    where <fastapi.applications.FastAPI object at 0x000002695576E330> = <function create_app at 0x00000269555F9760>(WindowsPath('C:/Users/BhaviChasvi/AppData/Local/Temp/pytest-of-BhaviChasvi/pytest-1808/test_authenticated_slow_body_h0'))
+E    +      where <function create_app at 0x00000269555F9760> = <module 'pipefoundry.api' from 'C:\\Users\\BhaviChasvi\\Downloads\\cyber_projects\\pipefoundry\\src\\pipefoundry\\api.py'>.create_app
+__________ test_declared_oversize_body_is_rejected_before_reading_it __________
+tests\test_public_boundary.py:61: in test_declared_oversize_body_is_rejected_before_reading_it
+    assert exchange(create_app(tmp_path), receive, b"Bearer " + b"t" * 32,
+E   AssertionError: assert 422 == 413
+E    +  where 422 = exchange(<fastapi.applications.FastAPI object at 0x00000269557916D0>, <function test_declared_oversize_body_is_rejected_before_reading_it.<locals>.receive at 0x00000269557CB600>, (b'Bearer ' + (b't' * 32)), [(b'content-length', b'999999999999999999')])
+E    +    where <fastapi.applications.FastAPI object at 0x00000269557916D0> = <function create_app at 0x00000269555F9760>(WindowsPath('C:/Users/BhaviChasvi/AppData/Local/Temp/pytest-of-BhaviChasvi/pytest-1808/test_declared_oversize_body_is0'))
+=========================== short test summary info ===========================
+FAILED tests/test_public_boundary.py::test_unauthorized_requests_do_not_read_an_attacker_body
+FAILED tests/test_public_boundary.py::test_authenticated_slow_body_has_a_total_read_deadline
+FAILED tests/test_public_boundary.py::test_declared_oversize_body_is_rejected_before_reading_it
+3 failed in 1.63s

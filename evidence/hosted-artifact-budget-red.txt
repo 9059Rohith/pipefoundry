@@ -1,0 +1,10 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_persistent_revision_artifact_budget_blocks_new_files_but_allows_log_updates _
+tests\test_durable_metadata.py:161: in test_persistent_revision_artifact_budget_blocks_new_files_but_allows_log_updates
+    with pytest.raises(ValueError, match="artifact limit"):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+=========================== short test summary info ===========================
+FAILED tests/test_durable_metadata.py::test_persistent_revision_artifact_budget_blocks_new_files_but_allows_log_updates
+1 failed in 6.82s

@@ -1,0 +1,112 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.runtime-tests
+#1 transferring dockerfile: 941B 0.0s done
+#1 DONE 0.0s
+
+#2 [context test-sources] load .dockerignore
+#2 transferring test-sources: 2B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2
+#3 DONE 0.1s
+
+#4 [internal] load metadata for docker.io/library/pipefoundry:security
+#4 DONE 0.2s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 158B 0.0s done
+#5 DONE 0.0s
+
+#6 [context test-sources] load from client
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 10.80kB 0.0s done
+#7 DONE 0.1s
+
+#8 [stage-0 1/8] FROM cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2
+#8 resolve cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2 0.1s done
+#8 DONE 0.1s
+
+#9 FROM docker.io/library/pipefoundry:security@sha256:ed36ea380b472a1438c647c8557369433f6a9d4616be2e4c9acd268b03b6a493
+#9 resolve docker.io/library/pipefoundry:security@sha256:ed36ea380b472a1438c647c8557369433f6a9d4616be2e4c9acd268b03b6a493 0.1s done
+#9 DONE 0.1s
+
+#6 [context test-sources] load from client
+#6 transferring test-sources: 61.06kB 0.1s done
+#6 DONE 0.1s
+
+#9 FROM docker.io/library/pipefoundry:security@sha256:ed36ea380b472a1438c647c8557369433f6a9d4616be2e4c9acd268b03b6a493
+#9 DONE 0.5s
+
+#10 [stage-0 2/8] WORKDIR /verification
+#10 CACHED
+
+#11 [stage-0 3/8] COPY --from=pipefoundry:security /opt/venv /opt/venv
+#11 DONE 0.6s
+
+#12 [stage-0 4/8] RUN --mount=type=cache,target=/root/.cache/pip python -m pip install     --target=/test-tools pytest==9.2.0 httpx2==2.16.0
+#12 1.074 Collecting pytest==9.2.0
+#12 1.080   Using cached pytest-9.2.0-py3-none-any.whl.metadata (7.9 kB)
+#12 1.162 Collecting httpx2==2.16.0
+#12 1.166   Using cached httpx2-2.16.0-py3-none-any.whl.metadata (10 kB)
+#12 1.278 Collecting iniconfig>=2 (from pytest==9.2.0)
+#12 1.281   Using cached iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+#12 1.365 Collecting packaging>=24 (from pytest==9.2.0)
+#12 1.368   Using cached packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+#12 1.539 Collecting pluggy<2,>=1.6 (from pytest==9.2.0)
+#12 1.540   Using cached pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+#12 1.634 Collecting pygments>=2.15 (from pytest==9.2.0)
+#12 1.637   Using cached pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+#12 1.713 Collecting anyio>=4.10 (from httpx2==2.16.0)
+#12 1.715   Using cached anyio-4.15.1-py3-none-any.whl.metadata (4.7 kB)
+#12 1.798 Collecting httpcore2==2.16.0 (from httpx2==2.16.0)
+#12 1.801   Using cached httpcore2-2.16.0-py3-none-any.whl.metadata (27 kB)
+#12 1.901 Collecting idna>=3.18 (from httpx2==2.16.0)
+#12 1.905   Using cached idna-3.20-py3-none-any.whl.metadata (7.2 kB)
+#12 1.969 Collecting truststore>=0.10 (from httpx2==2.16.0)
+#12 1.974   Using cached truststore-0.10.5-py3-none-any.whl.metadata (4.5 kB)
+#12 2.033 Collecting h11>=0.16 (from httpcore2==2.16.0->httpx2==2.16.0)
+#12 2.034   Using cached h11-0.16.0-py3-none-any.whl.metadata (8.3 kB)
+#12 2.045 Using cached pytest-9.2.0-py3-none-any.whl (411 kB)
+#12 2.051 Using cached httpx2-2.16.0-py3-none-any.whl (97 kB)
+#12 2.054 Using cached httpcore2-2.16.0-py3-none-any.whl (85 kB)
+#12 2.057 Using cached pluggy-1.7.0-py3-none-any.whl (27 kB)
+#12 2.059 Using cached anyio-4.15.1-py3-none-any.whl (132 kB)
+#12 2.061 Using cached h11-0.16.0-py3-none-any.whl (37 kB)
+#12 2.063 Using cached idna-3.20-py3-none-any.whl (69 kB)
+#12 2.064 Using cached iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+#12 2.066 Using cached packaging-26.3-py3-none-any.whl (129 kB)
+#12 2.070 Using cached pygments-2.21.0-py3-none-any.whl (1.3 MB)
+#12 2.076 Using cached truststore-0.10.5-py3-none-any.whl (19 kB)
+#12 2.147 Installing collected packages: truststore, pygments, pluggy, packaging, iniconfig, idna, h11, pytest, httpcore2, anyio, httpx2
+#12 4.521
+#12 4.523 Successfully installed anyio-4.15.1 h11-0.16.0 httpcore2-2.16.0 httpx2-2.16.0 idna-3.20 iniconfig-2.3.1 packaging-26.3 pluggy-1.7.0 pygments-2.21.0 pytest-9.2.0 truststore-0.10.5
+#12 4.527 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#12 DONE 4.7s
+
+#13 [stage-0 5/8] COPY --from=test-sources / /verification/tests/
+#13 DONE 0.1s
+
+#14 [stage-0 6/8] COPY scripts/ /verification/scripts/
+#14 DONE 0.1s
+
+#15 [stage-0 7/8] COPY examples/ /verification/examples/
+#15 DONE 0.1s
+
+#16 [stage-0 8/8] COPY pyproject.toml /verification/pyproject.toml
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 2.2s done
+#17 exporting manifest sha256:d36cb40bdcddcfffaf5f1a7a43662d05430aca092fedffcc7cac501805c92a16 0.0s done
+#17 exporting config sha256:9ca25d0f5e0b3ed19c542f9d1630c3391422e22d61e2c04fdc31c5e58b342e45 0.0s done
+#17 exporting attestation manifest sha256:7067c56d8821ead3f9d9396fae6496861df047f1d3af088f0ef7f2de636adb95 0.0s done
+#17 exporting manifest list sha256:8897158a8b20722c9f039f71ffcc05b9c4891d0085af06704ea4a72f827fd1e4
+#17 exporting manifest list sha256:8897158a8b20722c9f039f71ffcc05b9c4891d0085af06704ea4a72f827fd1e4 0.0s done
+#17 naming to docker.io/library/pipefoundry:runtime-tests done
+#17 unpacking to docker.io/library/pipefoundry:runtime-tests
+#17 unpacking to docker.io/library/pipefoundry:runtime-tests 1.2s done
+#17 DONE 3.7s

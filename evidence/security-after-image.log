@@ -1,0 +1,14 @@
+2026-10-30T14:52:45Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-10-30T14:52:45Z	INFO	[secret] Secret scanning is enabled
+2026-10-30T14:52:45Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-10-30T14:52:45Z	INFO	[secret] Please see https://trivy.dev/docs/v0.76/guide/scanner/secret#recommendation for faster secret detection
+2026-10-30T14:53:07Z	INFO	[python] Licenses acquired from one or more METADATA files may be subject to additional terms. Use `--debug` flag to see all affected packages.
+2026-10-30T14:53:07Z	INFO	Detected OS	family="wolfi" version="20230201"
+2026-10-30T14:53:07Z	INFO	[wolfi] Detecting vulnerabilities...	pkg_num=30
+2026-10-30T14:53:07Z	INFO	Number of language-specific files	num=1
+2026-10-30T14:53:07Z	INFO	[python-pkg] Detecting vulnerabilities...
+
+📣 Notices:
+  - Version 0.76.1 of Trivy is now available, current version is 0.76.0
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag

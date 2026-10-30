@@ -1,0 +1,6 @@
+............................s............ss                              [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_runtime_image.py:8: container opt in
+SKIPPED [1] tests/test_workloads.py:77: Spark runtime opt in
+SKIPPED [1] tests/test_workloads.py:120: openssl required to generate ephemeral HTTPS test certificate
+40 passed, 3 skipped in 52.84s

@@ -1,4 +1,5 @@
 .venv/
+.vercel/
 .runtime/
 __pycache__/
 *.pyc

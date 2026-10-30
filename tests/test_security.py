@@ -13,7 +13,13 @@ def test_oversize_api_body_and_short_token_are_rejected(tmp_path, monkeypatch):
     client = TestClient(create_app(tmp_path))
     assert client.get("/health/ready").status_code == 503
     assert client.get("/pipelines", headers={"Authorization": "Bearer short"}).status_code == 503
-    assert client.post("/pipelines", content="x" * 33000).status_code == 413
+    monkeypatch.setenv("PIPEFOUNDRY_API_TOKEN", "t" * 32)
+    assert (
+        client.post(
+            "/pipelines", content="x" * 33000, headers={"Authorization": "Bearer " + "t" * 32}
+        ).status_code
+        == 413
+    )
 
 
 def test_non_ascii_bearer_fails_auth_without_server_error(tmp_path, monkeypatch):

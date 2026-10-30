@@ -1,0 +1,318 @@
+{
+  "python": "3.15.1 (heads/3.15-dirty:d6903b58e39, Oct 27 2026, 20:52:19) [GCC 16.2.0]",
+  "openssl": "OpenSSL 4.0.3 29 Sep 2026",
+  "sqlite": "3.54.1",
+  "uid": 10001,
+  "yaml_native_extension": false,
+  "os_packages": [
+    {
+      "name": "wolfi-baselayout",
+      "version": "20230201-r31"
+    },
+    {
+      "name": "ca-certificates-bundle",
+      "version": "20261020-r0"
+    },
+    {
+      "name": "glibc-2.44-locale-posix",
+      "version": "2.44-r11"
+    },
+    {
+      "name": "libgcc",
+      "version": "16.2.0-r2"
+    },
+    {
+      "name": "glibc-2.44",
+      "version": "2.44-r11"
+    },
+    {
+      "name": "ld-linux-2.44",
+      "version": "2.44-r11"
+    },
+    {
+      "name": "gdbm",
+      "version": "1.26-r9"
+    },
+    {
+      "name": "libbrotlicommon1",
+      "version": "1.2.1-r2"
+    },
+    {
+      "name": "libbrotlidec1",
+      "version": "1.2.1-r2"
+    },
+    {
+      "name": "libbrotlienc1",
+      "version": "1.2.1-r2"
+    },
+    {
+      "name": "libbz2-1",
+      "version": "1.0.8-r28"
+    },
+    {
+      "name": "libexpat1",
+      "version": "2.9.0-r0"
+    },
+    {
+      "name": "libffi",
+      "version": "3.8.0-r2"
+    },
+    {
+      "name": "libstdc++",
+      "version": "16.2.0-r2"
+    },
+    {
+      "name": "libuuid",
+      "version": "2.42.4-r1"
+    },
+    {
+      "name": "libzstd1",
+      "version": "1.5.7-r12"
+    },
+    {
+      "name": "mpdecimal",
+      "version": "4.0.1-r6"
+    },
+    {
+      "name": "ncurses-terminfo-base",
+      "version": "6.6.20261024-r0"
+    },
+    {
+      "name": "ncurses",
+      "version": "6.6.20261024-r0"
+    },
+    {
+      "name": "openssl-provider-legacy-allowed",
+      "version": "4.1.0-r0"
+    },
+    {
+      "name": "openssl-4.0-libcrypto",
+      "version": "4.0.3-r8"
+    },
+    {
+      "name": "openssl-4.0-libssl",
+      "version": "4.0.3-r8"
+    },
+    {
+      "name": "py3-pip-wheel",
+      "version": "26.2.2-r2"
+    },
+    {
+      "name": "xz",
+      "version": "5.8.4-r0"
+    },
+    {
+      "name": "readline",
+      "version": "8.3-r3"
+    },
+    {
+      "name": "sqlite-libs",
+      "version": "3.54.1-r0"
+    },
+    {
+      "name": "zlib",
+      "version": "1.3.2.1_rc20260921-r1"
+    },
+    {
+      "name": "python-3.15-base",
+      "version": "3.15.1_git20261024-r1"
+    },
+    {
+      "name": "python-3.15-runtime",
+      "version": "3.15.1_git20261024-r1"
+    },
+    {
+      "name": "python-3.15",
+      "version": "3.15.1_git20261024-r1"
+    }
+  ],
+  "loaded_shared_objects": [
+    "/etc/ld.so.cache",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libcom_err-2abe824b.so.2.1",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libcrypt-bc2db45e.so.1",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libcrypto-2d1629ee.so.3",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libgssapi_krb5-497db0c6.so.2.2",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libk5crypto-b1f99d5c.so.3.1",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libkeyutils-dfe70bd6.so.1.5",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libkrb5-fcafa220.so.3.3",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libkrb5support-d0bcff84.so.0.1",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/liblber-a44a5afb.so.2.0.200",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libldap-7c3a4b12.so.2.0.200",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libpcre-9513aab5.so.1.2.0",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libpq-e9b5c9ac.so.5.18",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libsasl2-84219a89.so.3.0.0",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libselinux-0922c95c.so.1",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary.libs/libssl-8bd944e8.so.3",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary/_psycopg.cpython-315-x86_64-linux-gnu.so",
+    "/opt/venv/lib/python3.15/site-packages/psycopg_binary/pq.cpython-315-x86_64-linux-gnu.so",
+    "/opt/venv/lib/python3.15/site-packages/pydantic_core/_pydantic_core.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/ld-linux-x86-64.so.2",
+    "/usr/lib/libbrotlicommon.so.1.2.1",
+    "/usr/lib/libbrotlidec.so.1.2.1",
+    "/usr/lib/libbrotlienc.so.1.2.1",
+    "/usr/lib/libbz2.so.1.0.8",
+    "/usr/lib/libc.so.6",
+    "/usr/lib/libcrypto.so.4",
+    "/usr/lib/libdl.so.2",
+    "/usr/lib/libffi.so.8.5.0",
+    "/usr/lib/libgcc_s.so.1",
+    "/usr/lib/liblzma.so.5.8.4",
+    "/usr/lib/libm.so.6",
+    "/usr/lib/libmpdec.so.4.0.1",
+    "/usr/lib/libpthread.so.0",
+    "/usr/lib/libpython3.15.so.1.0",
+    "/usr/lib/libresolv.so.2",
+    "/usr/lib/librt.so.1",
+    "/usr/lib/libsqlite3.so.3.54.1",
+    "/usr/lib/libssl.so.4",
+    "/usr/lib/libuuid.so.1.3.0",
+    "/usr/lib/libz.so.1.3.2.1-motley",
+    "/usr/lib/libzstd.so.1.5.7",
+    "/usr/lib/ossl-modules-4/legacy.so",
+    "/usr/lib/python3.15/lib-dynload/_bisect.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_blake2.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_bz2.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_ctypes.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_decimal.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_hashlib.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_heapq.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_hmac.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_interpreters.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_json.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_lzma.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_math_integer.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_pickle.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_posixsubprocess.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_queue.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_random.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_socket.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_sqlite3.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_ssl.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_struct.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_uuid.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_zoneinfo.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/_zstd.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/binascii.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/fcntl.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/grp.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/math.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/select.cpython-315-x86_64-linux-gnu.so",
+    "/usr/lib/python3.15/lib-dynload/zlib.cpython-315-x86_64-linux-gnu.so"
+  ],
+  "python_packages": [
+    [
+      "PyYAML",
+      "6.0.3"
+    ],
+    [
+      "annotated-doc",
+      "0.0.5"
+    ],
+    [
+      "annotated-types",
+      "0.8.0"
+    ],
+    [
+      "anyio",
+      "4.15.1"
+    ],
+    [
+      "certifi",
+      "2026.10.23"
+    ],
+    [
+      "click",
+      "8.5.0"
+    ],
+    [
+      "croniter",
+      "6.2.4"
+    ],
+    [
+      "fastapi",
+      "0.162.0"
+    ],
+    [
+      "h11",
+      "0.16.0"
+    ],
+    [
+      "httpcore",
+      "1.0.9"
+    ],
+    [
+      "httpx",
+      "0.28.1"
+    ],
+    [
+      "idna",
+      "3.20"
+    ],
+    [
+      "opentelemetry-api",
+      "1.45.2"
+    ],
+    [
+      "pipefoundry",
+      "0.1.0"
+    ],
+    [
+      "psycopg",
+      "3.3.6"
+    ],
+    [
+      "psycopg-binary",
+      "3.3.6"
+    ],
+    [
+      "pydantic",
+      "2.14.2"
+    ],
+    [
+      "pydantic_core",
+      "2.50.2"
+    ],
+    [
+      "python-dateutil",
+      "3.0.0"
+    ],
+    [
+      "six",
+      "1.17.0"
+    ],
+    [
+      "starlette",
+      "1.10.0"
+    ],
+    [
+      "typing-inspection",
+      "0.4.4"
+    ],
+    [
+      "typing_extensions",
+      "4.16.0"
+    ],
+    [
+      "tzdata",
+      "2026.6"
+    ],
+    [
+      "uvicorn",
+      "0.54.0"
+    ]
+  ],
+  "commands": {
+    "sh": null,
+    "bash": null,
+    "mount": null,
+    "umount": null,
+    "nsenter": null,
+    "infocmp": "/usr/bin/infocmp",
+    "perl": null,
+    "apt": null,
+    "apk": null,
+    "pip": null
+  },
+  "systemd_homed_present": false,
+  "perl_archive_tar_present": false
+}
