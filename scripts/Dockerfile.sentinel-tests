@@ -1,0 +1,17 @@
+# Exercise installed Python 3.15 package in the same pinned ABI as the minimal image.
+ARG DEV_IMAGE=cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2
+FROM ${DEV_IMAGE}
+USER 0
+WORKDIR /verification
+COPY --from=pipefoundry:sentinel /opt/venv /opt/venv
+RUN --mount=type=cache,target=/root/.cache/pip python -m pip install \
+    --target=/test-tools pytest==9.2.0 httpx2==2.16.0
+COPY --from=test-sources / /verification/tests/
+COPY examples /verification/examples
+COPY scripts /verification/scripts
+COPY pyproject.toml /verification/pyproject.toml
+ENV PYTHONPATH=/test-tools PATH=/opt/venv/bin:/usr/bin \
+    PIPEFOUNDRY_STATE_DIR=/tmp/runtime-platform
+USER 10001:10001
+ENTRYPOINT []
+CMD ["python", "-m", "pytest", "-q", "--tb=short", "-rs", "-p", "no:cacheprovider"]

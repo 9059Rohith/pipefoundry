@@ -1,6 +1,6 @@
 # PipeFoundry
 
-**Review a pipeline change before it runs, then deploy, backfill and recover it through one auditable interface.**
+**Release Sentinel binds a reviewed pipeline plan to exact recorded state, then reserves one auditable execution under a durable lease.**
 
 [Live console](https://rohith-pipefoundry.vercel.app) · [Execution receipts](https://rohith-pipefoundry.vercel.app/demo) · [Readiness](https://rohith-pipefoundry.vercel.app/health/ready) · [Source](https://github.com/9059Rohith/pipefoundry)
 
@@ -10,7 +10,26 @@ The public console runs a synthetic three-order workload against durable Postgre
 
 ![Actual public console](evidence/public-dashboard.jpg)
 
-## Five things to inspect
+## Release Sentinel signature
+
+`plan` freezes canonical config/executor, exact latest revision/status/artifacts, worker and renderer source identity, operator-setting identity, expiry, operation and rollout budgets in an authenticated immutable metadata record. `apply` accepts its opaque identity and an idempotency key. It acquires the same durable lease used by legacy lifecycle commands, checks the frozen state, atomically reserves the receipt and revision, then retains exclusivity through rendering and execution without holding a database transaction. Editing a review file, replaying a consumed plan with another key, changing settings or applying an obsolete plan cannot launch another worker.
+
+```powershell
+pipefoundry plan examples/orders-local.yaml --allow-operation create --max-input-rows 3 > release.json
+# Review operation, exact expected state, expiry, identities and deterministic risk reasons.
+pipefoundry apply release.json --idempotency-key orders-release-20261030
+pipefoundry receipt orders-release-20261030
+```
+
+The policy covers declared CPU/memory requests, a conservative input-row bound and exactly one current partition (zero backfill partitions). Dynamic sources use the worker's 10,000-row bound instead of a fabricated estimate. Guarded Kubernetes releases require a digest-pinned operator image and report API admission rather than workload completion. Code/operator/template changes cause an update even when pipeline YAML is unchanged; older revisions without runtime identity are conservatively updated once.
+
+Successful and failed receipts are terminal: a retry returns the recorded result even after the plan expires. An interrupted attempt stays `executing` and cannot automatically relaunch. After stopping the original controller **and** worker and inspecting output, an operator can close it using `recover-release KEY --confirm-worker-stopped`, then review a new plan. This is at-most-once launch reservation, not a distributed exactly-once guarantee for external systems. See the [threat model, recovery walkthrough and evaluation](docs/release-sentinel.md).
+
+Creating any Sentinel plan permanently disables the synthetic demo's age-based lease reclamation for that pipeline name. A paused release controller keeps exclusivity even before receipt reservation. Recovery requires a trusted operator to stop the controller and worker; confirmation is an assertion, not machine proof. Legacy lifecycle endpoints remain available and need gateway/RBAC restrictions if all releases must use Sentinel.
+
+The linked public deployment documents the earlier preview release; Sentinel is locally verified and has not been deployed by this change.
+
+## Five more things to inspect
 
 1. **A deployment preview with no execution effects.** `preview` validates the same configuration and hosted output rules as deploy, compares canonical configuration and executor to the latest recorded revision, and returns `create`, `update` or `no-op`. It reads metadata without creating revisions, acquiring locks, restoring artifacts or touching workloads. Change output contains bounded field paths and fingerprints; it never returns configuration values or environment credentials.
 2. **A real ingestion boundary.** The fixed Python worker normalizes currencies, retries bounded transient HTTPS failures and atomically upserts SQL rows with quality checks. The `(partition_date, id)` key makes repeated SQL partitions idempotent. URLs, credentials, container images and arbitrary programs cannot be supplied in pipeline YAML.
@@ -26,6 +45,10 @@ flowchart TD
   API[Authenticated FastAPI] --> V
   V --> P[Preview: metadata comparison only]
   P -. reads .-> DB[(SQLite / PostgreSQL metadata)]
+  V --> PLAN[Sentinel: immutable plan + policy + expiry]
+  PLAN --> DB
+  PLAN --> APPLY[Apply: lease + state check + atomic receipt]
+  APPLY --> O
   V --> D[Explicit deploy / render / rollback]
   D --> R[Revision + SHA256 artifact bundle]
   R --> DB
@@ -123,6 +146,10 @@ API port 8094 and PostgreSQL port 55435 bind to localhost. For direct developmen
 | API | Result |
 |---|---|
 | `POST /deployments/preview` | Compare `{config, executor}` without execution or durable lifecycle writes |
+| `POST /releases/plan` | Freeze `{config, executor, policy, ttl_seconds}` in immutable authenticated metadata |
+| `POST /releases/apply` | Apply `{plan_id, digest, idempotency_key}` under the pipeline lease |
+| `GET /releases/receipts/{key}` | Observe durable `executing`, `succeeded` or `failed` receipt |
+| `POST /releases/recover` | Close interrupted receipt with `{idempotency_key, confirm_worker_stopped: true}` |
 | `POST /pipelines` | Deploy `{config, executor}`; HTTP 201 |
 | `POST /render` | Render bare config as a new durable revision; HTTP 201 |
 | `GET /pipelines`, `GET /pipelines/{name}` | Latest recorded state; individual status also queries outstanding cluster targets |

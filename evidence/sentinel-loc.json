@@ -1,0 +1,68 @@
+{
+  "method": "Physical Python code lines from tokens, excluding comments/blank lines/standalone docstrings; multiline executable literals count; no generated artifacts",
+  "production": {
+    "before": 1651,
+    "after": 2326,
+    "net_added": 675,
+    "changed_files": {
+      "src/pipefoundry/api.py": {
+        "before": 250,
+        "after": 268,
+        "net_added": 18
+      },
+      "src/pipefoundry/cli.py": {
+        "before": 65,
+        "after": 124,
+        "net_added": 59
+      },
+      "src/pipefoundry/demo.py": {
+        "before": 176,
+        "after": 178,
+        "net_added": 2
+      },
+      "src/pipefoundry/engine.py": {
+        "before": 555,
+        "after": 588,
+        "net_added": 33
+      },
+      "src/pipefoundry/metadata.py": {
+        "before": 41,
+        "after": 44,
+        "net_added": 3
+      },
+      "src/pipefoundry/release_models.py": {
+        "before": 0,
+        "after": 21,
+        "net_added": 21
+      },
+      "src/pipefoundry/releases.py": {
+        "before": 0,
+        "after": 539,
+        "net_added": 539
+      }
+    }
+  },
+  "tests": {
+    "before": 1117,
+    "after": 1505,
+    "net_added": 388,
+    "changed_files": {
+      "tests/test_release_interfaces.py": {
+        "before": 0,
+        "after": 47,
+        "net_added": 47
+      },
+      "tests/test_release_races.py": {
+        "before": 0,
+        "after": 149,
+        "net_added": 149
+      },
+      "tests/test_releases.py": {
+        "before": 0,
+        "after": 192,
+        "net_added": 192
+      }
+    }
+  },
+  "new_verification_scripts": 216
+}

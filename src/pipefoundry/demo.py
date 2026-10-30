@@ -64,11 +64,14 @@ def seed_demo(platform, *, name=DEMO_NAME, key=DEMO_KEY):
                     raise ValueError("demo name belongs to a non-synthetic pipeline")
             if cluster:
                 raise ValueError("demo name belongs to a cluster pipeline")
-            # Recover only expired synthetic-demo operations. Normal platform
-            # locks never expire automatically; all demo writes are fixed upserts.
+            # Recover only expired legacy synthetic-demo operations. Once any
+            # Sentinel plan exists, age is never permission to steal its lease,
+            # including a controller paused before its receipt was reserved.
             if prior:
                 removed = db.execute(
-                    "DELETE FROM operations WHERE name=? AND started<?",
+                    "DELETE FROM operations WHERE name=? AND started<? "
+                    "AND NOT EXISTS (SELECT 1 FROM release_plans "
+                    "WHERE release_plans.name=operations.name)",
                     (name, (now - timedelta(minutes=5)).isoformat()),
                 )
                 if removed.rowcount:

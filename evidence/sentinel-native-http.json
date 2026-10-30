@@ -1,0 +1,29 @@
+{
+  "image": "pipefoundry:sentinel",
+  "runtime": {
+    "python": "3.15.1 (heads/3.15-dirty:d6903b58e39, Oct 27 2026, 20:52:19) [GCC 16.2.0]",
+    "uid": 10001,
+    "binaries": {
+      "sh": null,
+      "bash": null,
+      "mount": null,
+      "umount": null,
+      "pip": null,
+      "apt": null,
+      "apk": null
+    }
+  },
+  "unauthenticated_plan": 401,
+  "plan_operation": "create",
+  "receipt_state": "succeeded",
+  "revision": 1,
+  "retry_same_receipt": true,
+  "worker": {
+    "rows": 3,
+    "total_rows": 3,
+    "quality": {
+      "invalid_rows": 0
+    }
+  },
+  "scope": "local native image; no hosted deployment"
+}

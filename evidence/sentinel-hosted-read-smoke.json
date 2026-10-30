@@ -1,0 +1,15 @@
+{
+  "scope": "Read-only public routes; Sentinel was not deployed by this task",
+  "routes": {
+    "/health/ready": {
+      "status": 200,
+      "read_only": null,
+      "health": "ready"
+    },
+    "/demo": {
+      "status": 200,
+      "read_only": true,
+      "health": null
+    }
+  }
+}

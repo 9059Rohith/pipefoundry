@@ -21,6 +21,8 @@ from pipefoundry.console import CSP, render_console
 from pipefoundry.demo import DEMO_KEY, DEMO_NAME, demo_ready, demo_receipt, seed_demo
 from pipefoundry.engine import Platform
 from pipefoundry.models import Pipeline, StrictModel
+from pipefoundry.release_models import ApplyRequest, RecoveryRequest, ReleaseRequest
+from pipefoundry.releases import ReleaseSentinel
 
 MAX_BODY_BYTES = 32768
 BODY_READ_TIMEOUT = 5.0
@@ -138,7 +140,7 @@ def create_app(
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, exc):
-        if request.url.path == "/deployments/preview":
+        if request.url.path == "/deployments/preview" or request.url.path.startswith("/releases/"):
             # Pydantic's default errors include input and unknown field names.
             # A preview must never reflect accidentally pasted credentials.
             return JSONResponse({"detail": "invalid deployment configuration"}, status_code=422)
@@ -272,6 +274,26 @@ def create_app(
     @app.post("/render", status_code=201, dependencies=authenticated)
     def render_pipeline(body: Pipeline):
         return platform.render(body)
+
+    @app.post("/releases/plan", dependencies=authenticated)
+    def release_plan(body: ReleaseRequest):
+        return ReleaseSentinel(platform).plan(
+            body.config, body.executor, policy=body.policy, ttl_seconds=body.ttl_seconds
+        )
+
+    @app.post("/releases/apply", dependencies=authenticated)
+    def release_apply(body: ApplyRequest):
+        return ReleaseSentinel(platform).apply(body.plan_id, body.digest, body.idempotency_key)
+
+    @app.get("/releases/receipts/{key}", dependencies=authenticated)
+    def release_receipt(key: str):
+        return ReleaseSentinel(platform).receipt(key)
+
+    @app.post("/releases/recover", dependencies=authenticated)
+    def release_recover(body: RecoveryRequest):
+        return ReleaseSentinel(platform).recover(
+            body.idempotency_key, confirm_worker_stopped=body.confirm_worker_stopped
+        )
 
     @app.get("/pipelines/{name}", dependencies=authenticated)
     def status(name: str):

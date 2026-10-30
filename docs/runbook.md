@@ -2,6 +2,13 @@
 
 ## Review before deployment
 
+Use `pipefoundry plan CONFIG > release.json` and `pipefoundry apply release.json
+--idempotency-key KEY` for a guarded release. Sentinel binds reviewed intent to
+exact state, source/operator/artifact identities, expiry and budgets. Read
+`pipefoundry receipt KEY` after a request timeout rather than creating another
+key. See [Release Sentinel](release-sentinel.md) for the full recovery protocol.
+The following `preview` workflow remains available as an advisory comparison.
+
 Run `pipefoundry --state-dir PATH preview CONFIG --executor local` (or
 `kubernetes`) before deploying. The API equivalent is authenticated
 `POST /deployments/preview` with `{config, executor}`, the same envelope used by
@@ -50,12 +57,17 @@ SELECT name, started FROM operations;
 SELECT name, revision, status, executor FROM revisions ORDER BY name, revision;
 ```
 
-After confirming the operation is inactive, remove only the named lock with a
-parameterized operator script and set its unfinished revision to `failed` in the
+For Sentinel receipts, prefer `recover-release KEY --confirm-worker-stopped`
+after stopping both controller and worker. A crash before receipt reservation
+can leave only an operation row: inspect receipts and actual state first.
+After confirming the operation is inactive, remove only the exact observed
+`(name, started)` lock with a parameterized operator script and set its unfinished revision to `failed` in the
 same administrative recovery transaction. Record the recovery in the incident
-log. The application never automatically steals stale locks; process death does
-not prove an external mutation stopped. A future production reconciler should
-persist run IDs, leases and external operation receipts.
+log. Ordinary lifecycle and Sentinel locks are never reclaimed by age; process
+death does not prove an external mutation stopped. The opt-in synthetic demo
+can reclaim its own old seed operation, but that exception is disabled permanently
+for a pipeline name once any Sentinel plan exists. Sentinel launch receipts do
+not substitute for inspecting external effects.
 
 ## PostgreSQL
 

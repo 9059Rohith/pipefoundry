@@ -9,7 +9,10 @@ import sqlite3
 
 import psycopg
 
-TABLES = re.compile(r"\b(revisions|audit|operations|cluster_targets|artifacts|demo_seed)\b")
+TABLES = re.compile(
+    r"\b(revisions|audit|operations|cluster_targets|artifacts|demo_seed|"
+    r"release_plans|release_receipts|release_settings|revision_identities)\b"
+)
 
 
 class Record(dict):

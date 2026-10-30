@@ -1,0 +1,24 @@
+........ssssssssssss............................ss.sss.................. [ 82%]
+s...........sss                                                          [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_durable_metadata.py:24: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:48: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:79: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:100: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:110: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:121: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:137: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:161: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:177: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:208: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:231: PostgreSQL DSN required
+SKIPPED [1] tests/test_durable_metadata.py:266: PostgreSQL DSN required
+SKIPPED [2] tests/test_release_races.py:37: PostgreSQL DSN required
+SKIPPED [1] tests/test_release_races.py:107: PostgreSQL DSN required
+SKIPPED [1] tests/test_release_races.py:131: cold scratch roots require durable metadata
+SKIPPED [1] tests/test_release_races.py:129: PostgreSQL DSN required
+SKIPPED [1] tests/test_runtime_image.py:8: container opt in
+SKIPPED [1] tests/test_workloads.py:63: PostgreSQL DSN required
+SKIPPED [1] tests/test_workloads.py:77: Spark runtime opt in
+SKIPPED [1] tests/test_workloads.py:97: PostgreSQL DSN required
+66 passed, 21 skipped in 82.80s (0:01:22)

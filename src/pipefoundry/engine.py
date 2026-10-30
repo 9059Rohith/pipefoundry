@@ -63,6 +63,20 @@ class Platform:
                   seed_key TEXT PRIMARY KEY, pipeline_name TEXT NOT NULL,
                   owner TEXT NOT NULL, lease_until TEXT NOT NULL,
                   completed INTEGER NOT NULL DEFAULT 0, last_error TEXT NOT NULL DEFAULT '');
+                CREATE TABLE IF NOT EXISTS release_settings (
+                  setting TEXT PRIMARY KEY, value TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS revision_identities (
+                  name TEXT NOT NULL, revision INTEGER NOT NULL,
+                  code_identity TEXT NOT NULL, operator_identity TEXT NOT NULL,
+                  artifact_identity TEXT NOT NULL, PRIMARY KEY(name,revision));
+                CREATE TABLE IF NOT EXISTS release_plans (
+                  plan_id TEXT PRIMARY KEY, name TEXT NOT NULL, digest TEXT NOT NULL,
+                  payload TEXT NOT NULL, authentication TEXT NOT NULL, created TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS release_receipts (
+                  idempotency_key TEXT PRIMARY KEY, plan_id TEXT NOT NULL UNIQUE,
+                  digest TEXT NOT NULL, name TEXT NOT NULL, revision INTEGER,
+                  operation TEXT NOT NULL, state TEXT NOT NULL, lease_owner TEXT NOT NULL,
+                  created TEXT NOT NULL, updated TEXT NOT NULL, error_code TEXT NOT NULL);
             """)
 
     @contextmanager
@@ -157,18 +171,21 @@ class Platform:
     def operation(self, name: str):
         valid_name(name)
         with self._lock:
+            owner = self.now()
             try:
                 with self.connect() as db:
-                    db.execute("INSERT INTO operations VALUES (?, ?)", (name, self.now()))
+                    db.execute("INSERT INTO operations VALUES (?, ?)", (name, owner))
             except sqlite3.IntegrityError:
                 raise ValueError(
                     "pipeline has an active operation; inspect operations before retry"
                 ) from None
             try:
-                yield
+                yield owner
             finally:
                 with self.connect() as db:
-                    db.execute("DELETE FROM operations WHERE name = ?", (name,))
+                    db.execute(
+                        "DELETE FROM operations WHERE name = ? AND started = ?", (name, owner)
+                    )
 
     @staticmethod
     def now():
@@ -204,11 +221,30 @@ class Platform:
                     "",
                 ),
             )
+        return self._materialize_revision(config, executor, number)
+
+    def _materialize_revision(self, config: Pipeline, executor: str, number: int) -> dict:
+        """Render a reserved revision; caller must retain its pipeline operation lease."""
+        from pipefoundry.releases import ReleaseSentinel, digest
+
         directory = self.revision_dir(config.name, number)
         try:
             render(config, number, directory)
             checksum = hashlib.sha256((directory / "checksums.json").read_bytes()).hexdigest()
+            identity = ReleaseSentinel(self)
             with self.connect() as db:
+                db.execute(
+                    "INSERT INTO revision_identities VALUES(?,?,?,?,?)",
+                    (
+                        config.name,
+                        number,
+                        identity._code_identity(),
+                        identity._operator_identity(),
+                        digest(
+                            json.loads((directory / "checksums.json").read_text(encoding="utf-8"))
+                        ),
+                    ),
+                )
                 if self.durable:
                     for artifact in sorted(directory.rglob("*")):
                         if artifact.is_file():

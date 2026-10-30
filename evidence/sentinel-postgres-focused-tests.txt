@@ -1,0 +1,12 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.14, pytest-9.2.0, pluggy-1.7.0
+rootdir: C:\Users\BhaviChasvi\Downloads\cyber_projects\pipefoundry
+configfile: pyproject.toml
+plugins: anyio-4.15.1, platformdirs-4.14.0
+collected 10 items / 8 deselected / 2 selected
+
+tests\test_release_races.py s.                                           [100%]
+
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_release_races.py:146: demo recovery requires PostgreSQL
+================= 1 passed, 1 skipped, 8 deselected in 2.20s ==================
