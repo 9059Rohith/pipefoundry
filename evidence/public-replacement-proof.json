@@ -1,0 +1,6 @@
+{
+  "previous_deployment": "dpl_A7WFS8NzBYjPFCHjhjepjS52ppJh",
+  "replacement_deployment": "dpl_AD4TnKnpCsR7SxKZ7vE76ze4NJbT",
+  "same_pipeline_revision_artifacts_audit_backfill": true,
+  "comparison_excludes_only_observed_at": true
+}

@@ -279,3 +279,10 @@ Primary references: [Kubernetes CronJobs](https://kubernetes.io/docs/concepts/wo
 [PostgreSQL ON CONFLICT](https://www.postgresql.org/docs/current/sql-insert.html),
 [Spark Parquet](https://spark.apache.org/docs/4.0.1/sql-data-sources-parquet.html),
 [EKS private API access](https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html).
+
+
+## Public deployment evidence
+
+![Verified public dashboard](evidence/public-dashboard.jpg)
+
+Captured from the actual public HTTPS deployment. [Executed public checks](evidence/public-release-verification.json) record real backend responses, authentication results and a small warm-request sample.
