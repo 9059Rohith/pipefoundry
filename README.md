@@ -27,7 +27,7 @@ Successful and failed receipts are terminal: a retry returns the recorded result
 
 Creating any Sentinel plan permanently disables the synthetic demo's age-based lease reclamation for that pipeline name. A paused release controller keeps exclusivity even before receipt reservation. Recovery requires a trusted operator to stop the controller and worker; confirmation is an assertion, not machine proof. Legacy lifecycle endpoints remain available and need gateway/RBAC restrictions if all releases must use Sentinel.
 
-The linked public deployment documents the earlier preview release; Sentinel is locally verified and has not been deployed by this change.
+Sentinel is deployed and verified over public HTTPS: actual fixture execution, retry receipt identity and no duplicate revision. [Protected feature proof](evidence/signature-public-feature.json).
 
 ## Five more things to inspect
 
@@ -225,4 +225,6 @@ For a focused code review or interview discussion:
 
 Useful next exercises are adding an asynchronous operation receipt, an optimistic revision precondition on deploy, an actual on-cluster NetworkPolicy denial test, and a manifest-based atomic publish protocol for object storage. Each addresses a stated boundary rather than expanding the technology list.
 
-The current operational feature also has [actual public HTTPS verification](evidence/review-public-feature.json) and a [fresh all-severity runtime image scan](evidence/review-image-scan.json). These complement the dated local experiments; they do not establish a production SLA.
+The current operational feature also has [actual public HTTPS verification](evidence/review-public-feature.json) and a [fresh all-severity runtime image scan](evidence/signature-image-scan.json). These complement the dated local experiments; they do not establish a production SLA.
+
+Current signature release: [actual protected HTTPS checks](evidence/signature-public-feature.json), [all-severity runtime scan](evidence/signature-image-scan.json), and [measured code changes](evidence/signature-code-metrics.json). Application, test and operational-script lines are counted separately; documentation, comments and docstrings are excluded.

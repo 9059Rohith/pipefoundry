@@ -1,0 +1,14 @@
+{
+  "verified_at_utc": "2026-10-30T16:15:52.871457+00:00",
+  "public_url": "https://rohith-pipefoundry.vercel.app",
+  "scope": "Actual protected signatures over the public production hostname; credentials and raw business records excluded",
+  "checks": {
+    "anonymous_denied": true,
+    "tampered_digest_rejected": true,
+    "real_fixture_worker_completed": true,
+    "durable_revision": 1,
+    "repeated_apply_returns_same_receipt": true,
+    "no_duplicate_revision": true,
+    "same_runtime_and_artifacts_produce_noop_plan": true
+  }
+}
