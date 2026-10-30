@@ -1,5 +1,9 @@
 # PipeFoundry
 
+[![CI](https://github.com/9059Rohith/pipefoundry/actions/workflows/ci.yml/badge.svg)](https://github.com/9059Rohith/pipefoundry/actions/workflows/ci.yml)
+
+Hosted CI is currently blocked by an account-level runner restriction. [Executed local verification](docs/verification.md) is recorded separately; no hosted pass is claimed.
+
 A self-service data pipeline platform for the **OpenFX Data Engineering + DevOps
 Intern** portfolio. Submit a bounded YAML specification, validate it, create a
 versioned deployment bundle, execute the pipeline locally or apply its Kubernetes
@@ -127,7 +131,7 @@ For direct API development, set the token and run
 Mutations run synchronously; callers should allow five minutes per worker/date.
 This single-operator control plane intentionally has no multi-tenant identity/RBAC.
 
-## Real API → PostgreSQL ingestion
+## Real API â†’ PostgreSQL ingestion
 
 Administrators configure connectors using environment variables, rather than
 allowing API callers to provide arbitrary network destinations:
@@ -153,7 +157,7 @@ injects a real 503, runs worker child processes twice and reads PostgreSQL to
 prove one normalized row remains. Only that test routes to a local approved
 connector and ephemeral CA. No live vendor API is required.
 
-## PySpark JSON → Parquet
+## PySpark JSON â†’ Parquet
 
 Install the optional, separately locked runtime and Java 17+:
 
