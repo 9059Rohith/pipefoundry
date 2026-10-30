@@ -1,0 +1,39 @@
+name: optional-existing-eks-deployment
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: Deploy the API chart to an existing private EKS cluster
+        type: boolean
+        default: false
+permissions:
+  contents: read
+jobs:
+  deploy:
+    if: inputs.deploy == true
+    environment: production
+    runs-on: [self-hosted, linux, eks-vpc]
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+      - name: Configure private cluster
+        env:
+          EKS_CLUSTER: ${{ vars.EKS_CLUSTER }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        run: aws eks update-kubeconfig --name "$EKS_CLUSTER" --region "$AWS_REGION"
+      - name: Deploy reviewed chart
+        env:
+          WORKER_IMAGE: ${{ vars.WORKER_IMAGE_REPOSITORY }}
+          WORKER_TAG: ${{ vars.WORKER_IMAGE_TAG }}
+        run: >-
+          helm upgrade --install pipefoundry infra/helm/pipefoundry
+          --namespace pipefoundry --create-namespace --atomic --timeout 5m
+          --set-string image.repository="$WORKER_IMAGE"
+          --set-string image.tag="$WORKER_TAG"
