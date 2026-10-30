@@ -1,0 +1,79 @@
+{
+  "timestamp_utc": "2026-10-30T15:29:55.993921+00:00",
+  "feature": "Authenticated metadata-only deployment preview with CLI and typed API response",
+  "interface": {
+    "api": "POST /deployments/preview",
+    "cli": "pipefoundry [--state-dir PATH] preview CONFIG [--executor local|kubernetes]"
+  },
+  "verification": {
+    "host": {
+      "passed": 58,
+      "skipped": 1,
+      "seconds": 151.98,
+      "evidence": "evidence/preview-host-tests.txt"
+    },
+    "runtime": {
+      "passed": 56,
+      "skipped": 3,
+      "seconds": 56.88,
+      "evidence": "evidence/preview-runtime-tests.txt"
+    }
+  },
+  "targeted_review": {
+    "passed": 16,
+    "evidence": "evidence/preview-review-green.txt"
+  },
+  "preview_regressions_added": 16,
+  "host_scope": "Windows/Python 3.12.14; real PostgreSQL 17; real ephemeral HTTPS -> subprocess -> PG; container identity opt-in; only Spark opt-in skipped",
+  "runtime_scope": "Installed pinned Python 3.15 app in verification image; real PG; read-only root; UID 10001; Docker/Spark/OpenSSL-only tests skipped",
+  "red_green": "Initial preview tests observed 11 missing-interface failures. Review regressions observed two statements on SQLite and PostgreSQL, plus absent typed response; review green has 16 passes.",
+  "resolved_verification_issue": {
+    "evidence": "evidence/preview-host-isolation-failure.txt",
+    "cause": "No-side-effect regression counted global shared test tables while another full suite wrote unrelated pipelines. Assertion now scopes each table to the unique test pipeline."
+  },
+  "benchmarks": {
+    "validate": {
+      "samples": 100,
+      "median_ms": 0.09265,
+      "min_ms": 0.0857,
+      "max_ms": 1.0343
+    },
+    "template": {
+      "samples": 100,
+      "median_ms": 0.0165,
+      "min_ms": 0.0155,
+      "max_ms": 0.1208
+    },
+    "render": {
+      "samples": 100,
+      "median_ms": 99.44550000000001,
+      "min_ms": 63.4029,
+      "max_ms": 642.7722
+    },
+    "preview": {
+      "samples": 100,
+      "median_ms": 4.6419,
+      "min_ms": 3.1926,
+      "max_ms": 9.6117
+    },
+    "local_execution": {
+      "samples": 30,
+      "median_ms": 2448.5092,
+      "min_ms": 1735.6929,
+      "max_ms": 3356.4455
+    }
+  },
+  "artifact_counts": {
+    "source": "examples/orders-local.yaml",
+    "authored_lines": 11,
+    "generated_files": 8,
+    "generated_lines": 345,
+    "caveat": "Includes repeated standalone/bundle/Helm YAML and checksums; not unique logic."
+  },
+  "application_image_id": "sha256:5665b70b83d003abc3f0774c2423113bb2d9265a68016beaa666e1015fe6e08e",
+  "boundaries": [
+    "No new remote deploy/push or GitHub workflow edits in this change",
+    "No new image vulnerability scan; prior dated scans retain their own scope",
+    "Preview is advisory recorded-state comparison; no live drift/environment/readiness checks or deploy reservation"
+  ]
+}

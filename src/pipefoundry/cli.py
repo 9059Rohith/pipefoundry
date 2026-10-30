@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 import yaml
+from pydantic import ValidationError
 
 from pipefoundry.engine import Platform
 from pipefoundry.models import Pipeline
@@ -25,10 +26,10 @@ def main(argv: list[str] | None = None) -> int:
         "--state-dir", default=os.environ.get("PIPEFOUNDRY_STATE_DIR", ".pipefoundry")
     )
     commands = parser.add_subparsers(dest="command", required=True)
-    for name in ("validate", "render", "deploy"):
+    for name in ("validate", "render", "deploy", "preview"):
         command = commands.add_parser(name)
         command.add_argument("config")
-        if name == "deploy":
+        if name in {"deploy", "preview"}:
             command.add_argument("--executor", choices=["local", "kubernetes"], default="local")
     commands.add_parser("list")
     for name in ("status", "logs", "audit", "teardown", "backfill", "rollback"):
@@ -50,6 +51,8 @@ def main(argv: list[str] | None = None) -> int:
                     result = platform.render(load(arguments.config))
                 case "deploy":
                     result = platform.deploy(load(arguments.config), arguments.executor)
+                case "preview":
+                    result = platform.preview(load(arguments.config), arguments.executor)
                 case "list":
                     result = platform.list()
                 case "status":
@@ -63,5 +66,8 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(result, indent=2))
         return 0
     except (ValueError, RuntimeError, OSError, yaml.YAMLError) as exc:
-        print(json.dumps({"error": str(exc)}), file=sys.stderr)
+        message = str(exc)
+        if arguments.command == "preview" and isinstance(exc, (ValidationError, yaml.YAMLError)):
+            message = "invalid deployment configuration"
+        print(json.dumps({"error": message}), file=sys.stderr)
         return 1

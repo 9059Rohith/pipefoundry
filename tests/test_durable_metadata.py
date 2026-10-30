@@ -21,6 +21,61 @@ def pipeline():
     )
 
 
+def test_preview_reads_postgres_metadata_from_cold_root_without_restoring_artifacts(tmp_path):
+    config = pipeline()
+    first = Platform(tmp_path / "first", metadata_dsn=DSN)
+    first.deploy(config)
+    second = Platform(tmp_path / "cold", metadata_dsn=DSN)
+
+    def counts():
+        with second.connect() as db:
+            return [
+                db.execute(f"SELECT COUNT(*) FROM {table} WHERE name=?", (config.name,)).fetchone()[
+                    0
+                ]
+                for table in ("revisions", "audit", "operations", "artifacts")
+            ]
+
+    before = counts()
+    assert second.preview(config)["action"] == "no-op"
+    changed = config.model_copy(update={"schedule": "30 2 * * *"})
+    assert second.preview(changed)["changes"] == [{"path": "config.schedule", "kind": "changed"}]
+    assert counts() == before
+    assert list((tmp_path / "cold").iterdir()) == []
+    assert second.status(config.name)["revision"] == 1
+
+
+def test_postgres_preview_empty_revision_is_one_statement_and_has_no_durable_effects(
+    tmp_path, monkeypatch
+):
+    from pipefoundry.metadata import PostgresConnection
+
+    config = pipeline()
+    platform = Platform(tmp_path, metadata_dsn=DSN)
+    statements = []
+    original = PostgresConnection.execute
+
+    def tracked(db, statement, parameters=()):
+        statements.append(statement)
+        return original(db, statement, parameters)
+
+    monkeypatch.setattr(PostgresConnection, "execute", tracked)
+    result = platform.preview(config)
+    assert result["action"] == "create"
+    assert result["current"] is None
+    assert len(statements) == 1
+    assert statements[0].startswith("SELECT")
+    with platform.connect() as db:
+        for table in ("revisions", "audit", "operations", "artifacts"):
+            assert (
+                db.execute(f"SELECT COUNT(*) FROM {table} WHERE name=?", (config.name,)).fetchone()[
+                    0
+                ]
+                == 0
+            )
+    assert list(tmp_path.iterdir()) == []
+
+
 def test_postgres_state_artifacts_logs_and_rollback_survive_fresh_scratch_roots(tmp_path):
     config = pipeline()
     first = Platform(tmp_path / "first", metadata_dsn=DSN)

@@ -1,0 +1,136 @@
+{
+  "first": {
+    "name": "orders-demo",
+    "revision": 1,
+    "status": "succeeded",
+    "executor": "local",
+    "created": "2026-10-30T20:52:11.033195+05:30",
+    "cluster_targets": []
+  },
+  "create": {
+    "name": "orders-demo",
+    "action": "create",
+    "current": null,
+    "desired_fingerprint": "ec5e3b7b3b228a0d4d9884ba81975a189824ec46bd9ff0036251d521da75ac67",
+    "changes": [
+      {
+        "path": "config",
+        "kind": "added"
+      },
+      {
+        "path": "executor",
+        "kind": "added"
+      }
+    ],
+    "changes_truncated": false,
+    "operation_in_progress": false,
+    "comparison": "latest recorded revision; no live drift or environment check"
+  },
+  "audit": [
+    {
+      "id": 1,
+      "name": "orders-demo",
+      "revision": 1,
+      "action": "deploy",
+      "outcome": "succeeded",
+      "created": "2026-10-30T20:52:13.001525+05:30"
+    },
+    {
+      "id": 2,
+      "name": "orders-demo",
+      "revision": 2,
+      "action": "deploy",
+      "outcome": "succeeded",
+      "created": "2026-10-30T20:52:20.56331+05:30"
+    },
+    {
+      "id": 3,
+      "name": "orders-demo",
+      "revision": 2,
+      "action": "backfill",
+      "outcome": "succeeded",
+      "created": "2026-10-30T20:52:27.820534+05:30"
+    },
+    {
+      "id": 4,
+      "name": "orders-demo",
+      "revision": 3,
+      "action": "rollback",
+      "outcome": "succeeded",
+      "created": "2026-10-30T20:52:32.13865+05:30"
+    },
+    {
+      "id": 5,
+      "name": "orders-demo",
+      "revision": 3,
+      "action": "teardown",
+      "outcome": "succeeded",
+      "created": "2026-10-30T20:52:34.350955+05:30"
+    }
+  ],
+  "second": {
+    "name": "orders-demo",
+    "revision": 2,
+    "status": "succeeded",
+    "executor": "local",
+    "created": "2026-10-30T20:52:18.039576+05:30",
+    "cluster_targets": []
+  },
+  "backfill": {
+    "name": "orders-demo",
+    "partitions": 3,
+    "start": "2026-01-01",
+    "end": "2026-01-03"
+  },
+  "teardown": {
+    "name": "orders-demo",
+    "revision": 3,
+    "status": "torn_down",
+    "executor": "local",
+    "created": "2026-10-30T20:52:29.708324+05:30",
+    "cluster_targets": []
+  },
+  "update": {
+    "name": "orders-demo",
+    "action": "update",
+    "current": {
+      "revision": 1,
+      "status": "succeeded",
+      "executor": "local",
+      "fingerprint": "ec5e3b7b3b228a0d4d9884ba81975a189824ec46bd9ff0036251d521da75ac67"
+    },
+    "desired_fingerprint": "02e110ee5eeaba3e675666adb9c479f12aa4a54fe5156798ca8b9d45bc80f822",
+    "changes": [
+      {
+        "path": "config.schedule",
+        "kind": "changed"
+      }
+    ],
+    "changes_truncated": false,
+    "operation_in_progress": false,
+    "comparison": "latest recorded revision; no live drift or environment check"
+  },
+  "rollback": {
+    "name": "orders-demo",
+    "revision": 3,
+    "status": "succeeded",
+    "executor": "local",
+    "created": "2026-10-30T20:52:29.708324+05:30",
+    "cluster_targets": []
+  },
+  "noop": {
+    "name": "orders-demo",
+    "action": "no-op",
+    "current": {
+      "revision": 1,
+      "status": "succeeded",
+      "executor": "local",
+      "fingerprint": "ec5e3b7b3b228a0d4d9884ba81975a189824ec46bd9ff0036251d521da75ac67"
+    },
+    "desired_fingerprint": "ec5e3b7b3b228a0d4d9884ba81975a189824ec46bd9ff0036251d521da75ac67",
+    "changes": [],
+    "changes_truncated": false,
+    "operation_in_progress": false,
+    "comparison": "latest recorded revision; no live drift or environment check"
+  }
+}

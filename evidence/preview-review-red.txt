@@ -1,0 +1,16 @@
+.F.........F..                                                           [100%]
+================================== FAILURES ===================================
+_____ test_preview_empty_revision_and_operation_are_read_in_one_statement _____
+tests\test_preview.py:65: in test_preview_empty_revision_and_operation_are_read_in_one_statement
+    assert len([sql for sql in statements if sql.startswith("SELECT")]) == 1
+E   assert 2 == 1
+E    +  where 2 = len(["SELECT revision,config,status,executor,EXISTS(SELECT 1 FROM operations WHERE name='preview-orders') AS busy FROM rev...ns WHERE name='preview-orders' ORDER BY revision DESC LIMIT 1", "SELECT 1 FROM operations WHERE name='preview-orders'"])
+________ test_preview_api_auth_validation_and_payload_secrets_are_safe ________
+tests\test_preview.py:160: in test_preview_api_auth_validation_and_payload_secrets_are_safe
+    assert response_schema["content"]["application/json"]["schema"]["$ref"].endswith(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   KeyError: '$ref'
+=========================== short test summary info ===========================
+FAILED tests/test_preview.py::test_preview_empty_revision_and_operation_are_read_in_one_statement
+FAILED tests/test_preview.py::test_preview_api_auth_validation_and_payload_secrets_are_safe
+2 failed, 12 passed in 10.92s

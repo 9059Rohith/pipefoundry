@@ -1,0 +1,12 @@
+........F..............................................s.                [100%]
+================================== FAILURES ===================================
+_ test_preview_reads_postgres_metadata_from_cold_root_without_restoring_artifacts _
+tests\test_durable_metadata.py:41: in test_preview_reads_postgres_metadata_from_cold_root_without_restoring_artifacts
+    assert counts() == before
+E   assert [46, 60, 0, 427] == [46, 59, 1, 425]
+E
+E     At index 1 diff: 60 != 59
+E     Use -v to get more diff
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_workloads.py:77: Spark runtime opt in
+1 failed, 55 passed, 1 skipped in 190.24s (0:03:10)

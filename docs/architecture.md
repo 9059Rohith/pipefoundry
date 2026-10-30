@@ -7,6 +7,23 @@ success only after exit zero. Kubernetes deployment applies a bundle and reads
 the CronJob from the API server; acceptance is recorded independently of job
 success. Live status returns last schedule/success timestamps and active jobs.
 
+Deployment preview adds a read-only comparison before revision creation. Both the
+authenticated `POST /deployments/preview` and CLI `preview CONFIG` use the deploy
+request's typed configuration, executor vocabulary and hosted sink restrictions.
+They read the latest stored JSON and operation presence, expand defaults, normalize
+cron whitespace and compare deterministic canonical JSON. Stable SHA256
+fingerprints identify the compared specification; at most twelve changed field
+paths describe the diff without reflecting values or administrator environment.
+No worker, kubectl, renderer, artifact restore, operation lease or audit mutation
+is invoked. In particular, a PostgreSQL-backed cold root needs no artifact files.
+
+`no-op` requires a matching executor/config, latest succeeded/deployed status and
+no observed active operation. Other existing states report `update`; absent
+revisions report `create`. This is a metadata snapshot, not live drift detection,
+a credential/worker readiness check, or an optimistic concurrency reservation.
+Operator image/namespace/environment settings are outside the comparison. The
+explicit deploy path still creates a new revision even after a no-op preview.
+
 ```mermaid
 stateDiagram-v2
   [*] --> rendering: reserve next revision

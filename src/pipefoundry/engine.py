@@ -229,6 +229,84 @@ class Platform:
             self._audit(config.name, result["revision"], "render", "succeeded")
             return result
 
+    def _validate_deployment(self, config: Pipeline, executor: str):
+        if executor not in {"local", "kubernetes"}:
+            raise ValueError("unknown executor")
+        if self.durable and executor == "local" and config.output.connector != "postgres":
+            raise ValueError("hosted local execution requires PostgreSQL output")
+
+    def preview(self, config: Pipeline, executor: str = "local") -> dict:
+        """Compare a metadata snapshot; never restore artifacts or acquire a lease.
+
+        Only typed config/executor participate: operator environment, live resources,
+        output data and worker availability are deliberately outside this comparison.
+        """
+        self._validate_deployment(config, executor)
+
+        def canonical(pipeline, target):
+            desired = pipeline.model_dump()
+            desired["schedule"] = " ".join(desired["schedule"].split())
+            return {"config": desired, "executor": target}
+
+        def fingerprint(value):
+            payload = json.dumps(value, sort_keys=True, separators=(",", ":"))
+            return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+        def changed_paths(before, after, prefix=""):
+            paths = []
+            for key in sorted(after):
+                path = f"{prefix}.{key}" if prefix else key
+                if isinstance(after[key], dict):
+                    paths.extend(changed_paths(before[key], after[key], path))
+                elif before[key] != after[key]:
+                    paths.append({"path": path, "kind": "changed"})
+            return paths
+
+        # One statement gives a consistent revision/operation snapshot on both DBs.
+        # No status(refresh=True), verified_config or filesystem rehydration here.
+        with self.connect() as db:
+            row = db.execute(
+                "SELECT latest.revision,latest.config,latest.status,latest.executor,"
+                "EXISTS(SELECT 1 FROM operations WHERE name=?) AS busy "
+                "FROM (SELECT 1) AS anchor LEFT JOIN "
+                "(SELECT revision,config,status,executor FROM revisions WHERE name=? "
+                "ORDER BY revision DESC LIMIT 1) AS latest ON 1=1",
+                (config.name, config.name),
+            ).fetchone()
+            # The singleton also returns the lease observation before revision 1.
+            busy = bool(row["busy"])
+        desired = canonical(config, executor)
+        current = None
+        changes = [{"path": "config", "kind": "added"}, {"path": "executor", "kind": "added"}]
+        action = "create"
+        if row["revision"] is not None:
+            try:
+                previous = canonical(Pipeline.model_validate_json(row["config"]), row["executor"])
+            except ValueError:
+                raise ValueError("stored revision config is invalid") from None
+            changes = changed_paths(previous, desired)
+            current = {
+                "revision": row["revision"],
+                "status": row["status"],
+                "executor": row["executor"],
+                "fingerprint": fingerprint(previous),
+            }
+            action = (
+                "no-op"
+                if not changes and not busy and row["status"] in {"succeeded", "deployed"}
+                else "update"
+            )
+        return {
+            "name": config.name,
+            "action": action,
+            "current": current,
+            "desired_fingerprint": fingerprint(desired),
+            "changes": changes[:12],
+            "changes_truncated": len(changes) > 12,
+            "operation_in_progress": busy,
+            "comparison": "latest recorded revision; no live drift or environment check",
+        }
+
     def _set_status(self, name: str, revision: int, status: str):
         with self.connect() as db:
             db.execute(
@@ -363,8 +441,7 @@ class Platform:
         raise ValueError("pipeline is not deployed")
 
     def deploy(self, config: Pipeline, executor: str = "local", action: str = "deploy") -> dict:
-        if self.durable and executor == "local" and config.output.connector != "postgres":
-            raise ValueError("hosted local execution requires PostgreSQL output")
+        self._validate_deployment(config, executor)
         with self.operation(config.name):
             result = self._new_revision(config, executor)
             revision = result["revision"]

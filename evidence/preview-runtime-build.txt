@@ -1,0 +1,93 @@
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.40kB 0.0s done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for cgr.dev/chainguard/python:latest@sha256:bf06e09413bec94d6489f0be783b8f9349339907b89e0f759d190d0b95ab2d8f
+#2 ...
+
+#3 [internal] load metadata for cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2
+#3 DONE 0.1s
+
+#2 [internal] load metadata for cgr.dev/chainguard/python:latest@sha256:bf06e09413bec94d6489f0be783b8f9349339907b89e0f759d190d0b95ab2d8f
+#2 DONE 0.2s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 188B 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [stage-1 1/4] FROM cgr.dev/chainguard/python:latest@sha256:bf06e09413bec94d6489f0be783b8f9349339907b89e0f759d190d0b95ab2d8f
+#6 resolve cgr.dev/chainguard/python:latest@sha256:bf06e09413bec94d6489f0be783b8f9349339907b89e0f759d190d0b95ab2d8f 0.1s done
+#6 DONE 0.1s
+
+#7 [build 1/7] FROM cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2
+#7 resolve cgr.dev/chainguard/python:latest-dev@sha256:95d8cc85fad8acc8ebad357e1972f2a975c498a65406cd9b00bb2233371a94a2 0.1s done
+#7 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 83.62kB 0.0s done
+#5 DONE 0.0s
+
+#8 [build 2/7] WORKDIR /app
+#8 CACHED
+
+#9 [build 3/7] COPY requirements.lock ./
+#9 CACHED
+
+#10 [build 4/7] RUN --mount=type=cache,target=/root/.cache/pip python -m venv /opt/venv     && /opt/venv/bin/python -m pip install pip==26.2.2     && PYYAML_FORCE_LIBYAML=0 /opt/venv/bin/python -m pip install        --only-binary=:all: --no-binary=pyyaml -r requirements.lock
+#10 CACHED
+
+#11 [build 5/7] COPY pyproject.toml ./
+#11 CACHED
+
+#12 [build 6/7] COPY src ./src
+#12 DONE 0.1s
+
+#13 [build 7/7] RUN --mount=type=cache,target=/root/.cache/pip /opt/venv/bin/python -m pip install --no-deps .     && mkdir /state && chown 10001:10001 /state     && /opt/venv/bin/python -m pip uninstall -y pip setuptools wheel
+#13 1.181 Processing ./.
+#13 1.189   Installing build dependencies: started
+#13 2.603   Installing build dependencies: finished with status 'done'
+#13 2.605   Getting requirements to build wheel: started
+#13 3.582   Getting requirements to build wheel: finished with status 'done'
+#13 3.585   Preparing metadata (pyproject.toml): started
+#13 4.046   Preparing metadata (pyproject.toml): finished with status 'done'
+#13 4.064 Building wheels for collected packages: pipefoundry
+#13 4.068   Building wheel for pipefoundry (pyproject.toml): started
+#13 4.655   Building wheel for pipefoundry (pyproject.toml): finished with status 'done'
+#13 4.656   Created wheel for pipefoundry: filename=pipefoundry-0.1.0-py3-none-any.whl size=28737 sha256=d5773c7e025d8f4907f9077863e82d3b9d52a77faf9e713b47e98d334b2237a8
+#13 4.656   Stored in directory: /tmp/pip-ephem-wheel-cache-wr4eouiq/wheels/e4/aa/2a/66e2fb583aba00cfa897eaefdb4530364853b5d6b6cc1ee740
+#13 4.661 Successfully built pipefoundry
+#13 4.694 Installing collected packages: pipefoundry
+#13 4.793 Successfully installed pipefoundry-0.1.0
+#13 5.325 Found existing installation: pip 26.2.2
+#13 5.362 Uninstalling pip-26.2.2:
+#13 5.978   Successfully uninstalled pip-26.2.2
+#13 6.019 WARNING: Skipping setuptools as it is not installed.
+#13 6.022 WARNING: Skipping wheel as it is not installed.
+#13 DONE 6.2s
+
+#14 [stage-1 2/4] WORKDIR /app
+#14 CACHED
+
+#15 [stage-1 3/4] COPY --from=build /opt/venv /opt/venv
+#15 DONE 0.6s
+
+#16 [stage-1 4/4] COPY --from=build --chown=10001:10001 /state /state
+#16 DONE 0.1s
+
+#17 exporting to image
+#17 exporting layers
+#17 exporting layers 2.4s done
+#17 exporting manifest sha256:98b0d1fe0c6edead7348c0bc725be8187d56a766ad822600ee184dca4f672c06 0.0s done
+#17 exporting config sha256:fed57cf48b6eaed87c881905b98471e8a9498666c1146086484837c1aac5adb3 0.0s done
+#17 exporting attestation manifest sha256:e7db0c802be65769623ea436509545fb767add4206726b3df9aca1835078b1a7 0.0s done
+#17 exporting manifest list sha256:5665b70b83d003abc3f0774c2423113bb2d9265a68016beaa666e1015fe6e08e
+#17 exporting manifest list sha256:5665b70b83d003abc3f0774c2423113bb2d9265a68016beaa666e1015fe6e08e 0.0s done
+#17 naming to docker.io/library/pipefoundry:preview done
+#17 unpacking to docker.io/library/pipefoundry:preview
+#17 unpacking to docker.io/library/pipefoundry:preview 0.8s done
+#17 DONE 3.4s

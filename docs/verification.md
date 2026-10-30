@@ -1,5 +1,56 @@
 # Verification evidence — 2026-10-30
 
+## Deployment preview: latest source verification
+
+The deployment-preview change adds **16 regression cases**. Final full runs:
+
+| Environment | Observed result | Evidence |
+|---|---|---|
+| Windows / Python 3.12.14, real PostgreSQL, real HTTPS ingestion, container identity enabled | **58 passed, 1 skipped**, 151.98s; only optional Spark skipped | [Host output](../evidence/preview-host-tests.txt) |
+| Installed pinned Python 3.15 application, real PostgreSQL, UID 10001, read-only root | **56 passed, 3 skipped**, 56.88s; Docker-in-Docker, Spark and OpenSSL-only TLS test skipped | [Runtime output](../evidence/preview-runtime-tests.txt) |
+| Focused preview and PostgreSQL review regressions | **16 passed**, including empty-revision one-statement query budget on SQLite and PostgreSQL | [Review green](../evidence/preview-review-green.txt) |
+| Ruff lint/format, Bandit, whitespace validation | Exit 0 for each command | [Static checks](../evidence/preview-static-checks.json) |
+| README walkthrough | Create/no-op/update, rollback revision 3, three historical dates, 12 SQL rows / 17,000 cents and five lifecycle events | [Actual CLI results](../evidence/preview-walkthrough.json) |
+| Documentation links | 41 local links resolve; existing console, JSON receipts, readiness and source URLs return HTTP 200 | [Local links](../evidence/preview-doc-links.json), [HTTP links](../evidence/preview-public-links.json) |
+
+The new API response is typed in authenticated OpenAPI. Preview uses one SELECT
+snapshot for latest revision plus operation presence, including before revision
+1. Regressions assert unchanged revision/audit/operation/artifact rows and files,
+no worker/render/restore/lease invocation, safe invalid-input errors, canonical
+defaults/cron whitespace, inactive-state updates and metadata-only cold roots.
+
+Red/green evidence is retained for [SQLite/API review](../evidence/preview-review-red.txt)
+and [PostgreSQL query budget](../evidence/preview-postgres-review-red.txt). A
+concurrent full run also exposed a test-isolation defect: its assertion counted
+all rows in shared test tables while the other suite wrote unrelated pipelines.
+The [failure](../evidence/preview-host-isolation-failure.txt) is retained; each
+assertion now filters the unique pipeline name. The final runs above include the
+fix. No failed check is represented as a pass.
+
+[Raw performance samples](../evidence/preview-benchmark.json) record 100 samples
+per lightweight stage and 30 complete local deployments. Preview's 100 samples
+were remeasured after the final single-statement change; unchanged stage samples
+remain from the full run, with both timestamps and scope recorded. Median preview
+is **4.6419 ms** and median complete local deployment is **2448.5092 ms** on the
+shared Windows workstation. Contention differs between stages; no causal speedup,
+throughput or production SLA is inferred. The same report counts an 11-line YAML
+example generating eight files / 345 lines, including repeated YAML and checksums.
+This measures generated material, not hours saved.
+
+The source change was built as `pipefoundry:preview`; the runtime harness copies
+its installed `/opt/venv`, keeping test tools out of the shipped application.
+Use the existing [runtime-test Dockerfile](../scripts/Dockerfile.runtime-tests)
+with its application-image COPY reference set to the freshly built tag and
+`--build-context test-sources=tests`. Run with a private PostgreSQL test DSN,
+`--read-only`, dropped capabilities, no privilege escalation and writable `/tmp`.
+The exact build output and image ID appear in [summary](../evidence/preview-summary.json)
+and [runtime build](../evidence/preview-runtime-build.txt).
+
+No remote deployment, new vulnerability scan, live Kubernetes/Airflow execution
+or AWS provisioning is implied by this source verification. The anonymous link
+checks concern the existing deployment; preview publication is a separate release
+step. Historical hosting/image/Spark evidence follows with its original scope.
+
 The later public-hosting hardening pass supersedes the original image finding
 counts below: **42 host tests passed**, **40 Python 3.15 runtime tests passed**,
 and the full fresh-database image scan found **zero vulnerabilities at every

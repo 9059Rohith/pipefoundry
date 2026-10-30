@@ -1,0 +1,10 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_postgres_preview_empty_revision_is_one_statement_and_has_no_durable_effects _
+tests\test_durable_metadata.py:64: in test_postgres_preview_empty_revision_is_one_statement_and_has_no_durable_effects
+    assert len(statements) == 1
+E   AssertionError: assert 2 == 1
+E    +  where 2 = len(['SELECT revision,config,status,executor,EXISTS(SELECT 1 FROM operations WHERE name=?) AS busy FROM revisions WHERE name=? ORDER BY revision DESC LIMIT 1', 'SELECT 1 FROM operations WHERE name=?'])
+=========================== short test summary info ===========================
+FAILED tests/test_durable_metadata.py::test_postgres_preview_empty_revision_is_one_statement_and_has_no_durable_effects
+1 failed, 11 deselected in 1.11s

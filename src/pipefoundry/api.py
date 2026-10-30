@@ -12,6 +12,8 @@ from typing import Annotated, Literal
 
 import psycopg
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import Field
 
@@ -33,6 +35,50 @@ def secure_response(response):
 class Deployment(StrictModel):
     config: Pipeline
     executor: Literal["local", "kubernetes"] = "local"
+
+
+class PreviewChange(StrictModel):
+    path: Literal[
+        "config",
+        "executor",
+        "config.name",
+        "config.schedule",
+        "config.transform",
+        "config.input.connector",
+        "config.input.path",
+        "config.output.connector",
+        "config.output.path",
+        "config.resources.cpu_millis",
+        "config.resources.memory_mib",
+    ]
+    kind: Literal["added", "changed"]
+
+
+class PreviewCurrent(StrictModel):
+    revision: int = Field(ge=1)
+    status: Literal[
+        "rendering",
+        "rendered",
+        "running",
+        "deploying",
+        "succeeded",
+        "deployed",
+        "failed",
+        "torn_down",
+    ]
+    executor: Literal["local", "kubernetes", "render"]
+    fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
+class DeploymentPreview(StrictModel):
+    name: str
+    action: Literal["create", "update", "no-op"]
+    current: PreviewCurrent | None
+    desired_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    changes: list[PreviewChange] = Field(max_length=12)
+    changes_truncated: bool
+    operation_in_progress: bool
+    comparison: str
 
 
 class Backfill(StrictModel):
@@ -89,6 +135,14 @@ def create_app(
         title="PipeFoundry", version="0.1.0", docs_url=None, redoc_url=None, lifespan=lifespan
     )
     authenticated = [Depends(authorize)]
+
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request, exc):
+        if request.url.path == "/deployments/preview":
+            # Pydantic's default errors include input and unknown field names.
+            # A preview must never reflect accidentally pasted credentials.
+            return JSONResponse({"detail": "invalid deployment configuration"}, status_code=422)
+        return await request_validation_exception_handler(request, exc)
 
     @app.middleware("http")
     async def limit_body(request: Request, call_next):
@@ -210,6 +264,10 @@ def create_app(
     @app.post("/pipelines", status_code=201, dependencies=authenticated)
     def deploy(body: Deployment):
         return platform.deploy(body.config, body.executor)
+
+    @app.post("/deployments/preview", dependencies=authenticated, response_model=DeploymentPreview)
+    def preview_deployment(body: Deployment):
+        return platform.preview(body.config, body.executor)
 
     @app.post("/render", status_code=201, dependencies=authenticated)
     def render_pipeline(body: Pipeline):

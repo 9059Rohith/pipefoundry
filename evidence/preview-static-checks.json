@@ -1,0 +1,29 @@
+{
+  "timestamp_utc": "2026-10-30T15:30:45.308172+00:00",
+  "checks": [
+    {
+      "command": "-m ruff check src tests scripts",
+      "exit_code": 0,
+      "stdout": "All checks passed!",
+      "stderr": ""
+    },
+    {
+      "command": "-m ruff format --check src tests scripts",
+      "exit_code": 0,
+      "stdout": "27 files already formatted",
+      "stderr": ""
+    },
+    {
+      "command": "-m bandit -r src -q",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'evidence/preview-host-isolation-failure.txt', CRLF will be replaced by LF the next time Git touches it\nwarning: in the working copy of 'evidence/preview-runtime-test-build.txt', CRLF will be replaced by LF the next time Git touches it"
+    }
+  ]
+}

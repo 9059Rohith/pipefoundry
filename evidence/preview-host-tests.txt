@@ -1,0 +1,4 @@
+.........................................................s.              [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_workloads.py:77: Spark runtime opt in
+58 passed, 1 skipped in 151.98s (0:02:31)

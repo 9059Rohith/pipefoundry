@@ -1,5 +1,29 @@
 # Operations and recovery
 
+## Review before deployment
+
+Run `pipefoundry --state-dir PATH preview CONFIG --executor local` (or
+`kubernetes`) before deploying. The API equivalent is authenticated
+`POST /deployments/preview` with `{config, executor}`, the same envelope used by
+`POST /pipelines`. Inspect `action`, `current.revision`, `current.status`,
+`operation_in_progress`, fingerprints and changed field paths. Invalid API
+configuration returns a sanitized 422; use CLI `validate CONFIG` in a protected
+terminal when field-specific diagnostics are needed.
+
+Preview does not reserve a revision, acquire/release locks, restore files, write
+audit records or affect schedules. First opening an unused local state directory
+initializes its metadata database. A matching failed/rendered/torn-down revision
+still reports update. An active operation must be investigated before a mutation;
+preview can report its presence without bypassing it. A no-op means the desired
+specification matches successful/deployed metadata; it does not prove live cluster
+agreement or include changed administrator image, namespace, DSN or allowlist
+settings. Deploy after preview still explicitly creates and executes a revision.
+
+For hosted PostgreSQL metadata, use a config with PostgreSQL output when previewing
+local execution. The same hosted restriction applies to deploy. Rollback restores
+configuration using the current operator runtime settings; inspect both the config
+diff and those settings during recovery.
+
 ## Local pipeline failure
 
 1. Run `pipefoundry status NAME`, `pipefoundry logs NAME` and
