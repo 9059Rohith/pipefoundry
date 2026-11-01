@@ -1,0 +1,8 @@
+{
+  "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+  "http_status": 200,
+  "observed_at": "2026-11-01T18:50:10.524178+00:00",
+  "sha256": "5006c65fef7b769ec896c300b6f87e3c15ba9311af0589df604b887a9bf2bed9",
+  "max_stale_seconds": 86400,
+  "note": "Actual public GitHub response. Fallback metadata is explicitly labeled stale."
+}

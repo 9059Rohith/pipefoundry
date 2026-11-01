@@ -123,8 +123,9 @@ async function inspect(view, extra = "") {
   const result = await request(
     `/workbench/api/github?repo=${encodeURIComponent(repo)}&view=${view}${extra}`,
   );
-  $("#source-status").textContent =
-    `Observed ${new Date(result.observed_at).toLocaleTimeString()} · cached 60s`;
+  $("#source-status").textContent = result.stale
+    ? `Stale cache · observed ${new Date(result.observed_at).toLocaleString()}`
+    : `Observed ${new Date(result.observed_at).toLocaleTimeString()} · cached 60s`;
   audit("Repository inspected", `${repo} · ${view}`);
   return result;
 }
@@ -653,7 +654,7 @@ async function agent() {
           `${repo} · ${r.trace.length} tool reads`,
         );
         $("#agent-output").innerHTML =
-          `<div class="panel-body"><div class="agent-response">${esc(r.answer)}</div><p class="mono muted">Provider: ${esc(r.provider || d.ai_provider)} · ${esc(r.model)}</p><h3>Tool evidence</h3>${r.trace.map((t) => `<div class="activity-item"><span class="activity-icon">↳</span><div><p>${esc(t.tool)} · ${esc(t.view)}</p><small>${link(t.source, "Source")} · ${esc(fmt(t.observed_at))}</small></div></div>`).join("")}</div>`;
+          `<div class="panel-body">${r.trace.some((t) => t.stale) ? '<div class="notice">GitHub rate limiting prevented a fresh check. This analysis uses previously fetched public evidence at the observation times below.</div>' : ""}<div class="agent-response">${esc(r.answer)}</div><p class="mono muted">Provider: ${esc(r.provider || d.ai_provider)} · ${esc(r.model)}</p><h3>Tool evidence</h3>${r.trace.map((t) => `<div class="activity-item"><span class="activity-icon">↳</span><div><p>${esc(t.tool)} · ${esc(t.view)}</p><small>${link(t.source, "Source")} · ${esc(fmt(t.observed_at))} · ${t.stale ? "Cached · stale (GitHub rate limit)" : "Fresh evidence"}</small></div></div>`).join("")}</div>`;
       } catch (e) {
         notice(e.message, true);
         $("#agent-output").innerHTML = empty(

@@ -278,3 +278,50 @@ def test_gemini_rejects_unsupported_tools_and_ungrounded_answers(monkeypatch):
         )
         with pytest.raises(HTTPException):
             run_agent(AgentRequest(repo="a/b", question="Inspect repository metadata"))
+
+
+@pytest.mark.parametrize("age,expect_stale", [(30, False), (300, True)])
+def test_real_cached_github_evidence_survives_rate_limits(monkeypatch, age, expect_stale):
+    from datetime import UTC, datetime, timedelta
+
+    from pipefoundry import workbench
+
+    workbench._cache.clear()
+    observed = (datetime.now(UTC) - timedelta(seconds=age)).isoformat()
+    evidence = {
+        "data": {"default_branch": "main"},
+        "observed_at": observed,
+        "source": "https://api.github.com/repos/a/b",
+        "stale": False,
+    }
+    monkeypatch.setattr(workbench, "read_cached_evidence", lambda key: evidence)
+    monkeypatch.setattr(httpx.Client, "get", lambda *args, **kwargs: httpx.Response(429))
+    result = github("a/b", "repository")
+    assert result["stale"] is expect_stale
+    assert result["observed_at"] == observed
+    assert result["data"] == evidence["data"]
+    if expect_stale:
+        assert result["cache_status"] == "stale-rate-limit"
+        assert "previously fetched" in result["warning"]
+
+
+def test_github_rejects_expired_cache_and_reports_retry(monkeypatch):
+    from datetime import UTC, datetime, timedelta
+
+    from fastapi import HTTPException
+
+    from pipefoundry import workbench
+
+    workbench._cache.clear()
+    observed = (datetime.now(UTC) - timedelta(days=2)).isoformat()
+    monkeypatch.setattr(
+        workbench,
+        "read_cached_evidence",
+        lambda key: {"data": {"default_branch": "main"}, "observed_at": observed},
+    )
+    monkeypatch.setattr(httpx.Client, "get", lambda *args, **kwargs: httpx.Response(429))
+    with pytest.raises(HTTPException) as error:
+        github("a/b", "repository")
+    assert error.value.status_code == 429
+    assert error.value.headers["Retry-After"] == "60"
+    assert "no usable cached evidence" in error.value.detail
