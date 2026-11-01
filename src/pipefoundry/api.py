@@ -165,6 +165,7 @@ def create_app(
             in {
                 "/workbench/assets/app.css",
                 "/workbench/assets/app.js",
+                "/workbench/assets/ui.js",
                 "/workbench/api/github",
                 "/workbench/api/integrations",
             }

@@ -416,7 +416,7 @@ def router(authorize):
     routes = APIRouter()
 
     @routes.get("/workbench/assets/{asset}")
-    def asset(asset: Literal["app.js", "app.css"]):
+    def asset(asset: Literal["app.js", "app.css", "ui.js"]):
         return FileResponse(STATIC / asset)
 
     @routes.get("/workbench/api/github")

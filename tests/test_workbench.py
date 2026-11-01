@@ -183,6 +183,7 @@ def test_every_workbench_route_is_public_and_has_security_headers(client):
     assert client.get("/").status_code == 200
     assert client.get("/workbench/assets/app.css").status_code == 200
     assert client.get("/workbench/assets/app.js").status_code == 200
+    assert client.get("/workbench/assets/ui.js").status_code == 200
 
 
 def test_gemini_roundtrips_original_tool_signatures_and_evidence(monkeypatch, client):

@@ -1,5 +1,6 @@
 "use strict";
 const page = document.body.dataset.page;
+const icon = FoundryUI.icon;
 const $ = (s) => document.querySelector(s);
 const esc = (v) =>
   String(v ?? "—").replace(
@@ -9,19 +10,11 @@ const esc = (v) =>
         c
       ],
   );
-const safeURL = (v) => {
-  try {
-    const u = new URL(v);
-    return u.protocol === "https:" &&
-      ["github.com", "api.github.com"].includes(u.hostname)
-      ? u.href
-      : "#";
-  } catch {
-    return "#";
-  }
-};
+const safeURL = (value) => FoundryUI.safeURL(value) || "#";
 const link = (url, label) =>
-  `<a href="${esc(safeURL(url))}" target="_blank" rel="noopener noreferrer">${esc(label)} ↗</a>`;
+  FoundryUI.safeURL(url)
+    ? `<a href="${esc(safeURL(url))}" target="_blank" rel="noopener noreferrer">${esc(label)} ${icon("external")}</a>`
+    : `<span>${esc(label)}</span>`;
 const fmt = (v) =>
   v
     ? new Date(v).toLocaleString(undefined, {
@@ -39,8 +32,7 @@ const descriptions = {
   run: "Inspect the steps, outcomes and timestamps for a workflow run.",
   releases: "Published versions and downloadable assets from your repository.",
   commits: "Trace changes to their authors, commits and source.",
-  editor:
-    "Compose typed pipeline configuration. Save your draft, then validate.",
+  editor: "Compose typed configuration. Validate before execution.",
   validation: "Check your draft against the same schema used by the runtime.",
   manifests:
     "Render a concrete Kubernetes bundle from validated configuration.",
@@ -51,7 +43,8 @@ const descriptions = {
   audit: "A local record of the actions you take in this browser session.",
   integrations:
     "Know what is connected, what is available and what needs credentials.",
-  agent: "Investigate repository evidence with a bounded, read-only AI agent.",
+  agent:
+    "Ask about this public repository. Inspect the evidence. No sign-in required.",
 };
 $("#description").textContent = descriptions[page] || "";
 document
@@ -132,7 +125,12 @@ async function inspect(view, extra = "") {
   );
   $("#source-status").textContent = result.stale
     ? `Stale cache · observed ${new Date(result.observed_at).toLocaleString()}`
-    : `Observed ${new Date(result.observed_at).toLocaleTimeString()} · cached 60s`;
+    : `Observed ${new Date(result.observed_at).toLocaleString()} · ${result.cache_status === "live" ? "live response" : "fresh cache"}`;
+  if (result.stale)
+    notice(
+      result.warning ||
+        "Historical cached evidence is shown at its original observation time.",
+    );
   audit("Repository inspected", `${repo} · ${view}`);
   return result;
 }
@@ -140,10 +138,23 @@ function panel(title, body, subtitle = "", action = "") {
   return `<section class="panel"><div class="panel-head"><div><h2>${esc(title)}</h2>${subtitle ? `<p>${esc(subtitle)}</p>` : ""}</div>${action}</div>${body}</section>`;
 }
 function empty(title, text, href = "", cta = "") {
-  return `<div class="empty"><span class="empty-icon">⌘</span><strong>${esc(title)}</strong>${esc(text)}${href ? `<br><a class="button" href="${href}">${esc(cta)}</a>` : ""}</div>`;
+  return `<div class="empty"><span class="empty-icon">${icon("file")}</span><strong>${esc(title)}</strong>${esc(text)}${href ? `<br><a class="button" href="${href}">${esc(cta)}</a>` : ""}</div>`;
 }
 function table(headers, rows) {
-  return `<div class="table-wrap"><table><thead><tr>${headers.map((x) => `<th scope="col">${esc(x)}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div>`;
+  const searchable =
+    rows.length > 3 && !headers[0].startsWith("Workflow / execution");
+  const tools = searchable
+    ? `<div class="table-tools"><input type="search" data-table-filter aria-label="Filter table records" placeholder="Filter these records…"><span data-table-count>${rows.length} records</span></div>`
+    : "";
+  const contents = rows.map((row) =>
+    row
+      .replace("<tr>", "<tr data-inspect-row>")
+      .replace(
+        "</tr>",
+        `<td class="row-inspect"><button class="icon-button" data-inspect-record aria-label="Inspect record">${icon("inspect")}</button></td></tr>`,
+      ),
+  );
+  return `<div class="data-table">${tools}<div class="table-wrap"><table><thead><tr>${headers.map((x) => `<th scope="col">${esc(x)}</th>`).join("")}<th scope="col"><span class="sr-only">Details</span></th></tr></thead><tbody>${contents.join("")}</tbody></table></div><p class="table-empty" data-table-empty hidden>No matching records. Change the filter to see more results.</p></div>`;
 }
 function metric(label, value, sub = "", small = false) {
   return `<div class="metric"><dt>${esc(label)}</dt><dd${small ? ' class="small"' : ""}>${esc(value)}</dd><small>${esc(sub)}</small></div>`;
@@ -155,7 +166,7 @@ function getDraft() {
   const raw = readStore("pf.draft");
   if (!raw) return defaultConfig;
   try {
-    return JSON.parse(raw);
+    return FoundryUI.parseDraft(raw);
   } catch {
     throw new Error(
       "Your saved draft is invalid JSON. Open the pipeline editor to repair it.",
@@ -207,35 +218,28 @@ async function overview() {
     inspect("workflows"),
   ]);
   if (repository.status === "rejected") throw repository.reason;
-  const d = repository.value.data;
-  const rs = runs.status === "fulfilled" ? runs.value.data.workflow_runs : [];
-  const ws =
-    workflows.status === "fulfilled" ? workflows.value.data.workflows : [];
+  const data = repository.value.data;
+  const executions =
+    runs.status === "fulfilled" ? runs.value.data.workflow_runs || [] : [];
+  const definitions =
+    workflows.status === "fulfilled"
+      ? workflows.value.data.workflows || []
+      : [];
   $("#page-actions").innerHTML =
-    '<a class="button primary" href="/workbench/editor">＋ New pipeline</a>';
-  return `<dl class="metrics">${metric("Repository", d.name, "Public GitHub source", true)}${metric("Workflow definitions", workflows.status === "fulfilled" ? ws.length : "Unavailable", "Up to 50 definitions")}${metric("Recent executions", runs.status === "fulfilled" ? rs.length : "Unavailable", "Latest 30 GitHub runs")}${metric("Default branch", d.default_branch, "Repository configuration", true)}</dl><div class="split">${panel("Recent executions", runs.status === "rejected" ? empty("Executions unavailable", runs.reason.message) : rs.length ? table(["Workflow / execution", "Outcome", "Branch", "Started", "Trigger"], runRows(rs.slice(0, 6))) : empty("No workflow executions", "GitHub returned no workflow runs for this repository."), "Evidence from GitHub Actions", '<a href="/workbench/runs">View all executions →</a>')}${panel(
-    "Your next pipeline",
-    `<div class="flow"><div class="flow-node">Source<small>Typed input</small></div><span class="flow-arrow">→</span><div class="flow-node">Transform<small>Normalize orders</small></div><span class="flow-arrow">→</span><div class="flow-node">Sink<small>Validated output</small></div></div><p class="note">A draft becomes a validated configuration, then a versioned manifest. Deployment requires your authenticated control plane.</p><div class="panel-body">${facts(
-      [
-        ["Runtime", "Python / FastAPI"],
-        ["Configuration", "Strict Pydantic schema"],
-        ["Public access", "Read-only inspection"],
-        ["Draft storage", "This browser session"],
-      ],
-    )}</div>`,
-    "A deliberate path from configuration to execution",
-  )}</div><div class="split equal">${panel(
-    "Repository activity",
-    `<div class="panel-body"><h3>${esc(d.full_name)}</h3><p class="muted">${esc(d.description || "No repository description provided.")}</p>${facts(
-      [
-        ["Last push", fmt(d.pushed_at)],
-        ["Language", d.language],
-        ["Open issues", d.open_issues_count],
-      ],
-    )}</div>`,
-    "Live repository metadata",
-    link(d.html_url, "Open GitHub"),
-  )}${panel("Build, inspect, release", `<div class="panel-body steps"><a class="step" href="/workbench/editor"><div><h3>Compose your configuration</h3><p>Use typed connectors, schedules and resource limits.</p></div></a><a class="step" href="/workbench/validation"><div><h3>Validate before execution</h3><p>Resolve schema and compatibility issues on the server.</p></div></a><a class="step" href="/workbench/plans"><div><h3>Preview the deployment</h3><p>Compare your desired configuration with recorded state.</p></div></a></div>`)}</div>`;
+    `<a class="button primary" href="/workbench/editor">${icon("plus")} New pipeline</a>`;
+  return `<section class="repository-summary"><div><div class="summary-identity">${icon("repo")}<h2>${esc(data.full_name)}</h2></div><p>${esc(data.description || "Explore the repository and the evidence behind its workflows.")}</p></div><div class="summary-context"><span>${icon("workflow")} ${esc(data.default_branch)}</span><span>${esc(data.language || "Language not specified")}</span>${link(data.html_url, "Open source")}</div></section><div class="split">${panel("Recent executions", runs.status === "rejected" ? empty("Executions unavailable", runs.reason.message) : executions.length ? table(["Workflow / execution", "Outcome", "Branch", "Started", "Trigger"], runRows(executions.slice(0, 6))) : empty("No workflow executions", "GitHub returned no runs for the selected repository."), "Observed GitHub Actions history · outcomes are not simulated", '<a href="/workbench/runs">All executions ' + icon("arrow") + "</a>")}${panel("Build a pipeline", `<div class="panel-body steps"><a class="step" href="/workbench/editor"><div><h3>Configure</h3><p>Compose a typed source, transform and destination.</p></div></a><a class="step" href="/workbench/validation"><div><h3>Validate</h3><p>Check schedule, resources and connector compatibility.</p></div></a><a class="step" href="/workbench/manifests"><div><h3>Inspect the artifact</h3><p>Copy or download the rendered Kubernetes bundle.</p></div></a><a class="step" href="/workbench/plans"><div><h3>Preview a plan</h3><p>Compare recorded state through the protected control plane.</p></div></a></div>`, "Configuration is a draft until the runtime validates it.")}</div><dl class="metrics">${metric("Workflow definitions", workflows.status === "fulfilled" ? definitions.length : "Unavailable", "Up to 50 definitions")}${metric("Recent executions", runs.status === "fulfilled" ? executions.length : "Unavailable", "Latest 30 returned runs")}${metric("Open issues", data.open_issues_count, "Repository observation")}${metric("Last push", new Date(data.pushed_at).toLocaleDateString(), "See the source observation time", true)}</dl><div class="split equal">${panel(
+    "Repository details",
+    `<div class="panel-body">${facts([
+      ["Default branch", data.default_branch],
+      ["Primary language", data.language],
+      ["License", data.license?.name || "Not specified"],
+      ["Last updated", fmt(data.updated_at)],
+    ])}</div>`,
+    "Public metadata, with dated cache fallback when needed.",
+    '<a href="/workbench/repository">Inspect repository ' +
+      icon("arrow") +
+      "</a>",
+  )}${panel("Ask about the evidence", `<div class="panel-body"><p class="muted">The public Foundry agent inspects this project's GitHub repository before answering. Every answer includes the tool records and their observation times.</p><div class="toolbar"><a class="button" href="/workbench/agent">${icon("agent")} Open Foundry agent</a><a class="button" href="/workbench/policy">${icon("shield")} Review boundaries</a></div><p class="note">No sign-in. Read-only tools. Shared demo allowances apply.</p></div>`)}</div>`;
 }
 async function repository() {
   const { data: d, source } = await inspect("repository");
@@ -377,7 +381,7 @@ async function releases() {
     .map((r) =>
       panel(
         r.name || r.tag_name,
-        `<div class="panel-body"><div class="toolbar"><span class="pill">${esc(r.tag_name)}</span><span class="muted mono">${esc(fmt(r.published_at))}</span>${r.prerelease ? '<span class="pill">Prerelease</span>' : ""}</div><div class="release-notes">${esc(r.body || "No release notes provided.")}</div><h3>Release assets</h3>${
+        `<div class="panel-body"><div class="toolbar"><span class="pill">${esc(r.tag_name)}</span><span class="muted mono">${esc(fmt(r.published_at))}</span>${r.prerelease ? '<span class="pill">Prerelease</span>' : ""}</div><div class="release-notes agent-response">${FoundryUI.markdown(r.body || "No release notes provided.")}</div><h3>Release assets</h3>${
           r.assets.length
             ? table(
                 ["Asset", "Size", "Downloads", "Download"],
@@ -410,102 +414,211 @@ async function commits() {
     "Latest 30 commits on the default branch",
   );
 }
+function validationResult(result) {
+  if (!result.valid)
+    return `<div class="result-banner bad">${icon("info")} ${result.errors.length} validation issue${result.errors.length === 1 ? "" : "s"}</div><ul class="checks">${result.errors.map((error) => `<li><span>${icon("close")}</span><div>${esc(error.message)}<small>${esc(error.type)}</small></div></li>`).join("")}</ul><div class="panel-body"><a class="button" href="/workbench/editor">Return to editor ${icon("arrow")}</a></div>`;
+  return `<div class="result-banner good">${icon("check")} Configuration accepted by the runtime schema</div><ul class="checks"><li><span>${icon("check")}</span><div>Strict fields and safe paths<small>Unknown fields and paths outside the data root are rejected.</small></div></li><li><span>${icon("check")}</span><div>Compatible connectors<small>${esc(result.config.input.connector)} → ${esc(result.config.output.connector)}</small></div></li><li><span>${icon("check")}</span><div>Schedule and resources<small>${esc(result.config.schedule)} UTC · ${result.config.resources.cpu_millis}m CPU · ${result.config.resources.memory_mib} MiB</small></div></li></ul><div class="panel-body"><p class="mono wrap">Configuration SHA-256<br>${esc(result.sha256)}</p><a class="button primary" href="/workbench/manifests">Inspect manifest ${icon("arrow")}</a></div>`;
+}
+async function copyText(value, label = "Text") {
+  try {
+    await navigator.clipboard.writeText(value);
+    notice(label + " copied to the clipboard.");
+  } catch {
+    notice(
+      "Clipboard access is unavailable. Use the download action to save this artifact.",
+      true,
+    );
+  }
+}
 function editor() {
-  const raw = readStore("pf.draft") || JSON.stringify(defaultConfig, null, 2);
+  const raw =
+    readStore("pf.pending-draft") ||
+    readStore("pf.draft") ||
+    JSON.stringify(defaultConfig, null, 2);
   setTimeout(() => {
-    $("#config-editor").value = raw;
-    $("#save-draft").onclick = () => {
+    const input = $("#config-editor"),
+      highlighted = $("#syntax-view"),
+      lines = $("#line-numbers");
+    input.value = raw;
+    function paint(invalidate = true) {
+      highlighted.innerHTML = FoundryUI.highlightJSON(input.value) + "\n";
+      lines.textContent = input.value
+        .split("\n")
+        .map((_, index) => index + 1)
+        .join("\n");
+      highlighted.scrollTop = input.scrollTop;
+      highlighted.scrollLeft = input.scrollLeft;
+      lines.scrollTop = input.scrollTop;
       try {
-        const config = JSON.parse($("#config-editor").value);
-        writeStore("pf.draft", JSON.stringify(config, null, 2));
-        audit("Draft saved", config.name || "unnamed");
-        notice(
-          "Draft saved for this browser session. Open Validation to run the server checks.",
-        );
+        const config = FoundryUI.parseDraft(input.value);
+        $("#draft-summary").innerHTML = facts([
+          ["Pipeline", config.name || "Not specified"],
+          ["Schedule", (config.schedule || "Not specified") + " UTC"],
+          ["CPU", (config.resources?.cpu_millis ?? 250) + " millicores"],
+          ["Memory", (config.resources?.memory_mib ?? 256) + " MiB"],
+        ]);
+        const connectors = {
+          fixture: "Fixture",
+          orders_api: "Orders API",
+          spark_json: "Spark JSON",
+          sqlite: "SQLite",
+          postgres: "PostgreSQL",
+          parquet: "Parquet",
+        };
+        $("#pipeline-flow").innerHTML =
+          `<div class="flow-node">${esc(connectors[config.input?.connector || "fixture"] || config.input?.connector)}<small>Source</small></div>${icon("arrow")}<div class="flow-node">${esc(!config.transform || config.transform === "normalize_orders" ? "Normalize orders" : config.transform)}<small>Transform</small></div>${icon("arrow")}<div class="flow-node">${esc(connectors[config.output?.connector || "sqlite"] || config.output?.connector)}<small>Sink</small></div>`;
       } catch {
-        notice("Invalid JSON. Resolve the syntax error before saving.", true);
+        $("#draft-summary").innerHTML =
+          '<p class="note">Complete valid JSON to preview the configuration fields.</p>';
+        $("#pipeline-flow").innerHTML =
+          '<p class="note">A JSON object is required to preview connectors.</p>';
       }
-    };
-    $("#reset-draft").onclick = () => {
-      $("#config-editor").value = JSON.stringify(defaultConfig, null, 2);
-      notice(
-        "Starter configuration loaded into the editor. Save to replace your session draft.",
-      );
-    };
-    $("#download-draft").onclick = () => {
+      if (invalidate) {
+        $("#editor-state").textContent = "Unsaved changes";
+        $("#inspector-validation").innerHTML = empty(
+          "Validate this draft",
+          "Configuration changed. Run validation to inspect it.",
+        );
+        $("#inline-results").innerHTML = empty(
+          "Draft changed",
+          "Validate the current configuration to update its results.",
+        );
+        writeStore("pf.pending-draft", input.value);
+      }
+    }
+    function save() {
       try {
-        const content = JSON.stringify(
-          JSON.parse($("#config-editor").value),
+        const config = FoundryUI.parseDraft(input.value);
+        writeStore("pf.draft", JSON.stringify(config, null, 2));
+        try {
+          sessionStorage.removeItem("pf.pending-draft");
+        } catch {}
+        $("#editor-state").textContent = "Session draft saved";
+        audit("Draft saved", config.name || "unnamed");
+        return config;
+      } catch (error) {
+        notice(
+          error instanceof TypeError
+            ? "Pipeline configuration must be a JSON object."
+            : "JSON syntax is invalid. Check quotes, commas and closing braces before continuing.",
+          true,
+        );
+        return null;
+      }
+    }
+    input.addEventListener("input", () => paint());
+    input.addEventListener("scroll", () => {
+      highlighted.scrollTop = input.scrollTop;
+      highlighted.scrollLeft = input.scrollLeft;
+      lines.scrollTop = input.scrollTop;
+    });
+    $("#save-draft").onclick = () => {
+      if (save()) notice("Draft saved for this browser session.");
+    };
+    $("#format-json").onclick = () => {
+      try {
+        input.value = JSON.stringify(
+          FoundryUI.parseDraft(input.value),
           null,
           2,
         );
-        download("pipeline.json", content, "application/json");
+        paint();
       } catch {
-        notice("Invalid JSON. Resolve syntax errors before downloading.", true);
+        notice(
+          "JSON syntax is invalid. Format is available after the syntax is corrected.",
+          true,
+        );
       }
     };
+    $("#reset-draft").onclick = () => {
+      input.value = JSON.stringify(defaultConfig, null, 2);
+      paint();
+      notice("Starter loaded into the editor. It has not been executed.");
+    };
+    $("#download-draft").onclick = () => {
+      const config = save();
+      if (config)
+        download(
+          "pipeline.json",
+          JSON.stringify(config, null, 2),
+          "application/json",
+        );
+    };
+    $("#editor-validate").onclick = async () => {
+      const config = save();
+      if (!config) return;
+      const button = $("#editor-validate");
+      button.disabled = true;
+      button.textContent = "Validating…";
+      notice("");
+      try {
+        const result = await validate();
+        $("#inline-results").innerHTML = validationResult(result);
+        $("#inspector-validation").innerHTML =
+          `<div class="result-banner ${result.valid ? "good" : "bad"}">${icon(result.valid ? "check" : "info")}${result.valid ? "Configuration accepted" : "Changes required"}</div><p class="note">${result.valid ? "Manifest rendering is ready. No workload has been executed." : "Review the runtime validation issues below."}</p>`;
+        $("#editor-state").textContent = result.valid
+          ? "Validated session draft"
+          : "Validation issues";
+      } catch (error) {
+        notice(error.message, true);
+      } finally {
+        button.disabled = false;
+        button.innerHTML = "Validate configuration";
+      }
+    };
+    paint(false);
   }, 0);
-  return `<div class="split">${panel("Configuration workspace", `<div class="filebar"><span>pipeline.json</span><small>JSON · strict schema</small></div><textarea id="config-editor" class="editor" aria-label="Pipeline configuration JSON" spellcheck="false"></textarea><div class="panel-body toolbar"><button id="save-draft" class="primary">Save draft</button><button id="download-draft">Download JSON</button><button id="reset-draft">Load starter</button><a class="button" href="/workbench/validation">Validate →</a></div>`, "This starter is configuration only; it has not been executed.")}${panel(
-    "Configuration guide",
-    `<div class="panel-body">${facts([
-      ["name", "Lowercase / hyphens, 1–40"],
-      ["schedule", "Five-field cron · UTC"],
-      ["transform", "normalize_orders"],
-      ["CPU", "50–4,000 millicores"],
-      ["Memory", "64–8,192 MiB"],
-      ["Spark minimum", "1,024 MiB"],
-    ])}<p class="muted">Fixture input works with SQLite or PostgreSQL. Spark JSON requires Parquet output. Paths must remain relative to the data root.</p><p class="note">Drafts are stored in sessionStorage. Closing the browser session clears them. Export JSON for a durable copy.</p></div>`,
-    "Closed execution choices, validated on the server",
-  )}</div>`;
+  return `<div class="editor-layout"><section class="panel"><div class="editor-toolbar"><div class="editor-file">${icon("file")}pipeline.json <span class="draft-label">Draft</span></div><button id="format-json">Format JSON</button><button id="save-draft">Save draft</button><button id="editor-validate" class="primary">Validate configuration</button></div><div class="code-editor"><div id="line-numbers" class="line-numbers" aria-hidden="true"></div><div class="code-area"><pre id="syntax-view" class="syntax-view" aria-hidden="true"></pre><textarea id="config-editor" class="code-input" aria-label="Pipeline configuration JSON" spellcheck="false" wrap="off" autocomplete="off" autocapitalize="off"></textarea></div></div><div class="editor-status"><span>JSON · UTF-8</span><span id="editor-state">Session draft</span><span>Not executed</span></div></section><section class="panel inspector"><h2>Configuration</h2><div id="pipeline-flow" class="flow"></div><div id="draft-summary"></div><div class="inspector-result"><h3>Validation</h3><div id="inspector-validation">${empty("Not validated yet", "Run validation to inspect this draft.")}</div></div><div class="inspector-actions"><button id="download-draft">${icon("download")} Export JSON</button><button id="reset-draft">${icon("file")} Load starter</button></div></section></div><section class="panel editor-results"><div class="panel-head"><h2>Validation results</h2><a href="/workbench/validation">Open validation ${icon("arrow")}</a></div><div id="inline-results">${empty("Ready when you are", "Results appear after a real server validation.")}</div></section>`;
 }
 async function validation() {
-  const d = getDraft();
+  const draft = getDraft();
   setTimeout(() => {
     $("#validate-button").onclick = async () => {
-      const b = $("#validate-button");
-      b.disabled = true;
+      const button = $("#validate-button");
+      button.disabled = true;
+      button.textContent = "Validating…";
       try {
-        const r = await validate();
-        $("#validation-result").innerHTML = r.valid
-          ? `<div class="result-banner good">✓ Configuration accepted by the runtime schema</div><ul class="checks"><li><span>✓</span><div>Strict configuration fields<small>Unknown fields rejected, safe paths enforced.</small></div></li><li><span>✓</span><div>Connector compatibility<small>${esc(r.config.input.connector)} → ${esc(r.config.output.connector)}</small></div></li><li><span>✓</span><div>Schedule and resource limits<small>${esc(r.config.schedule)} · ${r.config.resources.cpu_millis}m CPU · ${r.config.resources.memory_mib} MiB</small></div></li></ul><div class="panel-body"><p class="mono wrap">SHA-256 ${esc(r.sha256)}</p><a class="button primary" href="/workbench/manifests">Inspect rendered manifest →</a></div>`
-          : `<div class="result-banner bad">${r.errors.length} validation issue(s)</div><ul class="checks">${r.errors.map((e) => `<li><span class="bad">×</span><div>${esc(e.message)}<small>${esc(e.type)}</small></div></li>`).join("")}</ul>`;
-      } catch (e) {
-        notice(e.message, true);
+        $("#validation-result").innerHTML = validationResult(await validate());
+      } catch (error) {
+        notice(error.message, true);
       } finally {
-        b.disabled = false;
+        button.disabled = false;
+        button.textContent = "Run validation";
       }
     };
   }, 0);
-  return `<div class="split">${panel(
+  return `<div class="split equal">${panel(
     "Runtime validation",
     `<div class="panel-body">${facts([
-      ["Pipeline", d.name],
-      ["Schedule", d.schedule],
+      ["Pipeline", draft.name],
+      ["Schedule", draft.schedule],
       ["Execution", "Not requested"],
-    ])}<p class="muted">Validation checks the saved draft against the server's Pipeline model and renders a manifest in memory. It does not write metadata or launch a workload.</p><div class="toolbar"><button class="primary" id="validate-button">Run validation</button><a class="button" href="/workbench/editor">Edit draft</a></div></div>`,
-    "Real schema checks. No synthetic validation results.",
-  )}${panel("Validation results", '<div id="validation-result">' + empty("Ready to validate", "Run the server checks to see your configuration results.") + "</div>")}</div>`;
+    ])}<p class="muted">Check the saved draft against the same strict schema used by the pipeline runtime. Validation creates no revisions and launches no workload.</p><div class="toolbar"><button class="primary" id="validate-button">${icon("check")} Run validation</button><a class="button" href="/workbench/editor">Edit configuration</a></div></div>`,
+    "A real schema check before an artifact is generated.",
+  )}${panel("Validation results", `<div id="validation-result">${empty("Ready to validate", "Run the server checks to see the saved draft's results.")}</div>`)}</div>`;
 }
 async function manifests() {
-  const r = await validate();
-  if (!r.valid)
+  const result = await validate();
+  if (!result.valid)
     return panel(
       "Manifest unavailable",
-      empty(
-        "Resolve validation issues first",
-        "Your saved configuration was rejected by the runtime schema.",
-        "/workbench/validation",
-        "Review validation",
-      ),
+      validationResult(result),
+      "Resolve the runtime schema issues before rendering a bundle.",
     );
   setTimeout(() => {
     $("#download-manifest").onclick = () =>
-      download(`${r.config.name}-bundle.yaml`, r.manifest, "application/yaml");
+      download(
+        `${result.config.name}-bundle.yaml`,
+        result.manifest,
+        "application/yaml",
+      );
+    $("#copy-manifest").onclick = () =>
+      copyText(result.manifest, "Kubernetes bundle");
   }, 0);
   return panel(
     "Kubernetes bundle",
-    `<div class="panel-body"><div class="toolbar"><button id="download-manifest" class="primary">↓ Download YAML</button><a class="button" href="/workbench/plans">Preview deployment →</a><span class="muted mono">Draft revision 1 · not deployed</span></div><pre class="terminal">${esc(r.manifest)}</pre><p class="mono muted wrap">Configuration SHA-256 ${esc(r.sha256)}</p></div>`,
-    "Generated by the same object renderer used by the control plane",
+    `<div class="panel-body"><div class="toolbar"><span class="editor-file">${icon("file")}${esc(result.config.name)}-bundle.yaml</span><button id="copy-manifest">${icon("copy")} Copy YAML</button><button id="download-manifest" class="primary">${icon("download")} Download YAML</button><a class="button" href="/workbench/plans">Preview plan ${icon("arrow")}</a></div><div class="result-banner good">${icon("check")} Rendered from validated configuration · not deployed</div><pre class="terminal">${esc(result.manifest)}</pre><p class="mono wrap muted">Configuration SHA-256<br>${esc(result.sha256)}</p><details><summary>Validated configuration</summary><pre class="terminal">${esc(JSON.stringify(result.config, null, 2))}</pre></details></div>`,
+    "The same object renderer used by the control plane. Copy or download the real artifact.",
   );
 }
 function plans() {
@@ -581,7 +694,7 @@ async function policy() {
     ) +
     panel(
       "Access boundary",
-      `<div class="panel-body"><p class="muted">Public pages can inspect public GitHub data and validate configuration. Deployments, release apply, rollback, backfill, logs, private audit metadata and AI provider calls require your control plane API token. The agent can only read GitHub evidence within a three-step / four-tool-call budget.</p><a class="button" href="/workbench/manifests">Review the manifest →</a></div>`,
+      `<div class="panel-body"><p class="muted">Public pages can inspect public GitHub data and validate configuration. Deployments, release apply, rollback, backfill, private logs and private audit metadata require an operator token. The public agent has a fixed read-only repository scope and persistent allowances. The agent can only read GitHub evidence within a three-step / four-tool-call budget.</p><a class="button" href="/workbench/manifests">Review the manifest →</a></div>`,
     )
   );
 }
@@ -636,63 +749,415 @@ async function integrations() {
     )
   );
 }
+function agentResult(result) {
+  const rows = result.trace.map(
+    (item) =>
+      `<tr><td class="mono">${esc(item.tool)}</td><td>${esc(item.view)}</td><td><time>${esc(fmt(item.observed_at))}</time><span class="secondary">${item.stale ? "Stale cached evidence" : item.cache_status === "fresh-cache" ? "Fresh cache" : "Live response"}</span></td><td>${link(item.source, "GitHub API")}</td></tr>`,
+  );
+  return `<div class="panel-body">${result.trace.some((item) => item.stale) ? '<div class="notice">GitHub rate limiting prevented a fresh check. This answer uses dated public evidence at the observation times below.</div>' : ""}<div class="agent-response">${FoundryUI.markdown(result.answer)}</div><p class="mono muted">Provider: ${esc(result.provider)} · ${esc(result.model)}</p><div class="evidence-section"><h3>Sources and tool evidence</h3>${table(["Tool", "Action", "Observed", "Source"], rows)}</div><p class="agent-warning">${icon("info")}A repository observation is not a deployment or live cluster check.</p></div>`;
+}
 async function agent() {
-  const d = await request("/workbench/api/integrations");
-  $("#repository-form").style.display = "none";
+  const state = await request("/workbench/api/integrations");
   setTimeout(() => {
+    $("#agent-question").addEventListener("input", () => {
+      $("#agent-count").textContent =
+        `${$("#agent-question").value.length} / 600`;
+    });
     $("#agent-submit").onclick = async () => {
-      const b = $("#agent-submit");
-      b.disabled = true;
+      const button = $("#agent-submit"),
+        question = $("#agent-question").value.trim();
+      if (question.length < 5 || question.length > 600) {
+        notice("Write a question of 5–600 characters.", true);
+        return;
+      }
+      button.disabled = true;
+      button.textContent = "Inspecting evidence…";
       let cooling = false;
+      notice("");
+      $("#agent-output").innerHTML =
+        '<div class="loading">Reading public repository evidence…</div>';
       try {
-        const headers = { "Content-Type": "application/json" };
-        const question = $("#agent-question").value.trim();
-        if (question.length < 5)
-          throw new Error(
-            "Write a specific question of at least five characters.",
-          );
-        $("#agent-output").innerHTML =
-          '<div class="loading">Inspecting repository evidence…</div>';
-        const r = await request("/workbench/api/demo-agent", {
+        const result = await request("/workbench/api/demo-agent", {
           method: "POST",
-          headers,
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question }),
         });
         audit(
-          "Agent analysis completed",
-          `Public demo · ${r.trace.length} tool reads`,
+          "Public agent analysis completed",
+          `${result.trace.length} read-only tool calls`,
         );
-        $("#agent-output").innerHTML =
-          `<div class="panel-body">${r.trace.some((t) => t.stale) ? '<div class="notice">GitHub rate limiting prevented a fresh check. This analysis uses previously fetched public evidence at the observation times below.</div>' : ""}<div class="agent-response">${esc(r.answer)}</div><p class="mono muted">Provider: ${esc(r.provider || d.ai_provider)} · ${esc(r.model)}</p><h3>Tool evidence</h3>${r.trace.map((t) => `<div class="activity-item"><span class="activity-icon">↳</span><div><p>${esc(t.tool)} · ${esc(t.view)}</p><small>${link(t.source, "Source")} · ${esc(fmt(t.observed_at))} · ${t.stale ? "Cached · stale (GitHub rate limit)" : "Fresh evidence"}</small></div></div>`).join("")}</div>`;
-      } catch (e) {
-        notice(e.message, true);
-        if (e.status === 429) {
+        $("#agent-output").innerHTML = agentResult(result);
+      } catch (error) {
+        notice(error.message, true);
+        $("#agent-output").innerHTML = empty(
+          "Analysis not completed",
+          error.message,
+        );
+        if (error.status === 429) {
           cooling = true;
-          const until = Date.now() + e.retryAfter * 1000;
+          const until = Date.now() + error.retryAfter * 1000;
           const tick = () => {
             const remaining = Math.max(
               0,
               Math.ceil((until - Date.now()) / 1000),
             );
-            b.textContent = remaining
+            button.textContent = remaining
               ? `Try again in ${remaining}s`
-              : "✧ Investigate repository";
-            b.disabled = remaining > 0;
+              : "Ask Foundry";
+            button.disabled = remaining > 0;
             if (!remaining) clearInterval(timer);
           };
           const timer = setInterval(tick, 1000);
           tick();
         }
-        $("#agent-output").innerHTML = empty(
-          "Analysis not completed",
-          e.message,
-        );
       } finally {
-        if (!cooling) b.disabled = false;
+        if (!cooling) {
+          button.disabled = false;
+          button.innerHTML = `Ask Foundry ${icon("arrow")}`;
+        }
       }
     };
   }, 0);
-  return `<div class="split">${panel("Ask Foundry", `<div class="panel-body">${!d.ai_configured ? '<div class="notice">AI provider credentials are not configured on this server. Agent execution is unavailable.</div>' : ""}${d.ai_configured ? `<div class="result-banner good">Connected: ${esc(d.ai_provider)} · ${esc(d.ai_model)}</div>` : ""}<p class="muted">Public repository demo · no sign-in or token required.</p><div class="form-field"><label for="agent-question">What should the agent investigate?</label><textarea id="agent-question" rows="5" maxlength="600" placeholder="Inspect recent workflow failures and summarize evidence for release readiness."></textarea><small>Repository: 9059Rohith/pipefoundry (fixed public scope). Public GitHub evidence is sent to the configured provider.</small></div><button class="primary" id="agent-submit" ${!d.ai_configured ? "disabled" : ""}>✧ Investigate repository</button><p class="note">3 requests per visitor / 10 minutes. Shared allowance: 2 per minute and 30 per day. Each attempt uses an allowance. Read-only public evidence; cached observations are dated. No shell, deployment or workflow dispatch. Gemini free-tier quotas apply; quota errors are explicit and no paid fallback is used.</p></div>`, "A limited public demo with real Gemini and GitHub evidence")}${panel("Analysis & evidence", '<div id="agent-output">' + empty("Ready for an investigation", "Findings appear only after a real provider request and GitHub inspection.") + "</div>")}</div>`;
+  return `<div class="agent-layout">${panel(
+    "Ask Foundry",
+    `<div class="panel-body"><p class="agent-meta">${esc(state.ai_model)} / Public demo</p>${!state.ai_configured ? '<div class="notice">The provider is not configured. No generated answer is available.</div>' : ""}<div class="form-field"><label for="agent-question">What should the agent investigate?</label><textarea id="agent-question" rows="6" maxlength="600" placeholder="Inspect this repository's default branch and primary language. Include the source and observation time."></textarea><small id="agent-count">0 / 600</small></div><div class="form-field"><label for="agent-repository">Repository (read-only)</label><input id="agent-repository" value="9059Rohith/pipefoundry" readonly></div><button class="primary agent-submit" id="agent-submit" ${!state.ai_configured ? "disabled" : ""}>Ask Foundry ${icon("arrow")}</button><div class="inspector-result">${facts(
+      [
+        ["Your allowance", "3 requests / 10 minutes"],
+        ["Shared allowance", "2 / minute · 30 / day"],
+        ["Permissions", "Read-only public evidence"],
+      ],
+    )}<p class="note">No sign-in required. Every accepted attempt uses an allowance. Dated cached evidence may be used. No deployment permissions or paid fallback.</p></div></div>`,
+    "Real Gemini analysis, with an inspectable source trail.",
+  )}${panel("Analysis", `<div id="agent-output">${empty("Evidence comes first", "Ask a question to see a real model answer and the source records it inspected.")}</div>`, "Answers appear only after an actual provider request.")}</div><p class="agent-warning">${icon("shield")}Read-only tools. Fixed repository scope. Free-tier and shared demo limits apply.</p>`;
+}
+function renderIcons(root) {
+  root.querySelectorAll("[data-icon]").forEach((element) => {
+    if (!element.dataset.iconRendered) {
+      element.innerHTML = icon(element.dataset.icon);
+      element.dataset.iconRendered = "true";
+    }
+  });
+}
+function decorateSymbols(root) {
+  const symbols = {
+    "↗": "external",
+    "→": "arrow",
+    "↓": "download",
+    "✓": "check",
+    "×": "close",
+    "＋": "plus",
+    "✧": "agent",
+    "⑂": "workflow",
+    "▧": "box",
+    "⌘": "terminal",
+  };
+  root
+    .querySelectorAll(
+      "button,a,.flow-arrow,.activity-icon,.integration-symbol,.checks li>span",
+    )
+    .forEach((element) => {
+      [...element.childNodes]
+        .filter(
+          (node) =>
+            node.nodeType === Node.TEXT_NODE &&
+            /[↗→↓✓×＋✧⑂▧⌘]/.test(node.textContent),
+        )
+        .forEach((node) => {
+          const fragment = document.createDocumentFragment();
+          for (const piece of node.textContent.split(/([↗→↓✓×＋✧⑂▧⌘])/)) {
+            if (symbols[piece]) {
+              const holder = document.createElement("span");
+              holder.innerHTML = icon(symbols[piece]);
+              fragment.append(holder.firstElementChild);
+            } else fragment.append(document.createTextNode(piece));
+          }
+          node.replaceWith(fragment);
+        });
+    });
+}
+function initializeWorkbench() {
+  renderIcons(document);
+  const current = document.querySelector(
+    `[data-nav="${page === "run" ? "runs" : page}"]`,
+  );
+  current?.setAttribute("aria-current", "page");
+  const steps = [
+    ["editor", "Configure"],
+    ["validation", "Validate"],
+    ["manifests", "Manifests"],
+    ["plans", "Plan"],
+  ];
+  if (steps.some(([name]) => name === page))
+    $("#journey").innerHTML =
+      `<nav class="journey" aria-label="Pipeline build journey">${steps.map(([name, label], index) => `<a href="/workbench/${name}" class="${name === page ? "current" : ""}" ${name === page ? 'aria-current="step"' : ""}><span class="step-number">0${index + 1}</span>${label}</a>`).join("")}</nav>`;
+  const menu = $("#menu-toggle"),
+    sidebar = $("#sidebar"),
+    backdrop = $("#nav-backdrop");
+  function closeMenu() {
+    sidebar.classList.remove("is-open");
+    backdrop.hidden = true;
+    menu.setAttribute("aria-expanded", "false");
+    document.querySelector(".app").inert = false;
+    document.body.classList.remove("nav-open");
+  }
+  menu.onclick = () => {
+    const open = !sidebar.classList.contains("is-open");
+    if (!open) closeMenu();
+    else {
+      sidebar.classList.add("is-open");
+      backdrop.hidden = false;
+      menu.setAttribute("aria-expanded", "true");
+      document.querySelector(".app").inert = true;
+      document.body.classList.add("nav-open");
+      current?.focus();
+    }
+  };
+  backdrop.onclick = () => {
+    closeMenu();
+    menu.focus();
+  };
+  $("#nav-close").onclick = () => {
+    closeMenu();
+    menu.focus();
+  };
+  window
+    .matchMedia("(min-width: 761px)")
+    .addEventListener("change", (event) => {
+      if (event.matches) closeMenu();
+    });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && sidebar.classList.contains("is-open")) {
+      closeMenu();
+      menu.focus();
+    }
+    if (event.key === "Tab" && sidebar.classList.contains("is-open")) {
+      const targets = [...sidebar.querySelectorAll("a,button")];
+      if (event.shiftKey && document.activeElement === targets[0]) {
+        event.preventDefault();
+        targets.at(-1).focus();
+      } else if (!event.shiftKey && document.activeElement === targets.at(-1)) {
+        event.preventDefault();
+        targets[0].focus();
+      }
+    }
+  });
+  document.querySelectorAll("[data-close-dialog]").forEach((button) => {
+    button.onclick = () => button.closest("dialog").close();
+  });
+  document.querySelectorAll("dialog").forEach((dialog) => {
+    dialog.addEventListener("click", (event) => {
+      if (event.target === dialog) {
+        const rect = dialog.getBoundingClientRect();
+        if (
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom
+        )
+          dialog.close();
+      }
+    });
+  });
+  const palette = $("#command-palette"),
+    search = $("#command-search");
+  let filtered = [],
+    selected = 0;
+  function commands() {
+    const values = [...document.querySelectorAll("[data-nav]")].map(
+      (anchor) => ({
+        label: anchor.textContent.trim(),
+        detail: descriptions[anchor.dataset.nav] || "Open workspace page",
+        href: anchor.getAttribute("href"),
+        icon: anchor.querySelector("[data-icon]")?.dataset.icon || "file",
+      }),
+    );
+    if (page === "editor")
+      for (const [selector, label, detail] of [
+        ["#format-json", "Format JSON", "Format the current editor text"],
+        ["#save-draft", "Save draft", "Save configuration for this session"],
+        [
+          "#editor-validate",
+          "Validate configuration",
+          "Save and run the real runtime schema",
+        ],
+      ])
+        if ($(selector))
+          values.unshift({ label, detail, selector, icon: "code" });
+    return values;
+  }
+  function drawCommands() {
+    filtered = FoundryUI.filterCommands(commands(), search.value);
+    selected = 0;
+    $("#command-results").innerHTML = filtered.length
+      ? filtered
+          .map(
+            (command, index) =>
+              `<button class="command-option ${index === 0 ? "active" : ""}" role="option" aria-selected="${index === 0}" id="command-option-${index}" data-command="${index}" tabindex="-1">${icon(command.icon)}<span>${esc(command.label)}<small>${esc(command.detail)}</small></span></button>`,
+          )
+          .join("")
+      : empty(
+          "No matching command",
+          "Try a page name such as editor, executions or manifests.",
+        );
+    search.setAttribute(
+      "aria-activedescendant",
+      filtered.length ? "command-option-0" : "",
+    );
+  }
+  function executeCommand(index) {
+    const command = filtered[index];
+    if (!command) return;
+    palette.close();
+    if (command.selector) $(command.selector)?.click();
+    else if (
+      command.href !== location.pathname &&
+      preserveJourneyDraft(command.href)
+    )
+      location.href = command.href;
+  }
+  $("#command-trigger").onclick = () => {
+    closeMenu();
+    search.value = "";
+    drawCommands();
+    palette.showModal();
+    search.focus();
+  };
+  search.addEventListener("input", drawCommands);
+  search.addEventListener("keydown", (event) => {
+    if (["ArrowDown", "ArrowUp"].includes(event.key) && filtered.length) {
+      event.preventDefault();
+      selected =
+        (selected + (event.key === "ArrowDown" ? 1 : -1) + filtered.length) %
+        filtered.length;
+      document.querySelectorAll("[data-command]").forEach((button, index) => {
+        button.classList.toggle("active", index === selected);
+        button.setAttribute("aria-selected", String(index === selected));
+      });
+      search.setAttribute(
+        "aria-activedescendant",
+        `command-option-${selected}`,
+      );
+      $("#command-option-" + selected)?.scrollIntoView({ block: "nearest" });
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      executeCommand(selected);
+    }
+  });
+  $("#command-results").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-command]");
+    if (button) executeCommand(Number(button.dataset.command));
+  });
+  document.addEventListener("keydown", (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      if (palette.open) palette.close();
+      else $("#command-trigger").click();
+    }
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      event.key.toLowerCase() === "s" &&
+      page === "editor"
+    ) {
+      event.preventDefault();
+      $("#save-draft")?.click();
+    }
+    if (
+      (event.ctrlKey || event.metaKey) &&
+      event.shiftKey &&
+      event.key === "Enter" &&
+      page === "editor"
+    ) {
+      event.preventDefault();
+      $("#editor-validate")?.click();
+    }
+  });
+  document.addEventListener("input", (event) => {
+    if (!event.target.matches("[data-table-filter]")) return;
+    const container = event.target.closest(".data-table"),
+      query = event.target.value.toLowerCase();
+    let visible = 0;
+    const rows = [...container.querySelectorAll("tbody tr")];
+    rows.forEach((row) => {
+      const show = row.textContent.toLowerCase().includes(query);
+      row.hidden = !show;
+      if (show) visible++;
+    });
+    container.querySelector("[data-table-count]").textContent =
+      `${visible} of ${rows.length} records`;
+    container.querySelector("[data-table-empty]").hidden = visible > 0;
+  });
+  document.addEventListener("click", (event) => {
+    const journeyLink = event.target.closest("a[href]");
+    if (
+      journeyLink &&
+      !preserveJourneyDraft(journeyLink.getAttribute("href"))
+    ) {
+      event.preventDefault();
+      return;
+    }
+    const row = event.target.closest("tr[data-inspect-row]");
+    if (
+      !row ||
+      event.target.closest("a") ||
+      (event.target.closest("button") &&
+        !event.target.closest("[data-inspect-record]")) ||
+      (!event.target.closest("[data-inspect-record]") &&
+        window.getSelection()?.toString())
+    )
+      return;
+    const tableElement = row.closest("table"),
+      headers = [...tableElement.querySelectorAll("thead th")]
+        .slice(0, -1)
+        .map((cell) => cell.textContent.trim());
+    const cells = [...row.cells]
+      .slice(0, -1)
+      .map((cell) => cell.textContent.trim());
+    const source = row.querySelector("a");
+    let target = null;
+    if (source) {
+      try {
+        const url = new URL(source.href);
+        if (
+          url.origin === location.origin &&
+          url.pathname.startsWith("/workbench/")
+        )
+          target = url.pathname + url.search;
+        else target = FoundryUI.safeURL(url.href);
+      } catch {}
+    }
+    $("#record-title").textContent = cells[0].slice(0, 90) || "Record details";
+    $("#record-content").innerHTML =
+      facts(headers.map((header, index) => [header, cells[index]])) +
+      (target
+        ? `<p><a class="button" href="${esc(target)}" ${target.startsWith("https:") ? 'target="_blank" rel="noopener noreferrer"' : ""}>Open record ${icon("external")}</a></p>`
+        : "");
+    $("#record-dialog").showModal();
+  });
+}
+function preserveJourneyDraft(href) {
+  if (
+    page !== "editor" ||
+    ![
+      "/workbench/validation",
+      "/workbench/manifests",
+      "/workbench/plans",
+    ].includes(href)
+  )
+    return true;
+  try {
+    const config = FoundryUI.parseDraft($("#config-editor").value);
+    writeStore("pf.draft", JSON.stringify(config, null, 2));
+    try {
+      sessionStorage.removeItem("pf.pending-draft");
+    } catch {}
+    return true;
+  } catch {
+    notice(
+      "Correct the JSON syntax before continuing the build journey.",
+      true,
+    );
+    return false;
+  }
 }
 const controllers = {
   overview,
@@ -716,6 +1181,8 @@ async function load() {
   $("#content").innerHTML = '<div class="loading">Loading workspace…</div>';
   try {
     $("#content").innerHTML = await (controllers[page] || overview)();
+    renderIcons($("#content"));
+    decorateSymbols($("#content"));
   } catch (e) {
     $("#content").innerHTML = panel(
       "Workspace unavailable",
@@ -740,4 +1207,5 @@ $("#repository-form").addEventListener("submit", (e) => {
   writeStore("pf.repo", repo);
   load();
 });
+initializeWorkbench();
 load();

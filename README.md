@@ -12,7 +12,9 @@ The public workbench has fifteen useful pages for actual GitHub repository and w
 
 GitHub rate limits can use genuine cached public evidence for at most 24 hours, with the original observation time and an explicit stale warning in the agent answer and trace. The default repository has an actual public metadata capture for cold starts; it is historical evidence and does not establish current repository counts. [Capture provenance](evidence/github-cache-seed.json).
 
-![PipeFoundry workbench editor](evidence/workbench-desktop.png)
+![Redesigned pipeline editor — actual local Browser QA](evidence/premium-editor-local.jpg)
+
+The developer workbench now has a connected configuration → validation → artifact → plan journey, a numbered syntax-highlighted editor with real inline validation, manifest copy/download, searchable records and inspection dialogs, a keyboard command palette, a focus-managed mobile menu, and safely formatted AI answers with dated source evidence. [Design and verification](docs/ui-redesign.md).
 
 The expanded 2026-11-01 verification passed **94 host tests** with real PostgreSQL, HTTPS ingestion and fresh minimal-container checks enabled. Three skips comprise two PostgreSQL-only cases under SQLite fixtures and host Spark, which passed separately in Linux: two JSON rows became two verified Parquet rows across EUR/USD partitions. The installed Linux package passed **92 tests** against a separate local PostgreSQL database. Ruff, JavaScript syntax, Bandit, wheel packaging and a pinned dependency audit also passed. Browser checks exercised draft save → server validation → actual YAML download at desktop and mobile sizes. Public HTTPS checks verified real repository inspection, manifest validation and authentication on legacy receipts. These results do not claim a passing hosted CI run or a newly scanned container image. See [current integration evidence](evidence/workbench-integration-summary.json) and the [workbench guide](docs/workbench.md).
 

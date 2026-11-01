@@ -3,85 +3,105 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#101214" />
     <meta
       name="description"
-      content="Inspect real GitHub workflows, validate pipeline configuration, and prepare secure deployment manifests with PipeFoundry."
+      content="A deliberate path from typed pipeline configuration to validated deployment artifacts. Inspect real GitHub evidence with PipeFoundry."
     />
     <title>__TITLE__ · PipeFoundry</title>
     <link rel="stylesheet" href="/workbench/assets/app.css" />
+    <script src="/workbench/assets/ui.js" defer></script>
     <script src="/workbench/assets/app.js" defer></script>
   </head>
   <body data-page="__PAGE__">
-    <a class="skip" href="#main">Skip to content</a>
-    <aside class="sidebar">
-      <a class="brand" href="/"
-        ><span class="brand-mark">P</span> PipeFoundry<span class="version"
-          >01</span
-        ></a
+    <a class="skip" href="#main">Skip to content</a
+    ><button
+      class="nav-backdrop"
+      id="nav-backdrop"
+      aria-label="Close navigation"
+      hidden
+    ></button>
+    <aside class="sidebar" id="sidebar">
+      <button
+        class="icon-button nav-close"
+        id="nav-close"
+        aria-label="Close navigation"
       >
-      <div class="workspace">
-        <span class="workspace-icon">⌘</span>
-        <div>
-          Developer workspace<small>Public repository inspection</small>
-        </div>
-      </div>
+        <span data-icon="close"></span>
+      </button>
+      <a class="brand" href="/"
+        ><span data-icon="pipe" class="brand-mark"></span
+        ><strong>PipeFoundry</strong></a
+      >
       <nav aria-label="Main navigation">
-        <div class="nav-label">WORKBENCH</div>
         <a href="/workbench/overview" data-nav="overview"
-          ><span>⌂</span>Overview</a
+          ><span data-icon="home"></span>Overview</a
         ><a href="/workbench/repository" data-nav="repository"
-          ><span>◇</span>Repository</a
+          ><span data-icon="repo"></span>Repository</a
         ><a href="/workbench/workflows" data-nav="workflows"
-          ><span>⑂</span>Workflows</a
-        ><a href="/workbench/runs" data-nav="runs"><span>▹</span>Executions</a
+          ><span data-icon="workflow"></span>Workflows</a
+        ><a href="/workbench/runs" data-nav="runs"
+          ><span data-icon="play"></span>Executions</a
         ><a href="/workbench/releases" data-nav="releases"
-          ><span>▣</span>Releases</a
+          ><span data-icon="tag"></span>Releases</a
         ><a href="/workbench/commits" data-nav="commits"
-          ><span>≡</span>Commit history</a
+          ><span data-icon="history"></span>Commit history</a
         >
-        <div class="nav-label">BUILD & VALIDATE</div>
+        <div class="nav-label">Build &amp; validate</div>
         <a href="/workbench/editor" data-nav="editor"
-          ><span>⌨</span>Pipeline editor</a
+          ><span data-icon="code"></span>Pipeline editor</a
         ><a href="/workbench/validation" data-nav="validation"
-          ><span>✓</span>Validation</a
+          ><span data-icon="check"></span>Validation</a
         ><a href="/workbench/manifests" data-nav="manifests"
-          ><span>▤</span>Manifests</a
+          ><span data-icon="file"></span>Manifests</a
         ><a href="/workbench/plans" data-nav="plans"
-          ><span>⇄</span>Deployment plans</a
+          ><span data-icon="box"></span>Deployment plans</a
         ><a href="/workbench/agent" data-nav="agent"
-          ><span>✧</span>Foundry agent</a
+          ><span data-icon="agent"></span>Foundry agent</a
         >
-        <div class="nav-label">GOVERNANCE</div>
+        <div class="nav-label">Governance</div>
         <a href="/workbench/policy" data-nav="policy"
-          ><span>⬡</span>Security policy</a
+          ><span data-icon="shield"></span>Security policy</a
         ><a href="/workbench/audit" data-nav="audit"
-          ><span>◷</span>Session audit</a
+          ><span data-icon="list"></span>Session audit</a
         ><a href="/workbench/integrations" data-nav="integrations"
-          ><span>⛭</span>Integrations</a
+          ><span data-icon="link"></span>Integrations</a
         >
       </nav>
       <div class="sidebar-foot">
         <span class="signal"></span> Read-only public workspace<a
-          href="https://github.com/9059Rohith/pipefoundry"
-          target="_blank"
-          rel="noopener noreferrer"
-          >Source code ↗</a
-        >
+          href="/workbench/policy"
+          >Execution boundaries <span data-icon="arrow"></span
+        ></a>
       </div>
     </aside>
     <div class="app">
       <header class="topbar">
+        <button
+          id="menu-toggle"
+          class="icon-button mobile-menu"
+          aria-label="Open navigation"
+          aria-controls="sidebar"
+          aria-expanded="false"
+        >
+          <span data-icon="menu"></span>
+        </button>
         <div class="breadcrumb">
-          Workspace <span>/</span> <strong>__TITLE__</strong>
+          <a href="/">Workspace</a><span>/</span><strong>__TITLE__</strong>
         </div>
         <div class="top-actions">
-          <a href="/workbench/agent">✧ Ask Foundry</a
+          <button class="command-trigger" id="command-trigger">
+            <span data-icon="search"></span><span>Search commands, pages…</span
+            ><kbd>Ctrl K</kbd></button
           ><a
-            class="avatar"
-            href="/workbench/integrations"
-            aria-label="Integration settings"
-            >PF</a
-          >
+            href="https://github.com/9059Rohith/pipefoundry"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="source-link"
+            ><span data-icon="workflow"></span>Source<span
+              data-icon="external"
+            ></span
+          ></a>
         </div>
       </header>
       <main id="main">
@@ -92,8 +112,10 @@
           </div>
           <div id="page-actions"></div>
         </div>
+        <div id="journey"></div>
         <form id="repository-form" class="repo-bar">
-          <label for="repository">Repository</label
+          <span data-icon="repo"></span
+          ><label for="repository">Repository</label
           ><input
             id="repository"
             name="repository"
@@ -102,18 +124,72 @@
             required
             pattern="[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
             maxlength="201"
-          /><button type="submit">Inspect repository <span>↵</span></button
-          ><span id="source-status">GitHub · public API</span>
+          /><button type="submit">
+            Inspect repository<span data-icon="arrow"></span></button
+          ><span id="source-status">Public GitHub API</span>
         </form>
         <div id="notice" role="status" aria-live="polite"></div>
         <div id="content"><div class="loading">Loading workspace…</div></div>
       </main>
       <footer>
         <span
-          >PIPEFOUNDRY <span class="footer-dot">/</span> Config is data. Every
-          action has a boundary.</span
-        ><a href="/workbench/policy">Security & execution policy ↗</a>
+          ><span data-icon="pipe"></span><strong>PipeFoundry</strong
+          ><span class="footer-dot">/</span>Build. Validate. Inspect the
+          evidence.</span
+        ><a href="/workbench/policy"
+          >Read-only workspace<span data-icon="shield"></span
+        ></a>
       </footer>
     </div>
+    <dialog
+      id="command-palette"
+      class="command-palette"
+      aria-labelledby="command-title"
+    >
+      <div class="dialog-head">
+        <h2 id="command-title">Go to a page or action</h2>
+        <button
+          class="icon-button"
+          data-close-dialog
+          aria-label="Close command palette"
+        >
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div class="command-input">
+        <span data-icon="search"></span
+        ><input
+          id="command-search"
+          type="search"
+          placeholder="Search pages, configuration, artifacts…"
+          aria-label="Search commands"
+          autocomplete="off"
+          aria-controls="command-results"
+          aria-autocomplete="list"
+        />
+      </div>
+      <div id="command-results" role="listbox" aria-label="Commands"></div>
+      <div class="dialog-foot">
+        <span>Arrow keys to navigate · Enter to open</span
+        ><kbd>Esc to close</kbd>
+      </div>
+    </dialog>
+    <dialog
+      id="record-dialog"
+      class="record-dialog"
+      aria-labelledby="record-title"
+    >
+      <div class="dialog-head">
+        <h2 id="record-title">Record details</h2>
+        <button
+          class="icon-button"
+          data-close-dialog
+          aria-label="Close record details"
+        >
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div id="record-content" class="panel-body"></div>
+    </dialog>
   </body>
 </html>

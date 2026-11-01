@@ -1,0 +1,10 @@
+# PipeFoundry workbench design
+
+Selected concepts: [editor](../evidence/design-concept-editor.png), [agent](../evidence/design-concept-agent.png). Generated with the built-in image tool before UI implementation. The editor is the primary system reference; the agent establishes answer typography and the evidence-table treatment. Concept dates and data are illustrative recorded observations; product data continues to come from the existing APIs.
+
+- Palette: background `#101214`, sidebar `#0c0e10`, workspace `#181b1e`, separators `#30363c`, text `#edf1f4`, secondary `#9aa5ae`, accent `#ff8d43`. No glow or decorative gradients.
+- Geometry: 232px navigation, 64px topbar, 32px desktop workspace gutters, 8px framed workspaces, aligned grid with a wide editor and narrower inspector. Mobile navigation collapses into a labeled menu, content becomes a single column, tables scroll inside their containers.
+- Typography: Segoe UI/system sans; 34px page headings, 18px section headings, 14–16px controls/body, 14px monospace configuration at 24px line height. Utility labels remain readable and high contrast.
+- Components: thin-line SVG icons, native buttons/inputs/dialogs, understated active navigation, connected Configure → Validate → Manifests → Plan rail, editor with numbered gutter, inspector facts, result banner, searchable tables, source/evidence rows, accessible command palette.
+- Interaction: editor format/save/export and real inline server validation; artifact copy/download; command navigation with Ctrl/Cmd+K; read-only row inspection; public AI stays anonymous with existing persistent limits. No synthetic runs, invented live metrics or new execution permission.
+- Fidelity checks for root Browser QA: sidebar/header proportions; type sizes and code readability; orange/graphite palette; connected journey and inspector alignment; evidence tables/answer formatting; mobile menu and containment. Intentional adaptation: one consistent pipe mark uses the editor concept, and no historical example AI answer is preloaded into the actual app.
