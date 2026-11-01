@@ -1,0 +1,63 @@
+{
+  "url": "https://rohith-pipefoundry.vercel.app",
+  "deployment": "dpl_83guHtdMks8cVpohdY8wb5MFmZru",
+  "method": "Parent reviewer using Codex Browser/CUA; no alternate browser automation",
+  "production": {
+    "editor_validation": "Actual server acceptance and configuration fingerprint observed",
+    "manifest": "Actual CronJob, non-root execution and resource caps inspected",
+    "plan_boundary": "Private operator authentication retained; no execution requested",
+    "command_palette": "Foundry agent selected and opened with Enter",
+    "navigation_views_opened": 14,
+    "navigation_actual_headings_checked": true,
+    "document_width_matches_scroll_on_every_view": true,
+    "commit_filter_and_inspection": "Query 2ca446 reduced returned records to one row; real commit details and source inspected",
+    "clipboard": "Copy action displayed Kubernetes bundle copied to the clipboard; content read-back remains independently unconfirmed",
+    "download": {
+      "filename": "orders-hourly-bundle.yaml",
+      "bytes": 2995,
+      "sha256": "8cf9f849d7a81db4259f8d972bd1e5565523957006c29323a83260a2f5aacae2",
+      "yaml_kinds": ["ConfigMap", "CronJob"],
+      "runAsNonRoot": true,
+      "cpu_requests_and_limits": "250m",
+      "memory_requests_and_limits": "256Mi",
+      "verification": "Actual browser download independently parsed in shell"
+    },
+    "mobile_viewport_width": 390,
+    "mobile_document_client_width": 375,
+    "mobile_document_scroll_width": 375,
+    "mobile_close_returns_focus_to_menu_toggle": true,
+    "console_errors": 0,
+    "console_warnings": 0,
+    "anonymous_agent": {
+      "calls_made": 1,
+      "provider": "gemini",
+      "model": "gemini-3.5-flash-lite",
+      "tool": "inspect_github",
+      "action": "repository",
+      "repository": "9059Rohith/pipefoundry",
+      "default_branch": "main",
+      "primary_language": "Python",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+      "observed_at": "2026-11-01T20:30:34.251235+00:00",
+      "cache_status": "live",
+      "deployment_boundary": "Answer explicitly states repository metadata is not proof of a deployed workload"
+    }
+  },
+  "local": {
+    "configure_validate_manifest_plan": true,
+    "mobile_viewport_width": 390,
+    "mobile_document_client_width": 375,
+    "mobile_document_scroll_width": 375,
+    "mobile_menu_focus_and_close": true,
+    "console_errors": 0,
+    "console_warnings": 0
+  },
+  "screenshots": [
+    "premium-editor-desktop.jpg",
+    "premium-agent-live.jpg",
+    "premium-editor-mobile-live.jpg",
+    "premium-editor-local.jpg",
+    "premium-mobile-local.jpg"
+  ],
+  "fidelity_review": "Both original generated concepts and actual editor/agent/mobile screenshots inspected with view_image; geometry, palette, type, navigation, workflow and evidence presentation compared"
+}
