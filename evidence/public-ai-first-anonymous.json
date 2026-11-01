@@ -1,0 +1,60 @@
+{
+  "verified_at": "2026-11-01T19:09:03.579371+00:00",
+  "url": "https://rohith-pipefoundry.vercel.app/workbench/api/demo-agent",
+  "http_status": 200,
+  "authenticated": false,
+  "minute_reset_epoch": 1793560200,
+  "integration_status": {
+    "github": "public read-only API",
+    "ai_configured": true,
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "ai_fallback": "none",
+    "public_ai": {
+      "repository": "9059Rohith/pipefoundry",
+      "access": "anonymous",
+      "limiter_backend": "postgresql",
+      "identity_source": "vercel-forwarded-for",
+      "question_limit": 600,
+      "client_requests": 3,
+      "client_window": 600,
+      "global_minute": 2,
+      "global_day": 30
+    },
+    "ai_requires_auth": true,
+    "validation": "Pydantic / server runtime",
+    "executors": "Authenticated control plane only"
+  },
+  "guards": {
+    "override": 422,
+    "cross_origin": 403,
+    "private_write": 401
+  },
+  "result": {
+    "answer": "- **Default Branch:** `main`\n- **Primary Language:** Python\n- **Source URL:** [https://github.com/9059Rohith/pipefoundry](https://github.com/9059Rohith/pipefoundry)\n- **Observation Time:** 2026-11-01T19:09:03.504590+00:00\n- **Evidence Status:** Live (not cached or stale, observed at 2026-11-01T19:09:03.504590+00:00).",
+    "trace": [
+      {
+        "tool": "inspect_github",
+        "view": "repository",
+        "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+        "observed_at": "2026-11-01T19:09:03.504590+00:00",
+        "stale": false,
+        "cache_status": "live"
+      }
+    ],
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "usage": {
+      "completion_tokens": 144,
+      "prompt_tokens": 2491,
+      "total_tokens": 2635
+    },
+    "request_id": "T47navibKL-A1sgP8qTIsA0",
+    "public_demo": true,
+    "repository": "9059Rohith/pipefoundry",
+    "limits": {
+      "client": "3 per 10 minutes",
+      "shared": "2 per minute / 30 per day"
+    }
+  }
+}

@@ -12,12 +12,20 @@ from typing import Literal
 
 import httpx
 import yaml
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import Field, ValidationError
 
 from pipefoundry.github_cache import read_cached_evidence
 from pipefoundry.models import Pipeline, StrictModel
+from pipefoundry.public_demo import (
+    PUBLIC_MODEL,
+    PUBLIC_REPOSITORY,
+    DemoLimiter,
+    client_identity,
+    enforce_origin,
+    unavailable,
+)
 from pipefoundry.render import objects
 
 STATIC = Path(__file__).with_name("web")
@@ -140,6 +148,10 @@ class AgentRequest(StrictModel):
     repo: str = Field(max_length=201)
 
 
+class PublicAgentRequest(StrictModel):
+    question: str = Field(min_length=5, max_length=600)
+
+
 def validate_config(raw):
     try:
         config = Pipeline.model_validate(raw)
@@ -200,7 +212,7 @@ def _gemini_request(client, *, key, payload):
     return response.json()
 
 
-def run_gemini_agent(body: AgentRequest, key: str, model: str):
+def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tokens=1200):
     if not REPO.fullmatch(body.repo):
         raise HTTPException(422, "Use a GitHub owner/repository name")
     messages = [
@@ -245,7 +257,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str):
                         "messages": messages,
                         "tools": tools,
                         "tool_choice": "required" if step == 0 else "auto",
-                        "max_tokens": 1200,
+                        "max_tokens": max_output_tokens,
                         "reasoning_effort": "minimal",
                     },
                 )
@@ -430,6 +442,21 @@ def router(authorize):
             "ai_provider": provider,
             "ai_model": model,
             "ai_fallback": "none",
+            "public_ai": {
+                "repository": PUBLIC_REPOSITORY,
+                "access": "anonymous",
+                "limiter_backend": "postgresql"
+                if os.getenv("PIPEFOUNDRY_METADATA_DSN")
+                else "unavailable",
+                "identity_source": "vercel-forwarded-for"
+                if os.getenv("VERCEL") == "1"
+                else "socket-peer",
+                "question_limit": 600,
+                "client_requests": 3,
+                "client_window": 600,
+                "global_minute": 2,
+                "global_day": 30,
+            },
             "ai_requires_auth": True,
             "validation": "Pydantic / server runtime",
             "executors": "Authenticated control plane only",
@@ -438,6 +465,26 @@ def router(authorize):
     @routes.post("/workbench/api/agent", dependencies=[Depends(authorize)])
     def agent(body: AgentRequest):
         return run_agent(body)
+
+    @routes.post("/workbench/api/demo-agent")
+    def public_agent(body: PublicAgentRequest, request: Request):
+        enforce_origin(request)
+        key = os.getenv("GEMINI_API_KEY")
+        if not key:
+            raise unavailable()
+        DemoLimiter.configured().consume(client_identity(request))
+        result = run_gemini_agent(
+            AgentRequest(question=body.question, repo=PUBLIC_REPOSITORY),
+            key,
+            PUBLIC_MODEL,
+            max_output_tokens=600,
+        )
+        return {
+            **result,
+            "public_demo": True,
+            "repository": PUBLIC_REPOSITORY,
+            "limits": {"client": "3 per 10 minutes", "shared": "2 per minute / 30 per day"},
+        }
 
     @routes.get("/", response_class=HTMLResponse)
     @routes.get("/workbench", response_class=HTMLResponse)

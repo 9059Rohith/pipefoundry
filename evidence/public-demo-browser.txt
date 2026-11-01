@@ -1,0 +1,111 @@
+- link "Skip to content":
+  - /url: "#main"
+- complementary:
+  - link "P PipeFoundry 01":
+    - /url: /
+    - generic: P
+    - text: PipeFoundry
+    - generic: "01"
+  - generic: ⌘
+  - text: Developer workspace
+  - generic: Public repository inspection
+  - navigation "Main navigation":
+    - generic: WORKBENCH
+    - link "⌂ Overview":
+      - /url: /workbench/overview
+      - generic: ⌂
+      - text: Overview
+    - link "◇ Repository":
+      - /url: /workbench/repository
+      - generic: ◇
+      - text: Repository
+    - link "⑂ Workflows":
+      - /url: /workbench/workflows
+      - generic: ⑂
+      - text: Workflows
+    - link "▹ Executions":
+      - /url: /workbench/runs
+      - generic: ▹
+      - text: Executions
+    - link "▣ Releases":
+      - /url: /workbench/releases
+      - generic: ▣
+      - text: Releases
+    - link "≡ Commit history":
+      - /url: /workbench/commits
+      - generic: ≡
+      - text: Commit history
+    - generic: BUILD & VALIDATE
+    - link "⌨ Pipeline editor":
+      - /url: /workbench/editor
+      - generic: ⌨
+      - text: Pipeline editor
+    - link "✓ Validation":
+      - /url: /workbench/validation
+      - generic: ✓
+      - text: Validation
+    - link "▤ Manifests":
+      - /url: /workbench/manifests
+      - generic: ▤
+      - text: Manifests
+    - link "⇄ Deployment plans":
+      - /url: /workbench/plans
+      - generic: ⇄
+      - text: Deployment plans
+    - link "✧ Foundry agent":
+      - /url: /workbench/agent
+      - generic: ✧
+      - text: Foundry agent
+    - generic: GOVERNANCE
+    - link "⬡ Security policy":
+      - /url: /workbench/policy
+      - generic: ⬡
+      - text: Security policy
+    - link "◷ Session audit":
+      - /url: /workbench/audit
+      - generic: ◷
+      - text: Session audit
+    - link "⛭ Integrations":
+      - /url: /workbench/integrations
+      - generic: ⛭
+      - text: Integrations
+  - text: Read-only public workspace
+  - link "Source code ↗":
+    - /url: https://github.com/9059Rohith/pipefoundry
+- banner:
+  - text: Workspace
+  - generic: /
+  - strong: Foundry agent
+  - link "✧ Ask Foundry":
+    - /url: /workbench/agent
+  - link "Integration settings":
+    - /url: /workbench/integrations
+    - text: PF
+- main:
+  - heading "Foundry agent" [level=1]
+  - paragraph: Investigate repository evidence with a bounded, read-only AI agent.
+  - status
+  - heading "Ask Foundry" [level=2]
+  - paragraph: A limited public demo with real Gemini and GitHub evidence
+  - generic: "Connected: gemini · gemini-3.5-flash-lite"
+  - paragraph: Public repository demo · no sign-in or token required.
+  - generic: What should the agent investigate?
+  - textbox "What should the agent investigate?":
+    - /placeholder: Inspect recent workflow failures and summarize evidence for release readiness.
+    - text: Inspect repository metadata. State the default branch, primary language, evidence URL and observation time. Say if the evidence is cached or stale.
+  - generic: "Repository: 9059Rohith/pipefoundry (fixed public scope). Public GitHub evidence is sent to the configured provider."
+  - button "✧ Investigate repository"
+  - paragraph: "3 requests per visitor / 10 minutes. Shared allowance: 2 per minute and 30 per day. Each attempt uses an allowance. Read-only public evidence; cached observations are dated. No shell, deployment or workflow dispatch. Gemini free-tier quotas apply; quota errors are explicit and no paid fallback is used."
+  - heading "Analysis & evidence" [level=2]
+  - generic: "- **Default Branch**: `main` - **Primary Language**: Python - **Evidence URL**: [https://github.com/9059Rohith/pipefoundry](https://github.com/9059Rohith/pipefoundry) - **Observation Time**: 2026-11-01T19:09:41.971356+00:00 - **Cache Status**: The evidence is live (not stale/cached)."
+  - paragraph: "Provider: gemini · gemini-3.5-flash-lite"
+  - heading "Tool evidence" [level=3]
+  - generic: ↳
+  - paragraph: inspect_github · repository
+  - link "Source ↗":
+    - /url: https://api.github.com/repos/9059Rohith/pipefoundry
+  - text: · Nov 2, 2026, 12:39 AM · Fresh evidence
+- contentinfo:
+  - generic: PIPEFOUNDRY / Config is data. Every action has a boundary.
+  - link "Security & execution policy ↗":
+    - /url: /workbench/policy

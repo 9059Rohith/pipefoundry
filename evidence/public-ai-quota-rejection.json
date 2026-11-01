@@ -1,0 +1,10 @@
+{
+  "verified_at": "2026-11-01T19:09:52.546049+00:00",
+  "url": "https://rohith-pipefoundry.vercel.app/workbench/api/demo-agent",
+  "http_status": 429,
+  "retry_after": "7",
+  "result": {
+    "detail": "Public demo allowance reached. Please try again later."
+  },
+  "note": "After one anonymous HTTP success and one separate browser success in the same minute."
+}

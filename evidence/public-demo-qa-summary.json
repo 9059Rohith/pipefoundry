@@ -1,0 +1,43 @@
+{
+  "verified_at": "2026-11-01T19:11:41.512380+00:00",
+  "canonical_url": "https://rohith-pipefoundry.vercel.app/workbench/agent",
+  "endpoint": "POST /workbench/api/demo-agent",
+  "deployment": "dpl_GF9sHtAgdwzkzdsBXuP4ZwY9FBLY",
+  "source_sha256": {
+    "src/pipefoundry/public_demo.py": "7968a7d72ff58707cc61c329fa432ad1334d765bd3ff77f67e76121792e2356d",
+    "src/pipefoundry/workbench.py": "4c6d3f40577bc976700b54955ccfcfafe0f19ba667736c0d80bdd35204f6bb09",
+    "src/pipefoundry/api.py": "a63c808d94925a12980c6cb514f713ddba157c13789f7691f88a35dfa46599bd",
+    "src/pipefoundry/web/app.js": "f0834ae46d1df5af6ff0f5715be8bd861c6592b9a2a4a87a6f0dabb97c58c314"
+  },
+  "verification": {
+    "targeted_passed": 21,
+    "full_passed": 88,
+    "optional_skips": 23,
+    "full_seconds": 249.46,
+    "ruff": "passed",
+    "format": "passed",
+    "javascript": "passed",
+    "bandit": "passed",
+    "wheel": "passed"
+  },
+  "live_checks": {
+    "anonymous_http": 200,
+    "anonymous_browser": "real Gemini answer with GitHub tool trace; no token field; zero console errors/warnings",
+    "third_request": 429,
+    "retry_after": "7",
+    "limiter_backend": "postgresql",
+    "identity_source": "vercel-forwarded-for",
+    "private_write": 401,
+    "cross_origin": 403,
+    "override": 422
+  },
+  "constraints": {
+    "repository": "9059Rohith/pipefoundry",
+    "client": "3/600seconds",
+    "global": "2/60seconds and30/86400seconds",
+    "storage_failure": "503beforeinference",
+    "question_characters": 600,
+    "response_tokens": 600,
+    "identity_storage": "HMAC only; no raw IP stored"
+  }
+}

@@ -146,6 +146,7 @@ def create_app(
             "/deployments/preview",
             "/workbench/api/validate",
             "/workbench/api/agent",
+            "/workbench/api/demo-agent",
         } or request.url.path.startswith("/releases/"):
             # Pydantic's default errors include input and unknown field names.
             # A preview must never reflect accidentally pasted credentials.
@@ -168,7 +169,10 @@ def create_app(
                 "/workbench/api/integrations",
             }
         )
-        public_validation = request.method == "POST" and path == "/workbench/api/validate"
+        public_validation = request.method == "POST" and path in {
+            "/workbench/api/validate",
+            "/workbench/api/demo-agent",
+        }
         if (
             not public_read
             and not public_validation

@@ -102,12 +102,19 @@ async function request(url, options = {}) {
   try {
     const r = await fetch(url, { ...options, signal: controller.signal });
     const data = await r.json();
-    if (!r.ok)
-      throw new Error(
+    if (!r.ok) {
+      const failure = new Error(
         typeof data.detail === "string"
           ? data.detail
-          : `Request failed (${r.status}). Check the configuration and try again.`,
+          : `Request failed (${r.status}). Try again later.`,
       );
+      failure.status = r.status;
+      failure.retryAfter = Math.min(
+        86400,
+        Math.max(1, Number(r.headers.get("Retry-After")) || 60),
+      );
+      throw failure;
+    }
     return data;
   } catch (e) {
     if (e.name === "AbortError")
@@ -620,7 +627,7 @@ async function integrations() {
   return (
     panel(
       "Connected capabilities",
-      `<div class="integration-row"><div class="integration-symbol">⑂</div><div class="integration-name"><h3>GitHub</h3><p>Anonymous public repository, workflows, runs, releases and commits.</p></div>${status("configured")}<a class="button" href="/workbench/repository">Inspect →</a></div><div class="integration-row"><div class="integration-symbol">{ }</div><div class="integration-name"><h3>Pipeline runtime</h3><p>Live server validation and deterministic Kubernetes manifest rendering.</p></div>${status("configured")}<a class="button" href="/workbench/validation">Validate →</a></div><div class="integration-row"><div class="integration-symbol">✧</div><div class="integration-name"><h3>${esc(d.ai_provider === "gemini" ? "Gemini API" : "OpenAI Responses API")}</h3><p>${d.ai_configured ? `Connected: ${esc(d.ai_model)}. An authorized control plane token is required.` : "Server provider key is missing. No AI output is generated without credentials."}</p></div>${status(d.ai_configured ? "configured" : "unavailable")}<a class="button" href="/workbench/agent">Open agent →</a></div><div class="integration-row"><div class="integration-symbol">▧</div><div class="integration-name"><h3>Execution control plane</h3><p>Local and Kubernetes executors. Authenticated API access required.</p></div><span class="pill">Protected</span><a class="button" href="/workbench/plans">Preview →</a></div>`,
+      `<div class="integration-row"><div class="integration-symbol">⑂</div><div class="integration-name"><h3>GitHub</h3><p>Anonymous public repository, workflows, runs, releases and commits.</p></div>${status("configured")}<a class="button" href="/workbench/repository">Inspect →</a></div><div class="integration-row"><div class="integration-symbol">{ }</div><div class="integration-name"><h3>Pipeline runtime</h3><p>Live server validation and deterministic Kubernetes manifest rendering.</p></div>${status("configured")}<a class="button" href="/workbench/validation">Validate →</a></div><div class="integration-row"><div class="integration-symbol">✧</div><div class="integration-name"><h3>${esc(d.ai_provider === "gemini" ? "Gemini API" : "OpenAI Responses API")}</h3><p>${d.ai_configured ? `Connected: ${esc(d.ai_model)}. A limited public repository demo is available without a token.` : "Server provider key is missing. No AI output is generated without credentials."}</p></div>${status(d.ai_configured ? "configured" : "unavailable")}<a class="button" href="/workbench/agent">Open agent →</a></div><div class="integration-row"><div class="integration-symbol">▧</div><div class="integration-name"><h3>Execution control plane</h3><p>Local and Kubernetes executors. Authenticated API access required.</p></div><span class="pill">Protected</span><a class="button" href="/workbench/plans">Preview →</a></div>`,
       "Live configuration presence; credentials are never disclosed.",
     ) +
     panel(
@@ -631,12 +638,14 @@ async function integrations() {
 }
 async function agent() {
   const d = await request("/workbench/api/integrations");
+  $("#repository-form").style.display = "none";
   setTimeout(() => {
     $("#agent-submit").onclick = async () => {
       const b = $("#agent-submit");
       b.disabled = true;
+      let cooling = false;
       try {
-        const headers = tokenHeaders();
+        const headers = { "Content-Type": "application/json" };
         const question = $("#agent-question").value.trim();
         if (question.length < 5)
           throw new Error(
@@ -644,30 +653,46 @@ async function agent() {
           );
         $("#agent-output").innerHTML =
           '<div class="loading">Inspecting repository evidence…</div>';
-        const r = await request("/workbench/api/agent", {
+        const r = await request("/workbench/api/demo-agent", {
           method: "POST",
           headers,
-          body: JSON.stringify({ repo, question }),
+          body: JSON.stringify({ question }),
         });
         audit(
           "Agent analysis completed",
-          `${repo} · ${r.trace.length} tool reads`,
+          `Public demo · ${r.trace.length} tool reads`,
         );
         $("#agent-output").innerHTML =
           `<div class="panel-body">${r.trace.some((t) => t.stale) ? '<div class="notice">GitHub rate limiting prevented a fresh check. This analysis uses previously fetched public evidence at the observation times below.</div>' : ""}<div class="agent-response">${esc(r.answer)}</div><p class="mono muted">Provider: ${esc(r.provider || d.ai_provider)} · ${esc(r.model)}</p><h3>Tool evidence</h3>${r.trace.map((t) => `<div class="activity-item"><span class="activity-icon">↳</span><div><p>${esc(t.tool)} · ${esc(t.view)}</p><small>${link(t.source, "Source")} · ${esc(fmt(t.observed_at))} · ${t.stale ? "Cached · stale (GitHub rate limit)" : "Fresh evidence"}</small></div></div>`).join("")}</div>`;
       } catch (e) {
         notice(e.message, true);
+        if (e.status === 429) {
+          cooling = true;
+          const until = Date.now() + e.retryAfter * 1000;
+          const tick = () => {
+            const remaining = Math.max(
+              0,
+              Math.ceil((until - Date.now()) / 1000),
+            );
+            b.textContent = remaining
+              ? `Try again in ${remaining}s`
+              : "✧ Investigate repository";
+            b.disabled = remaining > 0;
+            if (!remaining) clearInterval(timer);
+          };
+          const timer = setInterval(tick, 1000);
+          tick();
+        }
         $("#agent-output").innerHTML = empty(
           "Analysis not completed",
           e.message,
         );
       } finally {
-        b.disabled = false;
-        $("#access-token").value = "";
+        if (!cooling) b.disabled = false;
       }
     };
   }, 0);
-  return `<div class="split">${panel("Ask Foundry", `<div class="panel-body">${!d.ai_configured ? '<div class="notice">AI provider credentials are not configured on this server. Agent execution is unavailable.</div>' : ""}${d.ai_configured ? `<div class="result-banner good">Connected: ${esc(d.ai_provider)} · ${esc(d.ai_model)}</div>` : ""}${authField()}<div class="form-field"><label for="agent-question">What should the agent investigate?</label><textarea id="agent-question" rows="5" maxlength="1500" placeholder="Inspect recent workflow failures and summarize evidence for release readiness."></textarea><small>Repository: ${esc(repo)}. Public GitHub evidence is sent to the configured provider.</small></div><button class="primary" id="agent-submit" ${!d.ai_configured ? "disabled" : ""}>✧ Investigate repository</button><p class="note">Read-only tools · max 3 model steps · max 4 tool calls · no shell, deploy or workflow dispatch. Gemini free-tier quotas apply; quota errors are explicit and no paid fallback is used.</p></div>`, "Grounded analysis with inspectable tool evidence")}${panel("Analysis & evidence", '<div id="agent-output">' + empty("Ready for an investigation", "Findings appear only after a real provider request and GitHub inspection.") + "</div>")}</div>`;
+  return `<div class="split">${panel("Ask Foundry", `<div class="panel-body">${!d.ai_configured ? '<div class="notice">AI provider credentials are not configured on this server. Agent execution is unavailable.</div>' : ""}${d.ai_configured ? `<div class="result-banner good">Connected: ${esc(d.ai_provider)} · ${esc(d.ai_model)}</div>` : ""}<p class="muted">Public repository demo · no sign-in or token required.</p><div class="form-field"><label for="agent-question">What should the agent investigate?</label><textarea id="agent-question" rows="5" maxlength="600" placeholder="Inspect recent workflow failures and summarize evidence for release readiness."></textarea><small>Repository: 9059Rohith/pipefoundry (fixed public scope). Public GitHub evidence is sent to the configured provider.</small></div><button class="primary" id="agent-submit" ${!d.ai_configured ? "disabled" : ""}>✧ Investigate repository</button><p class="note">3 requests per visitor / 10 minutes. Shared allowance: 2 per minute and 30 per day. Each attempt uses an allowance. Read-only public evidence; cached observations are dated. No shell, deployment or workflow dispatch. Gemini free-tier quotas apply; quota errors are explicit and no paid fallback is used.</p></div>`, "A limited public demo with real Gemini and GitHub evidence")}${panel("Analysis & evidence", '<div id="agent-output">' + empty("Ready for an investigation", "Findings appear only after a real provider request and GitHub inspection.") + "</div>")}</div>`;
 }
 const controllers = {
   overview,
