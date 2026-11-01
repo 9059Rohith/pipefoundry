@@ -142,7 +142,11 @@ def create_app(
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, exc):
-        if request.url.path == "/deployments/preview" or request.url.path.startswith("/releases/"):
+        if request.url.path in {
+            "/deployments/preview",
+            "/workbench/api/validate",
+            "/workbench/api/agent",
+        } or request.url.path.startswith("/releases/"):
             # Pydantic's default errors include input and unknown field names.
             # A preview must never reflect accidentally pasted credentials.
             return JSONResponse({"detail": "invalid deployment configuration"}, status_code=422)

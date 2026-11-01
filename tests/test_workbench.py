@@ -46,6 +46,10 @@ def test_public_validation_has_no_state_changes_and_rejects_unsafe_config(client
 
 def test_public_input_body_limit_still_applies(client):
     assert client.post("/workbench/api/validate", content=b"x" * 32769).status_code == 413
+    invalid = client.post("/workbench/api/validate", json={"config": "NEVER-REFLECT"})
+    assert invalid.status_code == 422 and "NEVER-REFLECT" not in invalid.text
+    assert client.get("/demo").status_code == 401
+    assert client.get("/demo/console").status_code == 401
     assert client.get("/workbench/assets/../../api.py").status_code != 200
 
 
