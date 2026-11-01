@@ -188,16 +188,18 @@ def test_public_demo_endpoints_do_not_expose_private_api_or_credentials(tmp_path
     with TestClient(create_app(tmp_path, demo_name=name, demo_key=key)) as client:
         assert client.post("/demo/seed").status_code == 401
         assert client.get("/pipelines").status_code == 401
+        assert client.get("/demo").status_code == 401
+        headers = {"Authorization": "Bearer " + "t" * 32}
         deadline = time.monotonic() + 60
         while time.monotonic() < deadline:
-            response = client.get("/demo")
+            response = client.get("/demo", headers=headers)
             if response.status_code == 200:
                 break
             time.sleep(0.1)
         assert response.status_code == 200, response.text
         assert response.json()["read_only"] is True
         assert DSN not in response.text and "t" * 32 not in response.text
-        console = client.get("/")
+        console = client.get("/demo/console", headers=headers)
         assert "text/html" in console.headers["content-type"]
         assert name in console.text and "Pipeline execution" in console.text
         assert "script-src" not in console.text and "<script" not in console.text

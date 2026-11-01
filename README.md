@@ -2,13 +2,15 @@
 
 **Release Sentinel binds a reviewed pipeline plan to exact recorded state, then reserves one auditable execution under a durable lease.**
 
-[Live console](https://rohith-pipefoundry.vercel.app) · [Execution receipts](https://rohith-pipefoundry.vercel.app/demo) · [Readiness](https://rohith-pipefoundry.vercel.app/health/ready) · [Source](https://github.com/9059Rohith/pipefoundry)
+[Live workbench](https://rohith-pipefoundry.vercel.app) · [Pipeline editor](https://rohith-pipefoundry.vercel.app/workbench/editor) · [Workbench guide](docs/workbench.md) · [Source](https://github.com/9059Rohith/pipefoundry)
 
 A data engineer should not have to hand-edit a CronJob, Helm chart and scheduler DAG every time an ingestion schedule changes. An operator should be able to identify which configuration ran, replay specific dates, and recover a previous configuration without losing the evidence of what happened. PipeFoundry implements that workflow with typed YAML, fixed Python workers, real SQL writes and versioned deployment artifacts.
 
-The public console runs a synthetic three-order workload against durable PostgreSQL. It exposes read-only execution, quality, backfill and rollback receipts. The private control API requires a bearer token. This project demonstrates Data Engineering and DevOps concerns relevant to an OpenFX engineering review: partition correctness, idempotent ingestion, reproducible delivery, failure boundaries and operational recovery.
+The public workbench has fifteen useful pages for actual GitHub repository and workflow inspection, pipeline authoring, server validation, manifest export, deployment previews, security controls, session audit and integration status. Public execution history comes from GitHub Actions. Draft configuration is explicitly unexecuted. The legacy synthetic demonstration receipts at `/demo` and `/demo/console` now require authentication, as do all executor and release mutations. The bounded AI investigator uses real OpenAI tool calls when server credentials are configured and an authorized API token is supplied; it reports missing credentials instead of generating sample answers.
 
-![Actual public console](evidence/public-dashboard.jpg)
+![PipeFoundry workbench editor](evidence/workbench-desktop.png)
+
+The 2026-11-01 workbench verification passed **74 tests**, with **23 environment-dependent skips**, plus Ruff, JavaScript syntax, Bandit, a wheel build and a pinned runtime dependency audit with no known vulnerabilities. Browser checks exercised draft save → server validation → actual YAML download at desktop and mobile sizes. Public HTTPS checks verified real repository inspection, manifest validation and authentication on legacy receipts. PostgreSQL, Spark and Docker checks were not rerun because those services were unavailable. These results do not claim a passing hosted CI run or a newly scanned container image. See [current workbench evidence](docs/workbench.md).
 
 ## Release Sentinel signature
 
@@ -162,7 +164,7 @@ API port 8094 and PostgreSQL port 55435 bind to localhost. For direct developmen
 
 | Capability | Public deployment | Reproducible local execution | Artifact / external prerequisite |
 |---|---|---|---|
-| Synthetic ingestion, quality, two backfills and rollback | Real PostgreSQL receipts on the console | CLI/Compose worker and SQL tests | Public reads are deliberately read-only |
+| Synthetic ingestion, quality, two backfills and rollback | Legacy receipts require authentication | CLI/Compose worker and SQL tests | Public workbench uses real GitHub execution history |
 | Preview and lifecycle API | Authenticated operator routes | CLI and API tests, including cold-root PostgreSQL | Preview verified over public HTTPS; see [feature proof](evidence/review-public-feature.json) |
 | Approved HTTPS → PostgreSQL | Connector available to the operator | Ephemeral TLS server → real subprocess → PostgreSQL acceptance test | An actual upstream URL/CA/allowlist and DSN are operator settings |
 | Spark JSON → partitioned Parquet | Excluded from the minimal API image | Separately verified Linux Spark container | Java 17+ and optional locked Spark dependencies |
@@ -196,7 +198,7 @@ The 11-line authored example generates **8 files / 345 lines**, including duplic
 
 ## Security and operational tradeoffs
 
-Configuration is data, never code. Typed allowlists reject unknown fields, arbitrary SQL/scripts/URLs, traversal/absolute paths, unsupported connectors and excessive requested resources. Secrets and network destinations are administrator-owned. API body size is limited to 32 KiB, upload time to five seconds, and authentication is checked before consuming untrusted bodies. Preview validation errors do not echo pasted input; its change list intentionally omits before/after values. The public console publishes only the reserved synthetic receipt and uses a restrictive CSP.
+Configuration is data, never code. Typed allowlists reject unknown fields, arbitrary SQL/scripts/URLs, traversal/absolute paths, unsupported connectors and excessive requested resources. Secrets and network destinations are administrator-owned. API body size is limited to 32 KiB and upload time to five seconds. Protected routes check authentication before consuming untrusted bodies. Preview validation errors do not echo pasted input; its change list intentionally omits before/after values. Public validation renders in memory without creating platform revisions. Public GitHub reads use a fixed API host, safe repository names and no server credentials. The workbench uses self-hosted scripts and styles under a restrictive CSP. Tokens entered in authenticated workbench forms are cleared after each request and never saved in browser storage.
 
 SQL batches and quality checks commit atomically. A per-pipeline database lock coordinates separate instances, but a crashed ordinary operation requires operator reconciliation; only the reserved demo seed has constrained lease recovery. Worker output and durable artifact storage are bounded. Local subprocesses have deadlines but no OS resource sandbox; apply Docker limits for host isolation. Multi-tenant identity/RBAC, a distributed work queue, automatic ordinary-operation recovery, schema migration management and a production lakehouse commit protocol remain outside this implementation.
 

@@ -23,6 +23,8 @@ from pipefoundry.engine import Platform
 from pipefoundry.models import Pipeline, StrictModel
 from pipefoundry.release_models import ApplyRequest, RecoveryRequest, ReleaseRequest
 from pipefoundry.releases import ReleaseSentinel
+from pipefoundry.workbench import PAGES
+from pipefoundry.workbench import router as workbench_router
 
 MAX_BODY_BYTES = 32768
 BODY_READ_TIMEOUT = 5.0
@@ -150,10 +152,24 @@ def create_app(
     async def limit_body(request: Request, call_next):
         # Reject unknown credentials without consuming an attacker-controlled
         # stream. Route dependencies still recheck before executing an action.
-        public_read = (
-            public_demo and request.method in {"GET", "HEAD"} and request.url.path in {"/", "/demo"}
+        path = request.url.path
+        workbench_pages = {"/", "/workbench"} | {f"/workbench/{page}" for page in PAGES}
+        public_read = request.method in {"GET", "HEAD"} and (
+            path in workbench_pages
+            or path
+            in {
+                "/workbench/assets/app.css",
+                "/workbench/assets/app.js",
+                "/workbench/api/github",
+                "/workbench/api/integrations",
+            }
         )
-        if not public_read and request.url.path not in {"/health/live", "/health/ready"}:
+        public_validation = request.method == "POST" and path == "/workbench/api/validate"
+        if (
+            not public_read
+            and not public_validation
+            and path not in {"/health/live", "/health/ready"}
+        ):
             try:
                 authorize(request.headers.get("authorization"))
             except HTTPException as exc:
@@ -232,7 +248,7 @@ def create_app(
     def read_demo():
         return public_receipt()
 
-    @app.get("/", response_class=HTMLResponse)
+    @app.get("/demo/console", response_class=HTMLResponse)
     def read_console():
         if not public_demo:
             raise HTTPException(404, "public demo is disabled")
@@ -319,6 +335,7 @@ def create_app(
     def teardown(name: str):
         return platform.teardown(name)
 
+    app.include_router(workbench_router(authorize))
     return app
 
 

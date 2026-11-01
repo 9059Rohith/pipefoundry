@@ -19,6 +19,9 @@ pipefoundry = "pipefoundry.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+pipefoundry = ["web/*.html", "web/*.css", "web/*.js"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = ["postgres: requires PIPEFOUNDRY_POSTGRES_DSN", "spark: requires PySpark and Java runtime"]

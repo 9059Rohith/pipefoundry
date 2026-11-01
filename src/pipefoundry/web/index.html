@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta
+      name="description"
+      content="Inspect real GitHub workflows, validate pipeline configuration, and prepare secure deployment manifests with PipeFoundry."
+    />
+    <title>__TITLE__ · PipeFoundry</title>
+    <link rel="stylesheet" href="/workbench/assets/app.css" />
+    <script src="/workbench/assets/app.js" defer></script>
+  </head>
+  <body data-page="__PAGE__">
+    <a class="skip" href="#main">Skip to content</a>
+    <aside class="sidebar">
+      <a class="brand" href="/"
+        ><span class="brand-mark">P</span> PipeFoundry<span class="version"
+          >01</span
+        ></a
+      >
+      <div class="workspace">
+        <span class="workspace-icon">⌘</span>
+        <div>
+          Developer workspace<small>Public repository inspection</small>
+        </div>
+      </div>
+      <nav aria-label="Main navigation">
+        <div class="nav-label">WORKBENCH</div>
+        <a href="/workbench/overview" data-nav="overview"
+          ><span>⌂</span>Overview</a
+        ><a href="/workbench/repository" data-nav="repository"
+          ><span>◇</span>Repository</a
+        ><a href="/workbench/workflows" data-nav="workflows"
+          ><span>⑂</span>Workflows</a
+        ><a href="/workbench/runs" data-nav="runs"><span>▹</span>Executions</a
+        ><a href="/workbench/releases" data-nav="releases"
+          ><span>▣</span>Releases</a
+        ><a href="/workbench/commits" data-nav="commits"
+          ><span>≡</span>Commit history</a
+        >
+        <div class="nav-label">BUILD & VALIDATE</div>
+        <a href="/workbench/editor" data-nav="editor"
+          ><span>⌨</span>Pipeline editor</a
+        ><a href="/workbench/validation" data-nav="validation"
+          ><span>✓</span>Validation</a
+        ><a href="/workbench/manifests" data-nav="manifests"
+          ><span>▤</span>Manifests</a
+        ><a href="/workbench/plans" data-nav="plans"
+          ><span>⇄</span>Deployment plans</a
+        ><a href="/workbench/agent" data-nav="agent"
+          ><span>✧</span>Foundry agent</a
+        >
+        <div class="nav-label">GOVERNANCE</div>
+        <a href="/workbench/policy" data-nav="policy"
+          ><span>⬡</span>Security policy</a
+        ><a href="/workbench/audit" data-nav="audit"
+          ><span>◷</span>Session audit</a
+        ><a href="/workbench/integrations" data-nav="integrations"
+          ><span>⛭</span>Integrations</a
+        >
+      </nav>
+      <div class="sidebar-foot">
+        <span class="signal"></span> Read-only public workspace<a
+          href="https://github.com/9059Rohith/pipefoundry"
+          target="_blank"
+          rel="noopener noreferrer"
+          >Source code ↗</a
+        >
+      </div>
+    </aside>
+    <div class="app">
+      <header class="topbar">
+        <div class="breadcrumb">
+          Workspace <span>/</span> <strong>__TITLE__</strong>
+        </div>
+        <div class="top-actions">
+          <a href="/workbench/agent">✧ Ask Foundry</a
+          ><a
+            class="avatar"
+            href="/workbench/integrations"
+            aria-label="Integration settings"
+            >PF</a
+          >
+        </div>
+      </header>
+      <main id="main">
+        <div class="page-heading">
+          <div>
+            <h1>__TITLE__</h1>
+            <p id="description"></p>
+          </div>
+          <div id="page-actions"></div>
+        </div>
+        <form id="repository-form" class="repo-bar">
+          <label for="repository">Repository</label
+          ><input
+            id="repository"
+            name="repository"
+            value="9059Rohith/pipefoundry"
+            placeholder="owner/repository"
+            required
+            pattern="[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
+            maxlength="201"
+          /><button type="submit">Inspect repository <span>↵</span></button
+          ><span id="source-status">GitHub · public API</span>
+        </form>
+        <div id="notice" role="status" aria-live="polite"></div>
+        <div id="content"><div class="loading">Loading workspace…</div></div>
+      </main>
+      <footer>
+        <span
+          >PIPEFOUNDRY <span class="footer-dot">/</span> Config is data. Every
+          action has a boundary.</span
+        ><a href="/workbench/policy">Security & execution policy ↗</a>
+      </footer>
+    </div>
+  </body>
+</html>
