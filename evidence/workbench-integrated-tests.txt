@@ -1,0 +1,7 @@
+....................................................s.s................. [ 74%]
+.......................s.                                                [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_release_races.py:131: cold scratch roots require durable metadata
+SKIPPED [1] tests\test_release_races.py:146: demo recovery requires PostgreSQL
+SKIPPED [1] tests\test_workloads.py:77: Spark runtime opt in
+94 passed, 3 skipped in 221.67s (0:03:41)

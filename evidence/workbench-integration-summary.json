@@ -1,0 +1,36 @@
+{
+  "verified_at_utc": "2026-11-01T18:25:22.557373+00:00",
+  "source_commit": "109d52fe07d09d9e5f3f5d8cd06fd5e34021f98d",
+  "tests": {
+    "host": {
+      "passed": 94,
+      "skipped": 3,
+      "seconds": 221.67,
+      "evidence": "evidence/workbench-integrated-tests.txt"
+    },
+    "installed_linux_runtime": {
+      "passed": 92,
+      "skipped": 5,
+      "seconds": 75.24,
+      "evidence": "evidence/workbench-container-tests.txt"
+    }
+  },
+  "spark": {
+    "input_rows": 2,
+    "verified_parquet_rows": 2,
+    "currency_partitions": [
+      "EUR",
+      "USD"
+    ],
+    "runtime": "Linux / Java 17 / PySpark 4.0.1; current repository source mounted read-only",
+    "evidence": "evidence/workbench-spark-tests.txt"
+  },
+  "application_image": "sha256:7a5a28f40baef4c4316e9db4de593323aadf86e191e72a65deac15c8db5ee548",
+  "database_scope": "Two newly created isolated local PostgreSQL databases. No hosted DB accessed.",
+  "security_boundary": "Fresh minimal image verified as UID 10001, read-only root, no capabilities, no network, no shells or package manager; actual worker execution retained.",
+  "limits": [
+    "Live AI provider requests remain unverified because no provider key is configured.",
+    "Host Spark opt-in is covered separately by the real Linux acceptance check.",
+    "Installed Linux tests omit Docker-inside-container and absent OpenSSL CLI; those boundaries are covered by the host suite. SQLite fixtures have two PostgreSQL-only cases."
+  ]
+}

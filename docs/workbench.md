@@ -30,7 +30,24 @@ Deployment previews require an authorized `PIPEFOUNDRY_API_TOKEN`. This token is
 
 The agent requires both an authorized API token and server `OPENAI_API_KEY`. `PIPEFOUNDRY_AI_MODEL` can select a compatible Responses API model; the default is `gpt-4.1-mini`. The loop requires evidence on its first step and allows only `inspect_github`, at most three model requests and four tool calls, each with bounded network timeouts. It cannot run shell commands, deploy, dispatch workflows or mutate the control plane. Provider output and repository evidence remain escaped text. Missing credentials produce an explicit 503 and no generated answer. Live provider execution was unavailable in this session because no provider key was configured; deterministic protocol tests exercise real tool dispatch logic using isolated test transport responses.
 
-## Verification on 2026-11-01
+## Expanded integration verification on 2026-11-01
+
+After Docker Desktop became available, the optional integration checks were rerun against two freshly created local PostgreSQL databases. No hosted database was accessed or modified. The existing local PostgreSQL container was started, and each suite received its own database created from `template0` with C locale. Credentials stayed in process memory and were never printed or committed.
+
+| Scope | Result | Evidence |
+| --- | --- | --- |
+| Complete host suite with PostgreSQL and fresh minimal image enabled | **94 passed, 3 skipped in 221.67 seconds** | [Host log](../evidence/workbench-integrated-tests.txt), [JUnit](../evidence/workbench-integrated-tests.xml) |
+| Installed package in Linux / Python 3.15, read-only root, UID 10001, real PostgreSQL | **92 passed, 5 skipped in 75.24 seconds** | [Runtime log](../evidence/workbench-container-tests.txt) |
+| Real Linux / Java 17 / PySpark 4.0.1 JSON-to-Parquet acceptance, current source mounted read-only | **2 rows written and independently verified; 2 EUR/USD partition files** | [Spark log](../evidence/workbench-spark-tests.txt) |
+| Fresh application Docker build and packaged UI assets | **Passed**, 15 page definitions and all three web assets present | [Machine-readable summary](../evidence/workbench-integration-summary.json) |
+
+The host run enabled `PIPEFOUNDRY_POSTGRES_DSN` and `PIPEFOUNDRY_TEST_IMAGE=pipefoundry:workbench`. It covered actual PostgreSQL upserts and SQL quality, cold-root persistence, durable artifacts, locking, competing release processes, launch uniqueness, expired-operation recovery, private synthetic receipt authentication, actual HTTPS API ingestion through the worker, and the fresh minimal container's no-shell/no-package-manager execution boundary. Both PostgreSQL-only parametrized tests passed under the PostgreSQL fixture; their SQLite fixture variants are intentionally skipped. The remaining host Spark skip is covered by the separate real Linux Spark acceptance run.
+
+The installed Linux suite used the exact fresh `/opt/venv` from the application image and current test sources. Its five skips are the two intentionally PostgreSQL-only cases under SQLite fixtures, Docker inside the test container, Spark, and the absent OpenSSL command. The host suite covers Docker and ephemeral HTTPS certificate generation; the separate Linux check covers Spark. Live AI provider execution still requires a configured provider key and remains explicitly unavailable.
+
+No implementation changes were needed for these integration passes. The tested application source is commit `109d52f`; subsequent changes only update verification evidence and documentation.
+
+## Initial desktop verification on 2026-11-01
 
 - Full local Python suite: **74 passed, 23 skipped in 96.67 seconds**. PostgreSQL, Spark and container-dependent checks require unavailable services/opt-ins; this run does not claim those integrations passed.
 - New workbench regression suite: **7 passed**. Covers every page, CSP, request bounds, no validation state mutation, authentication, no secret reflection, fixed-host GitHub transport, caching, missing AI credentials and read-only agent tool dispatch.

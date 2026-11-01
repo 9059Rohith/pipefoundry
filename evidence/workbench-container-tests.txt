@@ -1,0 +1,9 @@
+....................................................s.s................. [ 74%]
+...s...................ss                                                [100%]
+=========================== short test summary info ============================
+SKIPPED [1] tests/test_release_races.py:131: cold scratch roots require durable metadata
+SKIPPED [1] tests/test_release_races.py:146: demo recovery requires PostgreSQL
+SKIPPED [1] tests/test_runtime_image.py:8: container opt in
+SKIPPED [1] tests/test_workloads.py:77: Spark runtime opt in
+SKIPPED [1] tests/test_workloads.py:120: openssl required to generate ephemeral HTTPS test certificate
+92 passed, 5 skipped in 75.24s (0:01:15)
