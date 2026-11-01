@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-11-01T18:52:58.914321+00:00",
+  "url": "https://rohith-pipefoundry.vercel.app",
+  "deployment": "dpl_Eb2bCiZpSEVTXWVQ9293zUqgz4ya",
+  "http_status": 200,
+  "metadata_observed_at": "2026-11-01T18:52:38.713718+00:00",
+  "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+  "stale": false,
+  "cache_status": "fresh-cache",
+  "tests": {
+    "passed": 80,
+    "optional_skips": 23,
+    "seconds": 54.41
+  },
+  "note": "Actual canonical response. Historical fallback is labeled stale and bounded to24h; this check does not claim current source counts."
+}
