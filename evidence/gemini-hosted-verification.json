@@ -1,0 +1,35 @@
+{
+  "verified_at": "2026-11-01T18:41:54.117562+00:00",
+  "url": "https://rohith-pipefoundry.vercel.app",
+  "http_status": 200,
+  "unauthorized_status": 401,
+  "integration_status": {
+    "github": "public read-only API",
+    "ai_configured": true,
+    "ai_provider": "gemini",
+    "ai_model": "gemini-3.5-flash-lite",
+    "ai_fallback": "none",
+    "ai_requires_auth": true,
+    "validation": "Pydantic / server runtime",
+    "executors": "Authenticated control plane only"
+  },
+  "result": {
+    "answer": "According to the GitHub repository metadata for [9059Rohith/pipefoundry](https://github.com/9059Rohith/pipefoundry):\n\n* **Default Branch:** `main`\n* **Primary Language:** Python",
+    "trace": [
+      {
+        "tool": "inspect_github",
+        "view": "repository",
+        "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+        "observed_at": "2026-11-01T18:41:18.985979+00:00"
+      }
+    ],
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "usage": {
+      "completion_tokens": 52,
+      "prompt_tokens": 2454,
+      "total_tokens": 2506
+    },
+    "request_id": "8ofnarC8FPaEytMPnJXOmQI"
+  }
+}

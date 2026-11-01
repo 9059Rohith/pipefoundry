@@ -20,7 +20,7 @@ The graphite-and-orange workbench provides fifteen routes with separate purposes
 | `/workbench/policy` | Inspect generated workload security controls |
 | `/workbench/audit` | Export or clear actual tab-session activity |
 | `/workbench/integrations` | Inspect live server capability and credential-presence status |
-| `/workbench/agent` | Real authenticated OpenAI investigation with GitHub tool traces |
+| `/workbench/agent` | Real authenticated Gemini investigation with GitHub tool traces |
 
 `/` and `/workbench` open Overview. The repository picker accepts public GitHub `owner/repository` names and persists the choice for the current tab session. No private GitHub token is attached. Results are cached for sixty seconds, with bounded page sizes and explicit API rate-limit or unavailable states.
 
@@ -28,7 +28,18 @@ Pipeline configuration starts as a clearly labeled, unexecuted starter. Save edi
 
 Deployment previews require an authorized `PIPEFOUNDRY_API_TOKEN`. This token is used for one request and cleared from the form. The preview compares recorded state; it is not a live drift audit or release reservation. Public pages expose no execution permissions. Historical synthetic demo receipts are now authenticated at `/demo` and `/demo/console`.
 
-The agent requires both an authorized API token and server `OPENAI_API_KEY`. `PIPEFOUNDRY_AI_MODEL` can select a compatible Responses API model; the default is `gpt-4.1-mini`. The loop requires evidence on its first step and allows only `inspect_github`, at most three model requests and four tool calls, each with bounded network timeouts. It cannot run shell commands, deploy, dispatch workflows or mutate the control plane. Provider output and repository evidence remain escaped text. Missing credentials produce an explicit 503 and no generated answer. Live provider execution was unavailable in this session because no provider key was configured; deterministic protocol tests exercise real tool dispatch logic using isolated test transport responses.
+The agent requires an authorized API token. Production now uses server-only `GEMINI_API_KEY`, `PIPEFOUNDRY_AI_PROVIDER=gemini` and `PIPEFOUNDRY_AI_MODEL=gemini-3.5-flash-lite`. Its dedicated Google project has billing disabled and is subject to free-tier quota. Gemini requests go to the fixed Google OpenAI-compatible Chat Completions endpoint; complete assistant/tool-call objects, including opaque thought signatures, are preserved for the next turn as required by [Google's compatibility protocol](https://ai.google.dev/gemini-api/docs/openai). Signatures are not published in the trace or verification artifacts.
+
+The loop requires actual GitHub evidence before returning an answer and allows only `inspect_github`, at most three model steps and four tool calls. Every network request has a timeout. A 429 may receive one retry per request only when the retry delay is at most two seconds; persistent quota exhaustion returns an explicit 429 with no paid fallback. The agent cannot run shell commands, deploy, dispatch workflows or mutate the control plane. Provider output and repository evidence remain escaped text. Missing credentials produce an explicit 503. Operators who explicitly select `PIPEFOUNDRY_AI_PROVIDER=openai` can still use `OPENAI_API_KEY` and the existing Responses adapter; Gemini never falls back to it automatically.
+
+## Real Gemini verification on 2026-11-02 IST
+
+- Actual local Gemini + GitHub HTTP loop: model `gemini-3.5-flash-lite`, one repository inspection and a grounded answer identifying the default branch and language. [Local evidence](../evidence/gemini-local-verification.json).
+- Actual canonical hosted endpoint: **HTTP 200**, nonempty answer and one `inspect_github` trace citing `https://api.github.com/repos/9059Rohith/pipefoundry`. Unauthenticated calls returned **401**. [Hosted evidence](../evidence/gemini-hosted-verification.json).
+- Production integration status reports Gemini, the configured model, authentication required and no fallback. Sensitive provider credentials were configured through CLI stdin and remain outside source, process arguments and browser assets.
+- Full Python suite: **77 passed, 23 skipped in 110.50 seconds**. The three new Gemini regressions cover thought-signature round trips, private credential status, unsupported tools, ungrounded answer rejection and bounded quota retry. Existing OpenAI tests remain green. PostgreSQL/Spark/container opt-ins retain the previously recorded separate integration coverage; Docker was not restarted for this adapter-only change.
+- Ruff check/format, JavaScript syntax and Bandit passed. No dependency was added.
+- Vercel container deployment `dpl_8GcWvEuwKworUD8G2Mr15Hh1ka92` reached Ready, was checked behind deployment protection and promoted to the existing public hostname.
 
 ## Expanded integration verification on 2026-11-01
 
@@ -43,7 +54,7 @@ After Docker Desktop became available, the optional integration checks were reru
 
 The host run enabled `PIPEFOUNDRY_POSTGRES_DSN` and `PIPEFOUNDRY_TEST_IMAGE=pipefoundry:workbench`. It covered actual PostgreSQL upserts and SQL quality, cold-root persistence, durable artifacts, locking, competing release processes, launch uniqueness, expired-operation recovery, private synthetic receipt authentication, actual HTTPS API ingestion through the worker, and the fresh minimal container's no-shell/no-package-manager execution boundary. Both PostgreSQL-only parametrized tests passed under the PostgreSQL fixture; their SQLite fixture variants are intentionally skipped. The remaining host Spark skip is covered by the separate real Linux Spark acceptance run.
 
-The installed Linux suite used the exact fresh `/opt/venv` from the application image and current test sources. Its five skips are the two intentionally PostgreSQL-only cases under SQLite fixtures, Docker inside the test container, Spark, and the absent OpenSSL command. The host suite covers Docker and ephemeral HTTPS certificate generation; the separate Linux check covers Spark. Live AI provider execution still requires a configured provider key and remains explicitly unavailable.
+The installed Linux suite used the exact fresh `/opt/venv` from the application image and current test sources. Its five skips are the two intentionally PostgreSQL-only cases under SQLite fixtures, Docker inside the test container, Spark, and the absent OpenSSL command. The host suite covers Docker and ephemeral HTTPS certificate generation; the separate Linux check covers Spark. AI credentials were unavailable during this earlier run; the subsequent real Gemini verification is recorded above.
 
 No implementation changes were needed for these integration passes. The tested application source is commit `109d52f`; subsequent changes only update verification evidence and documentation.
 

@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-11-01T18:38:52.672670+00:00",
+  "transport": "actual Gemini + GitHub HTTP",
+  "result": {
+    "answer": "Based on the repository metadata inspection:\n\n* **Default Branch:** `main`\n* **Primary Language:** Python\n\n**Source URL:** [https://github.com/9059Rohith/pipefoundry](https://github.com/9059Rohith/pipefoundry)\n\nPlease note that no deployment was performed.",
+    "trace": [
+      {
+        "tool": "inspect_github",
+        "view": "repository",
+        "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+        "observed_at": "2026-11-01T18:38:51.740266+00:00"
+      }
+    ],
+    "provider": "gemini",
+    "model": "gemini-3.5-flash-lite",
+    "usage": {
+      "completion_tokens": 72,
+      "prompt_tokens": 2456,
+      "total_tokens": 2528
+    },
+    "request_id": "PIfnavDHOInr694PvJCOuAM"
+  }
+}

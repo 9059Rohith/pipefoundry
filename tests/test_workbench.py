@@ -7,6 +7,17 @@ from fastapi.testclient import TestClient
 from pipefoundry.workbench import PAGES, AgentRequest, github, run_agent
 
 
+@pytest.fixture(autouse=True)
+def isolate_ai_configuration(monkeypatch):
+    for name in (
+        "GEMINI_API_KEY",
+        "OPENAI_API_KEY",
+        "PIPEFOUNDRY_AI_PROVIDER",
+        "PIPEFOUNDRY_AI_MODEL",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("PIPEFOUNDRY_API_TOKEN", "a" * 40)
@@ -172,3 +183,98 @@ def test_every_workbench_route_is_public_and_has_security_headers(client):
     assert client.get("/").status_code == 200
     assert client.get("/workbench/assets/app.css").status_code == 200
     assert client.get("/workbench/assets/app.js").status_code == 200
+
+
+def test_gemini_roundtrips_original_tool_signatures_and_evidence(monkeypatch, client):
+    from pipefoundry import workbench
+
+    monkeypatch.setenv("GEMINI_API_KEY", "unit-test-only")
+    message = {
+        "role": "assistant",
+        "content": None,
+        "tool_calls": [
+            {
+                "id": "call-1",
+                "type": "function",
+                "function": {"name": "inspect_github", "arguments": '{"view":"repository"}'},
+                "extra_content": {"google": {"thought_signature": "opaque-unit-test-signature"}},
+            }
+        ],
+        "extra_content": {"metadata": "preserve"},
+    }
+    requests = []
+
+    def post(self, url, **kwargs):
+        requests.append(kwargs["json"])
+        assert url == "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        if len(requests) == 1:
+            output = message
+        else:
+            assert kwargs["json"]["messages"][-2] == message
+            assert kwargs["json"]["messages"][-1]["tool_call_id"] == "call-1"
+            output = {"role": "assistant", "content": "The repository default branch is main."}
+        return httpx.Response(200, json={"id": "response-1", "choices": [{"message": output}]})
+
+    monkeypatch.setattr(httpx.Client, "post", post)
+    monkeypatch.setattr(
+        workbench,
+        "github",
+        lambda repo, view: {
+            "data": {"default_branch": "main"},
+            "source": "https://api.github.com/repos/a/b",
+            "observed_at": "2026-11-02T00:00:00Z",
+        },
+    )
+    result = run_agent(AgentRequest(repo="a/b", question="Inspect repository metadata"))
+    assert result["provider"] == "gemini"
+    assert result["model"] == "gemini-3.5-flash-lite"
+    assert result["trace"][0]["view"] == "repository"
+    assert len(requests) == 2
+    state = client.get("/workbench/api/integrations").json()
+    assert state["ai_provider"] == "gemini" and state["ai_configured"]
+    assert "unit-test-only" not in json.dumps(state)
+
+
+def test_gemini_free_quota_retries_once_without_paid_fallback(monkeypatch):
+    from fastapi import HTTPException
+
+    from pipefoundry import workbench
+
+    monkeypatch.setenv("GEMINI_API_KEY", "unit-test-only")
+    calls = []
+    monkeypatch.setattr(workbench.time, "sleep", lambda seconds: None)
+
+    def post(self, url, **kwargs):
+        calls.append(url)
+        return httpx.Response(429)
+
+    monkeypatch.setattr(httpx.Client, "post", post)
+    with pytest.raises(HTTPException) as error:
+        run_agent(AgentRequest(repo="a/b", question="Inspect repository metadata"))
+    assert error.value.status_code == 429
+    assert "no paid fallback" in error.value.detail
+    assert len(calls) == 2 and all("googleapis.com" in url for url in calls)
+
+
+def test_gemini_rejects_unsupported_tools_and_ungrounded_answers(monkeypatch):
+    from fastapi import HTTPException
+
+    monkeypatch.setenv("GEMINI_API_KEY", "unit-test-only")
+    for message in [
+        {"role": "assistant", "content": "An ungrounded answer"},
+        {
+            "role": "assistant",
+            "tool_calls": [
+                {"id": "call-1", "function": {"name": "execute_shell", "arguments": "{}"}}
+            ],
+        },
+    ]:
+        monkeypatch.setattr(
+            httpx.Client,
+            "post",
+            lambda *args, response_message=message, **kwargs: httpx.Response(
+                200, json={"choices": [{"message": response_message}]}
+            ),
+        )
+        with pytest.raises(HTTPException):
+            run_agent(AgentRequest(repo="a/b", question="Inspect repository metadata"))
