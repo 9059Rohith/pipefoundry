@@ -11,7 +11,7 @@ import httpx
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--url", default="https://pipefoundry.vercel.app")
+    parser.add_argument("--url", default="https://rohith-pipefoundry.vercel.app")
     args = parser.parse_args()
     checks = []
     with httpx.Client(base_url=args.url, timeout=40, follow_redirects=False) as client:

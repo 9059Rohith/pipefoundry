@@ -2,7 +2,9 @@
 
 Feature code: `2c2a073` (pushed to main). Production Ready was confirmed by Vercel
 CLI inspection on 2026-11-02 for deployment `dpl_7EfrPK2qGWiGm1oPzsFzpZ9Wrran`.
-Canonical route: https://pipefoundry.vercel.app/workbench/review
+Original canonical route: https://rohith-pipefoundry.vercel.app/workbench/review
+The additional https://pipefoundry.vercel.app alias points to the same Ready deployment.
+Both aliases passed the full public smoke, with the same evidence fingerprint.
 
 - TDD red: 12 new Python cases failed before implementation; new JS review renderer
   test failed before the helper existed.
