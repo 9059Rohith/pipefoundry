@@ -1,0 +1,48 @@
+{
+  "operation": "two strict configs -> server manifests -> policy audit -> diff -> SHA-256",
+  "environment": {
+    "python": "3.12.14",
+    "platform": "Windows-11-10.0.26300-SP0"
+  },
+  "input_bytes": 493,
+  "output_bytes": 28406,
+  "measurement": {
+    "count": 30,
+    "samples_ms": [
+      9.9905,
+      10.4047,
+      11.6642,
+      10.4882,
+      9.9918,
+      10.0261,
+      10.905,
+      10.3318,
+      10.3217,
+      13.6141,
+      14.1779,
+      11.4733,
+      12.8257,
+      15.7566,
+      15.7482,
+      10.6134,
+      11.3533,
+      9.8481,
+      10.1926,
+      9.9336,
+      14.1327,
+      15.6506,
+      17.4414,
+      17.953,
+      15.1126,
+      13.6144,
+      16.9343,
+      15.6939,
+      15.2269,
+      15.3215
+    ],
+    "p50_ms": 11.6642,
+    "p95_ms": 17.4414,
+    "p99_ms": 17.953
+  },
+  "scope": "Local pure function; no network, AI, workers or cluster. Not hosted latency."
+}

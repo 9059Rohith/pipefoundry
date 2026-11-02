@@ -36,6 +36,7 @@ const descriptions = {
   validation: "Check your draft against the same schema used by the runtime.",
   manifests:
     "Render a concrete Kubernetes bundle from validated configuration.",
+  review: "Inspect the rendered workload. Understand the change. Keep the evidence.",
   plans:
     "Compare your draft with recorded deployment state, without executing.",
   policy:
@@ -417,7 +418,7 @@ async function commits() {
 function validationResult(result) {
   if (!result.valid)
     return `<div class="result-banner bad">${icon("info")} ${result.errors.length} validation issue${result.errors.length === 1 ? "" : "s"}</div><ul class="checks">${result.errors.map((error) => `<li><span>${icon("close")}</span><div>${esc(error.message)}<small>${esc(error.type)}</small></div></li>`).join("")}</ul><div class="panel-body"><a class="button" href="/workbench/editor">Return to editor ${icon("arrow")}</a></div>`;
-  return `<div class="result-banner good">${icon("check")} Configuration accepted by the runtime schema</div><ul class="checks"><li><span>${icon("check")}</span><div>Strict fields and safe paths<small>Unknown fields and paths outside the data root are rejected.</small></div></li><li><span>${icon("check")}</span><div>Compatible connectors<small>${esc(result.config.input.connector)} → ${esc(result.config.output.connector)}</small></div></li><li><span>${icon("check")}</span><div>Schedule and resources<small>${esc(result.config.schedule)} UTC · ${result.config.resources.cpu_millis}m CPU · ${result.config.resources.memory_mib} MiB</small></div></li></ul><div class="panel-body"><p class="mono wrap">Configuration SHA-256<br>${esc(result.sha256)}</p><a class="button primary" href="/workbench/manifests">Inspect manifest ${icon("arrow")}</a></div>`;
+  return `<div class="result-banner good">${icon("check")} Configuration accepted by the runtime schema</div><ul class="checks"><li><span>${icon("check")}</span><div>Strict fields and safe paths<small>Unknown fields and paths outside the data root are rejected.</small></div></li><li><span>${icon("check")}</span><div>Compatible connectors<small>${esc(result.config.input.connector)} → ${esc(result.config.output.connector)}</small></div></li><li><span>${icon("check")}</span><div>Schedule and resources<small>${esc(result.config.schedule)} UTC · ${result.config.resources.cpu_millis}m CPU · ${result.config.resources.memory_mib} MiB</small></div></li></ul><div class="panel-body"><p class="mono wrap">Configuration SHA-256<br>${esc(result.sha256)}</p><a class="button primary" href="/workbench/review">Review release ${icon("arrow")}</a> <a class="button" href="/workbench/manifests">Inspect manifest ${icon("file")}</a></div>`;
 }
 async function copyText(value, label = "Text") {
   try {
@@ -620,6 +621,83 @@ async function manifests() {
     `<div class="panel-body"><div class="toolbar"><span class="editor-file">${icon("file")}${esc(result.config.name)}-bundle.yaml</span><button id="copy-manifest">${icon("copy")} Copy YAML</button><button id="download-manifest" class="primary">${icon("download")} Download YAML</button><a class="button" href="/workbench/plans">Preview plan ${icon("arrow")}</a></div><div class="result-banner good">${icon("check")} Rendered from validated configuration · not deployed</div><pre class="terminal">${esc(result.manifest)}</pre><p class="mono wrap muted">Configuration SHA-256<br>${esc(result.sha256)}</p><details><summary>Validated configuration</summary><pre class="terminal">${esc(JSON.stringify(result.config, null, 2))}</pre></details></div>`,
     "The same object renderer used by the control plane. Copy or download the real artifact.",
   );
+}
+function review() {
+  $("#page-actions").innerHTML = '<a class="button" href="/workbench/editor">Edit candidate ' + icon("code") + '</a>';
+  setTimeout(() => {
+    let latest = null;
+    const baselineInput = $("#review-baseline-json");
+    baselineInput.value = readStore("pf.review-baseline") || "";
+    function showComparison(comparison) {
+      if (!comparison) return `<div class="review-empty"><strong>Give this change a reference point.</strong><p>Capture the validated candidate as your baseline, edit it in the pipeline editor, then return to compare both rendered bundles.</p></div>`;
+      const rows = comparison.config_changes.map((change) => `<tr><td><code>${esc(change.path)}</code><span class="secondary">${esc(change.reason)}</span></td><td class="mono">${esc(JSON.stringify(change.before))}</td><td class="mono">${esc(JSON.stringify(change.after))}</td><td><span class="review-state ${change.risk === "escalation" ? "warn" : "na"}">${esc(change.risk)}</span></td></tr>`);
+      return `<div class="review-diff-summary"><strong>${comparison.changed ? `${comparison.config_changes.length} configuration changes · ${comparison.escalations} risk escalations` : "No configuration or manifest changes"}</strong><p>${esc(comparison.scope)}</p></div>${rows.length ? table(["Configuration field", "Baseline", "Candidate", "Review signal"], rows) : ""}${comparison.new_findings.length ? `<div class="notice error">New policy findings: ${esc(comparison.new_findings.join(", "))}</div>` : '<p class="review-diff-note">No newly failing or warning policy checks compared with this baseline.</p>'}<details class="review-manifest-diff"><summary>${comparison.manifest_changes.length} rendered manifest field changes</summary><pre class="terminal">${esc(JSON.stringify(comparison.manifest_changes, null, 2))}</pre></details>`;
+    }
+    async function runReview() {
+      latest = null;
+      $("#review-export").disabled = true;
+      $("#review-yaml").disabled = true;
+      $("#review-pin").disabled = true;
+      $("#review-run").disabled = true;
+      baselineInput.disabled = true;
+      $("#review-clear").disabled = true;
+      $("#review-run").textContent = "Inspecting bundle…";
+      $("#review-results").innerHTML = '<div class="loading">Validating configuration and inspecting rendered objects…</div>';
+      notice("");
+      try {
+        const body = { config: getDraft() };
+        if (baselineInput.value.trim()) body.baseline = FoundryUI.parseDraft(baselineInput.value);
+        const result = await request("/workbench/api/review", {
+          method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
+        });
+        latest = result;
+        const current = result.evidence.current, summary = current.summary;
+        if (body.baseline) writeStore("pf.review-baseline", JSON.stringify(result.evidence.baseline.config, null, 2));
+        const verdict = summary.fail ? "Changes required" : summary.warn ? "Review the warning" : "Selected controls pass";
+        $("#review-results").innerHTML = `<div class="review-verdict"><div><span class="review-eyebrow">STATIC POLICY RESULT</span><h2>${esc(verdict)}</h2><p>${esc(current.config.name)} · ${current.objects.length} rendered objects · policy ${esc(result.evidence.policy_version)}</p></div><span class="review-verdict-mark">${icon(summary.fail ? "close" : summary.warn ? "info" : "check")}</span></div><dl class="review-metrics">${metric("Passing", summary.pass, "Explicit field matches")}${metric("Warnings", summary.warn, "Operator review needed")}${metric("Failures", summary.fail, "Controls requiring changes")}${metric("Not applicable", summary.na, "Different workload kind")}</dl><div class="review-filter"><h3>Manifest controls</h3><label for="review-filter">Show<select id="review-filter"><option value="all">All 12 checks</option><option value="findings">Warnings & failures</option><option value="pass">Passing checks</option><option value="na">Not applicable</option></select></label></div><div id="review-checks" class="review-check-grid">${FoundryUI.reviewChecks(current.checks)}</div><section class="panel review-comparison"><div class="panel-head"><div><span class="review-eyebrow">BEFORE → AFTER</span><h2>Release comparison</h2></div><span class="pill">${result.evidence.baseline ? "Baseline captured" : "No baseline"}</span></div>${showComparison(result.evidence.comparison)}</section><section class="panel"><div class="panel-head"><h2>Evidence fingerprint</h2><span class="pill">SHA-256</span></div><div class="panel-body"><code class="review-hash">${esc(result.evidence_sha256)}</code><p class="muted">The export includes both configurations, structured objects, YAML, policy observations, source links and comparison. The hash covers the complete evidence object using sorted, compact UTF-8 JSON.</p><details><summary>Candidate bundle fingerprints</summary>${facts([["Configuration", current.config_sha256], ["Structured manifest", current.manifest_sha256], ["YAML bytes", current.yaml_sha256]])}</details></div></section>`;
+        $("#review-filter").onchange = (event) => { $("#review-checks").innerHTML = FoundryUI.reviewChecks(current.checks, event.target.value); };
+        $("#review-baseline-state").textContent = result.evidence.baseline ? `${result.evidence.baseline.config.name} · ${result.evidence.baseline.config_sha256.slice(0, 12)}` : "No baseline selected";
+        $("#review-export").disabled = false;
+        $("#review-yaml").disabled = false;
+        $("#review-pin").disabled = false;
+        audit("Manifest reviewed", `${current.config.name} · ${summary.warn} warnings · ${summary.fail} failures`);
+      } catch (error) {
+        $("#review-results").innerHTML = empty("Review could not complete", error instanceof SyntaxError ? "Baseline must be a typed pipeline JSON object. Correct its JSON syntax and retry." : error.message, "/workbench/editor", "Repair candidate");
+        notice("No review artifact was produced. Check the candidate and baseline configuration.", true);
+      } finally {
+        $("#review-run").disabled = false;
+        baselineInput.disabled = false;
+        $("#review-clear").disabled = false;
+        $("#review-run").textContent = "Run release review";
+      }
+    }
+    $("#review-run").onclick = runReview;
+    $("#review-pin").onclick = () => {
+      if (!latest) return;
+      baselineInput.value = JSON.stringify(latest.evidence.current.config, null, 2);
+      writeStore("pf.review-baseline", baselineInput.value);
+      runReview();
+    };
+    $("#review-clear").onclick = () => {
+      baselineInput.value = "";
+      writeStore("pf.review-baseline", "");
+      runReview();
+    };
+    $("#review-export").onclick = () => {
+      if (latest) download(`${latest.evidence.current.config.name}-release-review.json`, JSON.stringify(latest, null, 2), "application/json");
+    };
+    $("#review-yaml").onclick = () => {
+      if (latest) download(`${latest.evidence.current.config.name}-reviewed-bundle.yaml`, latest.evidence.current.manifest, "application/yaml");
+    };
+    baselineInput.addEventListener("input", () => {
+      latest = null;
+      for (const id of ["#review-export", "#review-yaml", "#review-pin"]) $(id).disabled = true;
+      $("#review-baseline-state").textContent = "Baseline edited · rerun to validate";
+      $("#review-results").innerHTML = empty("Baseline changed", "Run release review to validate this baseline and rebuild the evidence.");
+    });
+    runReview();
+  }, 0);
+  return `<section class="review-hero"><div><span class="review-eyebrow">MANIFEST SECURITY AUDITOR / 01</span><h2>A release deserves<br><em>a closer look.</em></h2><p>Follow the actual fields from your typed draft to the Kubernetes bundle. Catch risky changes before handing the artifact to your operator.</p><div class="review-scope"><span>${icon("shield")} 12 selected controls</span><span>${icon("code")} Structured inspection</span><span>${icon("file")} Verifiable export</span></div></div><div class="review-pipeline"><span>01 <strong>Typed configuration</strong><small>Strict fields · safe paths</small></span><i></i><span>02 <strong>Rendered workload</strong><small>ConfigMap + CronJob</small></span><i></i><span>03 <strong>Release evidence</strong><small>Checks · diff · SHA-256</small></span></div></section><div class="review-boundary">${icon("info")}<span><strong>Static review. Cluster validation not performed.</strong> Selected project controls only. Admission policies, RBAC, quota and runtime still need your cluster’s validation. ${link("https://kubernetes.io/docs/reference/using-api/api-concepts/#dry-run", "About server dry run")}</span></div><div class="review-workspace"><aside class="panel review-controls"><div class="panel-head"><div><span class="review-eyebrow">COMPARE & EXPORT</span><h2>Your review desk</h2></div></div><div class="panel-body"><h3>Candidate</h3><p>The saved draft from your pipeline editor.</p><a class="review-edit" href="/workbench/editor">Open pipeline editor ${icon("arrow")}</a><hr><h3>Baseline</h3><p id="review-baseline-state">No baseline selected</p><button id="review-pin" disabled>${icon("save")} Capture candidate as baseline</button><p class="muted">Capture first, edit your candidate, then return here to compare. Both versions are validated on the server.</p><details><summary>Paste baseline configuration</summary><label class="sr-only" for="review-baseline-json">Baseline pipeline JSON</label><textarea id="review-baseline-json" rows="10" spellcheck="false" placeholder='{"name":"orders-hourly","schedule":"0 * * * *"}'></textarea><small>Typed JSON only · no arbitrary YAML</small><button id="review-clear">Clear baseline</button></details><button class="primary" id="review-run">Run release review</button><hr><h3>Keep the evidence</h3><button id="review-export" disabled>${icon("download")} Export review JSON</button><button id="review-yaml" disabled>${icon("file")} Download reviewed YAML</button><p class="muted">A fingerprint proves content consistency. It is not a signature or a deployment approval.</p></div></aside><div id="review-results" aria-live="polite"></div></div>`;
 }
 function plans() {
   setTimeout(() => {
@@ -884,6 +962,7 @@ function initializeWorkbench() {
   const steps = [
     ["editor", "Configure"],
     ["validation", "Validate"],
+    ["review", "Review"],
     ["manifests", "Manifests"],
     ["plans", "Plan"],
   ];
@@ -1140,6 +1219,7 @@ function preserveJourneyDraft(href) {
     ![
       "/workbench/validation",
       "/workbench/manifests",
+      "/workbench/review",
       "/workbench/plans",
     ].includes(href)
   )
@@ -1170,6 +1250,7 @@ const controllers = {
   editor,
   validation,
   manifests,
+  review,
   plans,
   policy,
   audit: auditPage,

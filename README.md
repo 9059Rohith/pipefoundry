@@ -1,5 +1,17 @@
 # PipeFoundry
 
+The public [Release review workspace](https://pipefoundry.vercel.app/workbench/review)
+now audits the actual server-rendered ConfigMap/CronJob from your typed editor draft.
+Inspect 12 selected controls with exact field evidence, capture or paste a validated
+baseline, compare resource/schedule/data-flow changes, and export a review JSON with
+a SHA-256 fingerprint plus the exact reviewed YAML. No AI quota is consumed.
+
+This is static project policy review, not full PSS certification or cluster admission.
+Unknown configuration fields and unsafe paths are rejected. Baselines are browser-session
+data; both versions are rendered by the current server, not read from live cluster state.
+See [research and design](docs/release-review-design.md) and run
+`python scripts/benchmark_review.py --samples 30` for a bounded local measurement.
+
 **Release Sentinel binds a reviewed pipeline plan to exact recorded state, then reserves one auditable execution under a durable lease.**
 
 [Live workbench](https://rohith-pipefoundry.vercel.app) · [Public AI demo](https://rohith-pipefoundry.vercel.app/workbench/agent) · [Pipeline editor](https://rohith-pipefoundry.vercel.app/workbench/editor) · [Workbench guide](docs/workbench.md) · [Source](https://github.com/9059Rohith/pipefoundry)

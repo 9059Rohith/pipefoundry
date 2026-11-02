@@ -2,6 +2,23 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const ui = require("../src/pipefoundry/web/ui.js");
 
+test("manifest review cards escape evidence and filter findings", () => {
+  const checks = [
+    { id: "safe", title: "Non-root", status: "pass", evidence: [], source: "https://kubernetes.io/docs/" },
+    { id: "risk", title: "<script>risk</script>", status: "warn", explanation: "<img src=x>",
+      remediation: "Pin image", source: "javascript:alert(1)",
+      evidence: [{path: "spec.image", value: "<svg onload=alert(1)>", passed: false}] },
+  ];
+  const html = ui.reviewChecks(checks, "findings");
+  assert.ok(!html.includes("Non-root"));
+  assert.ok(html.includes("&lt;script&gt;risk&lt;/script&gt;"));
+  assert.ok(!html.includes("<svg onload"));
+  assert.ok(!html.includes("javascript:"));
+  assert.ok(ui.reviewChecks(checks, "all").includes("Non-root"));
+  assert.ok(ui.reviewChecks([], "findings").includes("No matching checks"));
+  assert.equal(ui.safeURL("https://kubernetes.io.evil.test/docs"), null);
+});
+
 test("pipeline drafts reject JSON primitives and arrays before saving", () => {
   for (const raw of ["null", "[]", "true", "17", '"data"']) {
     assert.throws(() => ui.parseDraft(raw), /JSON object/);

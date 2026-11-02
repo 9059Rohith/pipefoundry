@@ -19,7 +19,7 @@
         !url.username &&
         !url.password &&
         !url.port &&
-        ["github.com", "api.github.com"].includes(url.hostname)
+        ["github.com", "api.github.com", "kubernetes.io"].includes(url.hostname)
         ? url.href
         : null;
     } catch {
@@ -141,6 +141,16 @@
     }
     return value;
   }
+  function reviewChecks(checks, filter = "all") {
+    const selected = checks.filter((check) => filter === "all" ||
+      (filter === "findings" ? ["warn", "fail"].includes(check.status) : check.status === filter));
+    if (!selected.length) return '<div class="review-empty">No matching checks. Choose another filter to see the complete review.</div>';
+    return selected.map((check) => {
+      const state = ["pass", "warn", "fail", "na"].includes(check.status) ? check.status : "fail";
+      const source = safeURL(check.source);
+      return `<article class="review-check ${state}"><div class="review-check-heading"><span class="review-state ${state}">${state === "na" ? "N/A" : state.toUpperCase()}</span><h3>${escape(check.title)}</h3></div><p>${escape(check.explanation)}</p>${state === "warn" || state === "fail" ? `<div class="review-remedy">${escape(check.remediation)}</div>` : ""}<details><summary>Inspect ${check.evidence.length} field observation${check.evidence.length === 1 ? "" : "s"}</summary>${check.evidence.map((entry) => `<div class="review-observation"><code>${escape(entry.path)}</code><span class="review-state ${entry.passed ? "pass" : "warn"}">${entry.passed ? "MATCH" : "REVIEW"}</span><pre>${escape(JSON.stringify(entry.value, null, 2))}</pre></div>`).join("")}${!check.evidence.length ? '<p>No applicable resource in this bundle.</p>' : ""}</details>${source ? `<a class="review-source" href="${escape(source)}" target="_blank" rel="noopener noreferrer">Kubernetes documentation ↗</a>` : ""}</article>`;
+    }).join("");
+  }
   const paths = {
     inspect:
       "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",
@@ -180,6 +190,7 @@
   }
   const api = {
     parseDraft,
+    reviewChecks,
     escape,
     safeURL,
     markdown,

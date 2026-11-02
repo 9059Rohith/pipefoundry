@@ -17,6 +17,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import Field, ValidationError
 
 from pipefoundry.github_cache import read_cached_evidence
+from pipefoundry.manifest_review import ReviewRequest, review
 from pipefoundry.models import Pipeline, StrictModel
 from pipefoundry.public_demo import (
     PUBLIC_MODEL,
@@ -40,6 +41,7 @@ PAGES = {
     "editor": "Pipeline editor",
     "validation": "Validation",
     "manifests": "Manifests",
+    "review": "Release review",
     "plans": "Deployment plans",
     "policy": "Security policy",
     "audit": "Session audit",
@@ -432,6 +434,10 @@ def router(authorize):
     @routes.post("/workbench/api/validate")
     def validate(body: ConfigRequest):
         return validate_config(body.config)
+
+    @routes.post("/workbench/api/review")
+    def manifest_review(body: ReviewRequest):
+        return review(body)
 
     @routes.get("/workbench/api/integrations")
     def integrations():
