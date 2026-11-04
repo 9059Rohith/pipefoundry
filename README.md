@@ -12,6 +12,10 @@ data; both versions are rendered by the current server, not read from live clust
 See [research and design](docs/release-review-design.md) and run
 `python scripts/benchmark_review.py --samples 30` for a bounded local measurement.
 
+The dated Kubernetes run exercised guarded create, update and rollback on
+a disposable K3s cluster. Three Jobs wrote verified SQLite output from
+published NYC taxi fares. [Kubernetes execution proof](docs/kubernetes-release-proof.md).
+
 **Release Sentinel binds a reviewed pipeline plan to exact recorded state, then reserves one auditable execution under a durable lease.**
 
 [Live workbench](https://rohith-pipefoundry.vercel.app) · [Public AI demo](https://rohith-pipefoundry.vercel.app/workbench/agent) · [Pipeline editor](https://rohith-pipefoundry.vercel.app/workbench/editor) · [Workbench guide](docs/workbench.md) · [Source](https://github.com/9059Rohith/pipefoundry)

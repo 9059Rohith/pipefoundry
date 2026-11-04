@@ -1,0 +1,598 @@
+{
+  "revisions": [
+    {
+      "action": "release-create",
+      "revision": 1,
+      "status": "deployed",
+      "sentinel_receipt": {
+        "idempotency_key": "kind-release-r1",
+        "plan_id": "aa14c9a6c93a20cb9ade1525a2025512",
+        "digest": "8c9ae05a18a55a28fd0ea14234f2528ec44358b0aba885bcb8cb6e892b8d108a",
+        "name": "nyc-taxi-fares",
+        "revision": 1,
+        "operation": "create",
+        "state": "succeeded",
+        "created": "2026-11-04T13:34:21.012074+00:00",
+        "updated": "2026-11-04T13:34:22.836276+00:00",
+        "error_code": ""
+      },
+      "control_plane_seconds": 2.071,
+      "configuration": {
+        "name": "nyc-taxi-fares",
+        "schedule": "0 0 29 2 *",
+        "input": {
+          "connector": "orders_api",
+          "path": "orders.json"
+        },
+        "transform": "normalize_orders",
+        "output": {
+          "connector": "sqlite",
+          "path": "fares-baseline.db"
+        },
+        "resources": {
+          "cpu_millis": 250,
+          "memory_mib": 256
+        }
+      },
+      "configuration_sha256": "e0d370a7f38d5ca93f2c2ec5a135469ca05696141a3946c128fb5c1cd855753c",
+      "cronjob_generation": 1,
+      "cronjob_uid": "002c5572-4431-4f71-bf34-efa9c1dae5d9",
+      "job": {
+        "name": "nyc-taxi-fares-bf-20230101-r1",
+        "uid": "08007467-0762-4f45-9065-c8bb0ae21df3",
+        "start_time": "2026-11-04T13:34:24Z",
+        "completion_time": "2026-11-04T13:34:33Z",
+        "succeeded_pods": 1,
+        "seconds_including_apply_and_wait": 9.837,
+        "worker_result": {
+          "rows": 12,
+          "total_rows": 12,
+          "quality": {
+            "invalid_rows": 0
+          }
+        }
+      },
+      "sqlite_sink": {
+        "partition": "2023-01-01",
+        "rows": [
+          [
+            "2023-01-01",
+            "5df927370e71a46b13764268707c0a3342fa7d449acb4bf48781e6b60cc98778",
+            1298,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "75545a0d2dfc70b7af1d4787c78da56b2e0c8085f2da8173b3e81e84a0abf8a0",
+            2920,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "77d5ecd1fc1db14e3f3e5abb7bf91a6e574b91850e15641a779b16293705d589",
+            1630,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "7b83e9b3781d71f0b2ebf93a2770aa54dea1faacd1f2a0b1bb73affb5e887e92",
+            930,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "8df0acd489c68081fe83653771725812cd1630fe502b34c9950d5ee4e499a53a",
+            3800,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "9b1fa99b0afaa97743cafd90f93d316624e36cf286b2374fd754659a0f19b9ea",
+            2330,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "b11b6cccc1e0e8313c043681be03bac044ad801ee7ebe9a80c132b896e5760c0",
+            3450,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "b28399761719c1c52efcae0a3e4a30dfca59c8b2895eae41fa9463533f066ddf",
+            1140,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "d2d6775a63218f645356bb59a41b26d4a23379ce8e4873409ea3f7a0ed0c0d4b",
+            6600,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "d4f517d1eb557532ecc38b2f32f390a007c1a27ad63d6ba769c929344154a9be",
+            2190,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "e2598077572b51305e161913c77f1dfdecc411f9a537b03b751f42ae45914c31",
+            1980,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "ee8983b6342ebb0edc18731530f81d0669f3116abce9df31fb3a1b90a58a1478",
+            650,
+            "USD"
+          ]
+        ],
+        "rows_sha256": "0dac1032b2702dd18b595ee80c4ac7558250b70d2e26df206143f64725e28551",
+        "partition_fare_total_cents": 28918
+      }
+    },
+    {
+      "action": "release-update",
+      "revision": 2,
+      "status": "deployed",
+      "sentinel_receipt": {
+        "idempotency_key": "kind-release-r2",
+        "plan_id": "e16086fb7386201d26234b85d94d914d",
+        "digest": "00b58c414ce8bf1454ae3a6d38a8f00c34dba7b98f27e451770b92b857eebb21",
+        "name": "nyc-taxi-fares",
+        "revision": 2,
+        "operation": "update",
+        "state": "succeeded",
+        "created": "2026-11-04T13:34:35.942026+00:00",
+        "updated": "2026-11-04T13:34:37.480867+00:00",
+        "error_code": ""
+      },
+      "control_plane_seconds": 1.764,
+      "configuration": {
+        "name": "nyc-taxi-fares",
+        "schedule": "15 0 29 2 *",
+        "input": {
+          "connector": "orders_api",
+          "path": "orders.json"
+        },
+        "transform": "normalize_orders",
+        "output": {
+          "connector": "sqlite",
+          "path": "fares-candidate.db"
+        },
+        "resources": {
+          "cpu_millis": 500,
+          "memory_mib": 384
+        }
+      },
+      "configuration_sha256": "44989773561d88e562bb354733a5297907f5e40e0a0a3097935df038dbe4dcbe",
+      "cronjob_generation": 2,
+      "cronjob_uid": "002c5572-4431-4f71-bf34-efa9c1dae5d9",
+      "job": {
+        "name": "nyc-taxi-fares-bf-20230101-r2",
+        "uid": "48da5b21-d0fb-42b6-862c-d7ba4ef24fb0",
+        "start_time": "2026-11-04T13:34:39Z",
+        "completion_time": "2026-11-04T13:34:46Z",
+        "succeeded_pods": 1,
+        "seconds_including_apply_and_wait": 7.079,
+        "worker_result": {
+          "rows": 12,
+          "total_rows": 12,
+          "quality": {
+            "invalid_rows": 0
+          }
+        }
+      },
+      "sqlite_sink": {
+        "partition": "2023-01-01",
+        "rows": [
+          [
+            "2023-01-01",
+            "5df927370e71a46b13764268707c0a3342fa7d449acb4bf48781e6b60cc98778",
+            1298,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "75545a0d2dfc70b7af1d4787c78da56b2e0c8085f2da8173b3e81e84a0abf8a0",
+            2920,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "77d5ecd1fc1db14e3f3e5abb7bf91a6e574b91850e15641a779b16293705d589",
+            1630,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "7b83e9b3781d71f0b2ebf93a2770aa54dea1faacd1f2a0b1bb73affb5e887e92",
+            930,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "8df0acd489c68081fe83653771725812cd1630fe502b34c9950d5ee4e499a53a",
+            3800,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "9b1fa99b0afaa97743cafd90f93d316624e36cf286b2374fd754659a0f19b9ea",
+            2330,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "b11b6cccc1e0e8313c043681be03bac044ad801ee7ebe9a80c132b896e5760c0",
+            3450,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "b28399761719c1c52efcae0a3e4a30dfca59c8b2895eae41fa9463533f066ddf",
+            1140,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "d2d6775a63218f645356bb59a41b26d4a23379ce8e4873409ea3f7a0ed0c0d4b",
+            6600,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "d4f517d1eb557532ecc38b2f32f390a007c1a27ad63d6ba769c929344154a9be",
+            2190,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "e2598077572b51305e161913c77f1dfdecc411f9a537b03b751f42ae45914c31",
+            1980,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "ee8983b6342ebb0edc18731530f81d0669f3116abce9df31fb3a1b90a58a1478",
+            650,
+            "USD"
+          ]
+        ],
+        "rows_sha256": "0dac1032b2702dd18b595ee80c4ac7558250b70d2e26df206143f64725e28551",
+        "partition_fare_total_cents": 28918
+      }
+    },
+    {
+      "action": "rollback",
+      "revision": 3,
+      "status": "deployed",
+      "sentinel_receipt": null,
+      "control_plane_seconds": 1.456,
+      "configuration": {
+        "name": "nyc-taxi-fares",
+        "schedule": "0 0 29 2 *",
+        "input": {
+          "connector": "orders_api",
+          "path": "orders.json"
+        },
+        "transform": "normalize_orders",
+        "output": {
+          "connector": "sqlite",
+          "path": "fares-baseline.db"
+        },
+        "resources": {
+          "cpu_millis": 250,
+          "memory_mib": 256
+        }
+      },
+      "configuration_sha256": "e0d370a7f38d5ca93f2c2ec5a135469ca05696141a3946c128fb5c1cd855753c",
+      "cronjob_generation": 3,
+      "cronjob_uid": "002c5572-4431-4f71-bf34-efa9c1dae5d9",
+      "job": {
+        "name": "nyc-taxi-fares-bf-20230102-r3",
+        "uid": "4f6682e8-67e7-4afa-bed9-21d3bcac3fae",
+        "start_time": "2026-11-04T13:34:51Z",
+        "completion_time": "2026-11-04T13:35:00Z",
+        "succeeded_pods": 1,
+        "seconds_including_apply_and_wait": 9.206,
+        "worker_result": {
+          "rows": 12,
+          "total_rows": 24,
+          "quality": {
+            "invalid_rows": 0
+          }
+        }
+      },
+      "sqlite_sink": {
+        "partition": "2023-01-02",
+        "rows": [
+          [
+            "2023-01-01",
+            "5df927370e71a46b13764268707c0a3342fa7d449acb4bf48781e6b60cc98778",
+            1298,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "75545a0d2dfc70b7af1d4787c78da56b2e0c8085f2da8173b3e81e84a0abf8a0",
+            2920,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "77d5ecd1fc1db14e3f3e5abb7bf91a6e574b91850e15641a779b16293705d589",
+            1630,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "7b83e9b3781d71f0b2ebf93a2770aa54dea1faacd1f2a0b1bb73affb5e887e92",
+            930,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "8df0acd489c68081fe83653771725812cd1630fe502b34c9950d5ee4e499a53a",
+            3800,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "9b1fa99b0afaa97743cafd90f93d316624e36cf286b2374fd754659a0f19b9ea",
+            2330,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "b11b6cccc1e0e8313c043681be03bac044ad801ee7ebe9a80c132b896e5760c0",
+            3450,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "b28399761719c1c52efcae0a3e4a30dfca59c8b2895eae41fa9463533f066ddf",
+            1140,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "d2d6775a63218f645356bb59a41b26d4a23379ce8e4873409ea3f7a0ed0c0d4b",
+            6600,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "d4f517d1eb557532ecc38b2f32f390a007c1a27ad63d6ba769c929344154a9be",
+            2190,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "e2598077572b51305e161913c77f1dfdecc411f9a537b03b751f42ae45914c31",
+            1980,
+            "USD"
+          ],
+          [
+            "2023-01-01",
+            "ee8983b6342ebb0edc18731530f81d0669f3116abce9df31fb3a1b90a58a1478",
+            650,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "5df927370e71a46b13764268707c0a3342fa7d449acb4bf48781e6b60cc98778",
+            1298,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "75545a0d2dfc70b7af1d4787c78da56b2e0c8085f2da8173b3e81e84a0abf8a0",
+            2920,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "77d5ecd1fc1db14e3f3e5abb7bf91a6e574b91850e15641a779b16293705d589",
+            1630,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "7b83e9b3781d71f0b2ebf93a2770aa54dea1faacd1f2a0b1bb73affb5e887e92",
+            930,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "8df0acd489c68081fe83653771725812cd1630fe502b34c9950d5ee4e499a53a",
+            3800,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "9b1fa99b0afaa97743cafd90f93d316624e36cf286b2374fd754659a0f19b9ea",
+            2330,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "b11b6cccc1e0e8313c043681be03bac044ad801ee7ebe9a80c132b896e5760c0",
+            3450,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "b28399761719c1c52efcae0a3e4a30dfca59c8b2895eae41fa9463533f066ddf",
+            1140,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "d2d6775a63218f645356bb59a41b26d4a23379ce8e4873409ea3f7a0ed0c0d4b",
+            6600,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "d4f517d1eb557532ecc38b2f32f390a007c1a27ad63d6ba769c929344154a9be",
+            2190,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "e2598077572b51305e161913c77f1dfdecc411f9a537b03b751f42ae45914c31",
+            1980,
+            "USD"
+          ],
+          [
+            "2023-01-02",
+            "ee8983b6342ebb0edc18731530f81d0669f3116abce9df31fb3a1b90a58a1478",
+            650,
+            "USD"
+          ]
+        ],
+        "rows_sha256": "e4baebc6b4e9820edf249f4131f1a690ce57dad521a5bd8abe2f45ddedd9ddcc",
+        "partition_fare_total_cents": 28918
+      }
+    }
+  ],
+  "rollback_restored_baseline_cronjob_spec": true,
+  "pipeline_audit": [
+    {
+      "id": 1,
+      "name": "nyc-taxi-fares",
+      "revision": 1,
+      "action": "release",
+      "outcome": "succeeded",
+      "created": "2026-11-04T13:34:22.836313+00:00"
+    },
+    {
+      "id": 2,
+      "name": "nyc-taxi-fares",
+      "revision": 1,
+      "action": "backfill",
+      "outcome": "succeeded",
+      "created": "2026-11-04T13:34:34.033413+00:00"
+    },
+    {
+      "id": 3,
+      "name": "nyc-taxi-fares",
+      "revision": 2,
+      "action": "release",
+      "outcome": "succeeded",
+      "created": "2026-11-04T13:34:37.480904+00:00"
+    },
+    {
+      "id": 4,
+      "name": "nyc-taxi-fares",
+      "revision": 2,
+      "action": "backfill",
+      "outcome": "succeeded",
+      "created": "2026-11-04T13:34:46.114882+00:00"
+    },
+    {
+      "id": 5,
+      "name": "nyc-taxi-fares",
+      "revision": 3,
+      "action": "rollback",
+      "outcome": "succeeded",
+      "created": "2026-11-04T13:34:49.551103+00:00"
+    },
+    {
+      "id": 6,
+      "name": "nyc-taxi-fares",
+      "revision": 3,
+      "action": "backfill",
+      "outcome": "succeeded",
+      "created": "2026-11-04T13:35:00.121911+00:00"
+    }
+  ],
+  "scope": "Executed on a disposable local Kubernetes cluster.",
+  "verified_at": "2026-11-04T13:35:03.352523+00:00",
+  "source": {
+    "dataset": "NYC Open Data 2023 Yellow Taxi Trip Data",
+    "url": "https://data.cityofnewyork.us/resource/4b4i-vvec.json",
+    "query": {
+      "$select": ":id as row_id,tpep_pickup_datetime,fare_amount",
+      "$where": "tpep_pickup_datetime >= '2023-01-01T00:00:00' and tpep_pickup_datetime < '2023-01-01T00:02:00' and fare_amount > 0",
+      "$order": "tpep_pickup_datetime, :id",
+      "$limit": 12
+    },
+    "observed_at": "2026-11-04T13:31:21.750414+00:00",
+    "response_sha256": "7fc82715500dadbe54e91421316918f370cd807b7e384dbfb2f7f960ffb7da35",
+    "source_rows": [
+      {
+        "row_id": "row-q6jg~33gy~992a",
+        "tpep_pickup_datetime": "2023-01-01T00:00:00.000",
+        "fare_amount": "12.98"
+      },
+      {
+        "row_id": "row-57va.sjcw_wta3",
+        "tpep_pickup_datetime": "2023-01-01T00:00:05.000",
+        "fare_amount": "21.9"
+      },
+      {
+        "row_id": "row-3npj-pqjx.uhuj",
+        "tpep_pickup_datetime": "2023-01-01T00:00:06.000",
+        "fare_amount": "9.3"
+      },
+      {
+        "row_id": "row-zr78-ysiy_9jeh",
+        "tpep_pickup_datetime": "2023-01-01T00:00:08.000",
+        "fare_amount": "16.3"
+      },
+      {
+        "row_id": "row-qu3w-sa8d-u3ae",
+        "tpep_pickup_datetime": "2023-01-01T00:00:09.000",
+        "fare_amount": "19.8"
+      },
+      {
+        "row_id": "row-8hq2.pqx5.jzim",
+        "tpep_pickup_datetime": "2023-01-01T00:00:13.000",
+        "fare_amount": "34.5"
+      },
+      {
+        "row_id": "row-iha2-bnyz~67k6",
+        "tpep_pickup_datetime": "2023-01-01T00:00:18.000",
+        "fare_amount": "11.4"
+      },
+      {
+        "row_id": "row-dmfg_s492-9zz4",
+        "tpep_pickup_datetime": "2023-01-01T00:00:22.000",
+        "fare_amount": "29.2"
+      },
+      {
+        "row_id": "row-ny38_y7zb~fgf8",
+        "tpep_pickup_datetime": "2023-01-01T00:00:35.000",
+        "fare_amount": "66.0"
+      },
+      {
+        "row_id": "row-gyz8-giei-f8i2",
+        "tpep_pickup_datetime": "2023-01-01T00:00:47.000",
+        "fare_amount": "6.5"
+      },
+      {
+        "row_id": "row-htvw.n8ek-tiv4",
+        "tpep_pickup_datetime": "2023-01-01T00:00:52.000",
+        "fare_amount": "23.3"
+      },
+      {
+        "row_id": "row-5uei-6vdv.ruf7",
+        "tpep_pickup_datetime": "2023-01-01T00:00:57.000",
+        "fare_amount": "38.0"
+      }
+    ],
+    "mapped_rows_sha256": "d4e78c5c757d89cd035f6875a4093ed82ac84c52d72c69ba6e12808cba964282",
+    "row_mapping": "SHA-256 of Socrata row ID, exact fare_amount \u00d7 100, USD"
+  },
+  "cluster_backend": "k3s",
+  "kind": null,
+  "kubernetes": "v1.34.1+k3s1",
+  "kubectl": "v1.34.1",
+  "worker_image": "localhost:32768/pipefoundry@sha256:b34235b616c39c911c9ddbc1be23e1beb2681b92d948a0572599057c706ee7dd",
+  "worker_base": "python:3.12-slim@sha256:05cda9777409a9c3ffddd94a4c476b79f0769a0b4857f0c7ed9226b6800b0d6f",
+  "node_image": "127.0.0.1:38249/rancher/k3s@sha256:5e0707cfd1239b358ef73f3254bc3eadc027dd30cd5ec6ca41e29e47652a1b8c",
+  "source_commit": "7f005e4fe7e4df626dd923dcf1e34562e322534b"
+}
