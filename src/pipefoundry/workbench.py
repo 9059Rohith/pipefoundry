@@ -30,6 +30,7 @@ from pipefoundry.public_demo import (
     DemoLimiter,
     client_identity,
     enforce_origin,
+    public_model,
     unavailable,
 )
 from pipefoundry.render import objects
@@ -569,6 +570,7 @@ def router(authorize):
     @routes.get("/workbench/api/integrations")
     def integrations():
         provider, key, model = ai_settings()
+        preferred_public_model = public_model()
         return {
             "github": "public read-only API",
             "ai_configured": bool(key),
@@ -576,7 +578,8 @@ def router(authorize):
             "ai_model": model,
             "ai_fallback": "none",
             "public_ai": {
-                "preferred_model": PUBLIC_MODEL,
+                "preferred_model": preferred_public_model,
+                "configured": bool(preferred_public_model and os.getenv("GEMINI_API_KEY")),
                 "fallback_model": PUBLIC_FREE_FALLBACK_MODEL,
                 "repository": PUBLIC_REPOSITORY,
                 "access": "anonymous",
@@ -604,16 +607,17 @@ def router(authorize):
     @routes.post("/workbench/api/demo-agent")
     def public_agent(body: PublicAgentRequest, request: Request):
         enforce_origin(request)
+        model = public_model()
         key = os.getenv("GEMINI_API_KEY")
-        if not key:
+        if not model or not key:
             raise unavailable()
         DemoLimiter.configured().consume(client_identity(request))
         result = run_gemini_agent(
             AgentRequest(question=body.question, repo=PUBLIC_REPOSITORY),
             key,
-            PUBLIC_MODEL,
+            model,
             max_output_tokens=600,
-            allow_free_fallback=True,
+            allow_free_fallback=model == PUBLIC_MODEL,
         )
         return {
             **result,

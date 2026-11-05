@@ -3,7 +3,7 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const vm = require("node:vm");
 
-async function openAgent(status, retryAfter) {
+async function openAgent(status, retryAfter, preferredModel = "gemini-3.5-flash-lite") {
   let now = Date.parse("2026-11-05T12:00:00Z");
   const nodes = new Map(), timeouts = new Map(), intervals = new Map(), requests = [];
   let timer = 0;
@@ -36,7 +36,8 @@ async function openAgent(status, retryAfter) {
         ok: integrations || status === 200, status: integrations ? 200 : status,
         headers: { get: () => retryAfter },
         json: async () => integrations
-          ? { ai_configured: true, ai_model: "gemini-3.5-flash-lite" }
+          ? { ai_configured: true, ai_model: "private-operator-model",
+              public_ai: { preferred_model: preferredModel, configured: !!preferredModel } }
           : status === 200
             ? { answer: "Source-based analysis", trace: [], provider: "gemini", model: "test" }
             : { detail: "Provider unavailable" },
@@ -53,6 +54,7 @@ async function openAgent(status, retryAfter) {
   await node("#agent-submit").onclick();
   return {
     button: node("#agent-submit"), output: node("#agent-output"), requests, intervals,
+    content: node("#content"),
     advance(seconds) { now += seconds * 1000; for (const tick of intervals.values()) tick(); },
   };
 }
@@ -91,4 +93,18 @@ test("successful analysis still renders and enables another manual question", as
   assert.equal(app.intervals.size, 0);
   assert.match(app.output.innerHTML, /Source-based analysis/);
   assert.equal(app.requests.filter((url) => url.endsWith("demo-agent")).length, 1);
+});
+
+test("public agent identifies the public preferred model independently of operator settings", async () => {
+  const app = await openAgent(200, null, "gemini-3.1-flash-lite");
+  assert.match(app.content.innerHTML, /gemini-3\.1-flash-lite \/ Public demo/);
+  assert.ok(!app.content.innerHTML.includes("private-operator-model"));
+  assert.match(app.output.innerHTML, /Provider: gemini · test/);
+});
+
+test("unavailable public configuration disables public analysis despite configured operator AI", async () => {
+  const app = await openAgent(200, null, null);
+  assert.match(app.content.innerHTML, /id="agent-submit" disabled/);
+  assert.match(app.content.innerHTML, /The provider is not configured/);
+  assert.ok(!app.content.innerHTML.includes("private-operator-model"));
 });

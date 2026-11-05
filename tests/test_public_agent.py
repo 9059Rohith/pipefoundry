@@ -47,6 +47,7 @@ def test_client_and_daily_limits_persist(tmp_path):
 
 @pytest.fixture
 def public_client(tmp_path, monkeypatch):
+    monkeypatch.delenv("PIPEFOUNDRY_PUBLIC_AI_MODEL", raising=False)
     monkeypatch.delenv("VERCEL", raising=False)
     monkeypatch.delenv("PIPEFOUNDRY_METADATA_DSN", raising=False)
     monkeypatch.setenv("PIPEFOUNDRY_DEMO_LIMIT_DB", str(tmp_path / "limits.db"))
@@ -99,6 +100,7 @@ def test_public_input_and_origin_reject_before_provider(public_client):
         {"question": "x" * 601},
         {"question": "Inspect metadata", "repo": "a/b"},
         {"question": "Inspect metadata", "model": "paid-model"},
+        {"question": "Inspect metadata", "model": "gemini-3.1-flash-lite"},
     ]:
         assert client.post("/workbench/api/demo-agent", json=payload).status_code == 422
     response = client.post(
@@ -176,15 +178,18 @@ def test_database_failure_stops_public_inference(public_client, monkeypatch):
     assert "not-a-real-dsn" not in result.text
 
 
+@pytest.mark.parametrize("preferred_model", [None, "gemini-3.1-flash-lite"])
 @pytest.mark.parametrize("initial_failures", [0, 1, 2])
 def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(
-    public_client, monkeypatch, initial_failures
+    public_client, monkeypatch, initial_failures, preferred_model
 ):
     import httpx
 
     from pipefoundry import workbench
 
     client, _ = public_client
+    if preferred_model is not None:
+        monkeypatch.setenv("PIPEFOUNDRY_PUBLIC_AI_MODEL", preferred_model)
     monkeypatch.setenv("PIPEFOUNDRY_AI_MODEL", "paid-model-must-not-reach-public-route")
     monkeypatch.setattr(workbench.time, "sleep", lambda seconds: None)
     monkeypatch.setattr(workbench, "run_gemini_agent", real_gemini_agent)
@@ -234,13 +239,87 @@ def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(
     assert result.status_code == 200 and result.json()["public_demo"]
     assert result.json()["trace"][0]["stale"] is True
     assert len(messages) == initial_failures + 2
-    expected_model = "gemini-3.1-flash-lite" if initial_failures else "gemini-3.5-flash-lite"
+    expected_model = (
+        "gemini-3.1-flash-lite" if initial_failures or preferred_model else "gemini-3.5-flash-lite"
+    )
     assert result.json()["model"] == expected_model
     assert messages[-1]["model"] == expected_model
     assert [item["model"] for item in messages] == (
-        ["gemini-3.5-flash-lite"] + [expected_model] * (initial_failures + 1)
+        [preferred_model or "gemini-3.5-flash-lite"] + [expected_model] * (initial_failures + 1)
     )
     assert all("paid-model" not in item["model"] for item in messages)
     public_status = client.get("/workbench/api/integrations").json()["public_ai"]
-    assert public_status["preferred_model"] == "gemini-3.5-flash-lite"
+    assert public_status["preferred_model"] == (preferred_model or "gemini-3.5-flash-lite")
     assert public_status["fallback_model"] == "gemini-3.1-flash-lite"
+
+
+@pytest.mark.parametrize(
+    "configured_model",
+    ["", "gemini-3.5-flash-lite ", " gemini-3.1-flash-lite", "paid-model"],
+)
+def test_invalid_public_model_fails_before_limiter_and_provider(
+    public_client, monkeypatch, configured_model
+):
+    from pipefoundry import workbench
+
+    client, calls = public_client
+    monkeypatch.setenv("PIPEFOUNDRY_PUBLIC_AI_MODEL", configured_model)
+
+    configured = workbench.DemoLimiter.configured
+    database_accesses = []
+
+    def observed_database():
+        database_accesses.append(True)
+        return configured()
+
+    monkeypatch.setattr(workbench.DemoLimiter, "configured", observed_database)
+    response = client.post("/workbench/api/demo-agent", json={"question": "Inspect metadata"})
+    assert response.status_code == 503
+    assert "No AI request was made" in response.json()["detail"]
+    status = client.get("/workbench/api/integrations")
+    assert status.status_code == 200
+    assert status.json()["public_ai"]["preferred_model"] is None
+    assert status.json()["public_ai"]["configured"] is False
+    assert not calls and not database_accesses
+
+
+@pytest.mark.parametrize(
+    ("selected", "expected", "fallback"),
+    [
+        (None, "gemini-3.5-flash-lite", True),
+        ("gemini-3.5-flash-lite", "gemini-3.5-flash-lite", True),
+        ("gemini-3.1-flash-lite", "gemini-3.1-flash-lite", False),
+    ],
+)
+def test_approved_public_model_selection_keeps_the_fallback_direction(
+    public_client, monkeypatch, selected, expected, fallback
+):
+    client, calls = public_client
+    if selected is not None:
+        monkeypatch.setenv("PIPEFOUNDRY_PUBLIC_AI_MODEL", selected)
+    response = client.post("/workbench/api/demo-agent", json={"question": "Inspect metadata"})
+    assert response.status_code == 200
+    assert response.json()["model"] == expected
+    assert calls[0][1] == {"max_output_tokens": 600, "allow_free_fallback": fallback}
+    status = client.get("/workbench/api/integrations").json()["public_ai"]
+    assert status["preferred_model"] == expected
+    assert status["configured"] is True
+
+
+@pytest.mark.parametrize("public_model", ["gemini-3.1-flash-lite", "paid-model"])
+def test_public_model_selection_does_not_change_private_operator_settings(
+    public_client, monkeypatch, public_model
+):
+    client, calls = public_client
+    monkeypatch.setenv("PIPEFOUNDRY_PUBLIC_AI_MODEL", public_model)
+    monkeypatch.setenv("PIPEFOUNDRY_AI_PROVIDER", "gemini")
+    monkeypatch.setenv("PIPEFOUNDRY_AI_MODEL", "operator-selected-model")
+    response = client.post(
+        "/workbench/api/agent",
+        json={"question": "Inspect metadata", "repo": "owner/repository"},
+        headers={"Authorization": "Bearer " + "test-private-control-token-" * 2},
+    )
+    assert response.status_code == 200
+    assert response.json()["model"] == "operator-selected-model"
+    assert calls[0][0].repo == "owner/repository"
+    assert calls[0][1] == {}

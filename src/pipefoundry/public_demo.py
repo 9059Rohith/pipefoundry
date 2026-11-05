@@ -21,6 +21,11 @@ DDL = """CREATE TABLE IF NOT EXISTS pf_public_ai_limits (
 )"""
 
 
+def public_model():
+    model = os.getenv("PIPEFOUNDRY_PUBLIC_AI_MODEL", PUBLIC_MODEL)
+    return model if model in (PUBLIC_MODEL, PUBLIC_FREE_FALLBACK_MODEL) else None
+
+
 def unavailable():
     return HTTPException(503, "Public AI demo is temporarily unavailable. No AI request was made.")
 
