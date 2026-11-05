@@ -576,6 +576,8 @@ code {
 .metric small {
   display: block;
   font-size: 11px;
+  font-weight: 400;
+  letter-spacing: normal;
   color: #8c9ca9;
   margin-top: 7px;
 }

@@ -137,7 +137,8 @@ function table(headers, rows) {
   return `<div class="data-table">${tools}<div class="table-wrap"><table><thead><tr>${headers.map((x) => `<th scope="col">${esc(x)}</th>`).join("")}<th scope="col"><span class="sr-only">Details</span></th></tr></thead><tbody>${contents.join("")}</tbody></table></div><p class="table-empty" data-table-empty hidden>No matching records. Change the filter to see more results.</p></div>`;
 }
 function metric(label, value, sub = "", small = false) {
-  return `<div class="metric"><dt>${esc(label)}</dt><dd${small ? ' class="small"' : ""}>${esc(value)}</dd><small>${esc(sub)}</small></div>`;
+  const note = sub ? `<small>${esc(sub)}</small>` : "";
+  return `<div class="metric"><dt>${esc(label)}</dt><dd${small ? ' class="small"' : ""}>${esc(value)}${note}</dd></div>`;
 }
 function facts(items) {
   return `<dl class="facts">${items.map(([a, b]) => `<div><dt>${esc(a)}</dt><dd>${esc(b)}</dd></div>`).join("")}</dl>`;
