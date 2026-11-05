@@ -134,11 +134,13 @@ from airflow.providers.standard.operators.python import PythonOperator
 from pipefoundry.worker import run
 from pipefoundry.models import Pipeline
 import json
+import os
 
 CONFIG = json.loads({config.model_dump_json()!r})
 
 def execute_partition(ds, **context):
-    return run(Pipeline.model_validate(CONFIG), "/opt/airflow/pipeline-state", ds)
+    root = os.environ.get("PIPEFOUNDRY_AIRFLOW_STATE_DIR", "/opt/airflow/pipeline-state")
+    return run(Pipeline.model_validate(CONFIG), root, ds)
 
 with DAG(dag_id={config.name!r}, schedule={config.schedule!r},
          start_date=datetime(2026, 1, 1, tzinfo=timezone.utc),

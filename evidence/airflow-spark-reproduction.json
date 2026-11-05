@@ -1,0 +1,47 @@
+{
+  "source": {
+    "source_url": "https://data.cityofnewyork.us/resource/4b4i-vvec.json?%24select=%3Aid+as+row_id%2Ctpep_pickup_datetime%2Cfare_amount&%24where=tpep_pickup_datetime+%3E%3D+%272023-01-01T00%3A00%3A00%27+and+tpep_pickup_datetime+%3C+%272023-01-02T00%3A00%3A00%27+and+fare_amount+%3E+0&%24order=tpep_pickup_datetime%2C+%3Aid&%24limit=1000",
+    "captured_at_utc": "2026-11-05T04:53:11.824138+00:00",
+    "sha256": "942e7b07bf180803a934da9c05b5953a91ebf006696ffc72b8fdc783fb0385e2",
+    "size_bytes": 102746,
+    "rows": 1000,
+    "total_fare_cents": 1974145
+  },
+  "mapping": "SHA-256 source row ID, exact meter fare cents, USD",
+  "normalized_jsonl_sha256": "c4dc69b206a08077acaa7c52bc6231667ec34800c2135b7ac4a265286ef6011d",
+  "airflow_version": "3.3.2",
+  "standard_provider_version": "1.19.0",
+  "spark_version": "4.0.1",
+  "python_version": "3.12.3",
+  "execution_mode": "Airflow DAG.test local execution",
+  "dag": {
+    "id": "nyc-fares-proof",
+    "run_id": "manual__2026-11-05T05:32:49.996156+00:00",
+    "state": "success",
+    "task": {
+      "task_id": "execute",
+      "state": "success",
+      "try_number": 1,
+      "start_date": "2026-11-05 05:32:52.931440",
+      "end_date": "2026-11-05 05:33:23.405906"
+    },
+    "logical_date": "2026-11-05T05:32:48.582177+00:00",
+    "generated_file_sha256": "a01a51daee906e587c637c3d7f05e361d0c86f95f874d153c8d2267344a886ec",
+    "duration_seconds": 34.027
+  },
+  "independent_spark_readback_seconds": 0.658,
+  "parquet": {
+    "rows": 1000,
+    "distinct_ids": 1000,
+    "fare_total_cents": 1974145,
+    "currency": "USD",
+    "canonical_rows_sha256": "697d3440f010098d76cbc1f333ee4e2b5aa5d57ef17dd0a73110ac66407d1f89",
+    "files": [
+      {
+        "path": "currency=USD/part-00000-57c2f989-af2e-4d5e-8901-7a5ca2090ae2.c000.gz.parquet",
+        "size_bytes": 41113,
+        "sha256": "677f01dca82160a9090c701adcb87d94c6cce6abc7bd22e0ba7a04c22089371d"
+      }
+    ]
+  }
+}

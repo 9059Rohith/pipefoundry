@@ -1,0 +1,19 @@
+{
+  "verified_at_utc": "2026-11-05T05:23:54.041558+00:00",
+  "execution_mode": "Airflow 3.3.2 DAG.test with actual PythonOperator task and PySpark 4.0.1 local[2]",
+  "dag_state": "success",
+  "dag_test_wall_seconds": 34.826,
+  "source_sha256": "942e7b07bf180803a934da9c05b5953a91ebf006696ffc72b8fdc783fb0385e2",
+  "rows": 1000,
+  "fare_cents": 1974145,
+  "independent_reader": "DuckDB 2.0.0",
+  "all_rows_match_source": true,
+  "output_sha256": "697d3440f010098d76cbc1f333ee4e2b5aa5d57ef17dd0a73110ac66407d1f89",
+  "files": [
+    {
+      "path": "currency=USD\\part-00000-b0e7932b-d7ec-4aec-9952-82572d6fc259.c000.gz.parquet",
+      "sha256": "8cc76cc49b05e34d88fb4d2798100988f004d54d0570f758d059a278a7a474b5"
+    }
+  ],
+  "scope": "One local generated DAG test execution. Timing excludes environment installation and metadata migration."
+}

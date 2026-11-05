@@ -1,4 +1,6 @@
+import ast
 import json
+import os
 import sqlite3
 import subprocess
 import sys
@@ -20,6 +22,42 @@ def config(**changes):
     }
     result.update(changes)
     return result
+
+
+def test_airflow_export_uses_operator_state_directory_and_keeps_default(tmp_path, monkeypatch):
+    from pipefoundry.models import Pipeline
+    from pipefoundry.render import render
+
+    pipeline = Pipeline.model_validate(config())
+    render(pipeline, 1, tmp_path / "revision")
+    tree = ast.parse((tmp_path / "revision" / "airflow_dag.py").read_text())
+    assert any(
+        isinstance(node, ast.Import) and any(alias.name == "os" for alias in node.names)
+        for node in tree.body
+    )
+    function = next(
+        node
+        for node in tree.body
+        if isinstance(node, ast.FunctionDef) and node.name == "execute_partition"
+    )
+    calls = []
+    namespace = {
+        "os": os,
+        "Pipeline": Pipeline,
+        "CONFIG": pipeline.model_dump(),
+        "run": lambda checked, root, partition: calls.append((checked, root, partition)),
+    }
+    exec(
+        compile(ast.Module(body=[function], type_ignores=[]), "<generated DAG>", "exec"), namespace
+    )
+    monkeypatch.setenv("PIPEFOUNDRY_AIRFLOW_STATE_DIR", str(tmp_path / "operator-state"))
+    namespace["execute_partition"]("2026-11-05")
+    monkeypatch.delenv("PIPEFOUNDRY_AIRFLOW_STATE_DIR")
+    namespace["execute_partition"]("2026-11-06")
+    assert calls == [
+        (pipeline, str(tmp_path / "operator-state"), "2026-11-05"),
+        (pipeline, "/opt/airflow/pipeline-state", "2026-11-06"),
+    ]
 
 
 def test_config_rejects_url_injection_traversal_and_resource_exhaustion():

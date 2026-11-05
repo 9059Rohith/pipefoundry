@@ -196,7 +196,7 @@ API port 8094 and PostgreSQL port 55435 bind to localhost. For direct developmen
 | Approved HTTPS → PostgreSQL | Connector available to the operator | Ephemeral TLS server → real subprocess → PostgreSQL acceptance test | An actual upstream URL/CA/allowlist and DSN are operator settings |
 | Spark JSON → partitioned Parquet | Excluded from the minimal API image | Separately verified Linux Spark container | Java 17+ and optional locked Spark dependencies |
 | Kubernetes / Helm | No hosted cluster execution | Generated artifacts and external-tool boundary tests | Real cluster, namespace, PVC, secrets, kubectl and worker image required |
-| Airflow 3 DAG | No hosted scheduler | Generated Python artifact/syntax verification | Airflow 3.3.2 + standard provider and mounted worker package/data |
+| Airflow 3 DAG | No hosted scheduler | Actual generated DAG, PythonOperator and PySpark over 1,000 public NYC fares | Airflow 3.3.2 local Dag.test; [execution proof](docs/airflow-spark-proof.md) |
 | AWS EKS infrastructure | No AWS provisioned | Terraform validation / IaC scans recorded | AWS account, remote state and VPC-connected administrator runner |
 
 For HTTPS ingestion, use [orders-postgres.yaml](examples/orders-postgres.yaml) and set `PIPEFOUNDRY_ORDERS_URL`, `PIPEFOUNDRY_ALLOWED_HOSTS` and `PIPEFOUNDRY_POSTGRES_DSN`. TLS verification is mandatory, redirects and URL credentials are rejected, responses are bounded to 1 MiB/10,000 records, and transient retries stop after three attempts. For Spark, see [orders-spark.yaml](examples/orders-spark.yaml), [Dockerfile.spark](Dockerfile.spark) and the [verification notes](docs/verification.md).

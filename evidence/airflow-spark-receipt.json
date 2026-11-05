@@ -1,0 +1,22 @@
+{
+  "runs": [
+    {
+      "dag_id": "nyc-fares-proof",
+      "run_id": "manual__2026-11-05T05:22:57.302737+00:00",
+      "state": "success",
+      "logical_date": "2026-11-05 00:00:00.000000"
+    }
+  ],
+  "tasks": [
+    {
+      "dag_id": "nyc-fares-proof",
+      "task_id": "execute",
+      "run_id": "manual__2026-11-05T05:22:57.302737+00:00",
+      "state": "success",
+      "try_number": 1,
+      "start_date": "2026-11-05 05:22:59.814256",
+      "end_date": "2026-11-05 05:23:30.930512"
+    }
+  ],
+  "generated_dag_sha256": "a01a51daee906e587c637c3d7f05e361d0c86f95f874d153c8d2267344a886ec"
+}
