@@ -198,22 +198,30 @@ async function overview() {
     inspect("runs"),
     inspect("workflows"),
   ]);
-  if (repository.status === "rejected") throw repository.reason;
-  const data = repository.value.data;
+  const data = repository.status === "fulfilled" ? repository.value.data : null;
+  const metadataUnavailable = () => empty(
+    "Repository unavailable",
+    repository.reason.message,
+    "/workbench/repository",
+    "Retry repository inspection",
+  );
   const executions =
     runs.status === "fulfilled" ? runs.value.data.workflow_runs || [] : [];
   const definitions =
     workflows.status === "fulfilled"
       ? workflows.value.data.workflows || []
       : [];
-  return `<section class="repository-summary"><div><div class="summary-identity">${icon("repo")}<h2>${esc(data.full_name)}</h2></div><p>${esc(data.description || "Explore the repository and the evidence behind its workflows.")}</p></div><div class="summary-context"><span>${icon("workflow")} ${esc(data.default_branch)}</span><span>${esc(data.language || "Language not specified")}</span>${link(data.html_url, "Open source")}</div></section><div class="split">${panel("Recent executions", runs.status === "rejected" ? empty("Executions unavailable", runs.reason.message) : executions.length ? table(["Workflow / execution", "Outcome", "Branch", "Started", "Trigger"], runRows(executions.slice(0, 6))) : empty("No workflow executions", "GitHub returned no runs for the selected repository."), "Observed GitHub Actions history · outcomes are not simulated", '<a href="/workbench/runs">All executions ' + icon("arrow") + "</a>")}${panel("Build a pipeline", `<div class="panel-body steps"><a class="step" href="/workbench/editor"><div><h3>Configure</h3><p>Compose a typed source, transform and destination.</p></div></a><a class="step" href="/workbench/validation"><div><h3>Validate</h3><p>Check schedule, resources and connector compatibility.</p></div></a><a class="step" href="/workbench/manifests"><div><h3>Inspect the artifact</h3><p>Copy or download the rendered Kubernetes bundle.</p></div></a><a class="step" href="/workbench/plans"><div><h3>Preview a plan</h3><p>Compare recorded state through the protected control plane.</p></div></a></div>`, "Configuration is a draft until the runtime validates it.")}</div><dl class="metrics">${metric("Workflow definitions", workflows.status === "fulfilled" ? definitions.length : "Unavailable", "Up to 50 definitions")}${metric("Recent executions", runs.status === "fulfilled" ? executions.length : "Unavailable", "Latest 30 returned runs")}${metric("Open issues", data.open_issues_count, "Repository observation")}${metric("Last push", new Date(data.pushed_at).toLocaleDateString(), "See the source observation time", true)}</dl><div class="split equal">${panel(
+  const summary = data
+    ? `<section class="repository-summary"><div><div class="summary-identity">${icon("repo")}<h2>${esc(data.full_name)}</h2></div><p>${esc(data.description || "Explore the repository and the evidence behind its workflows.")}</p></div><div class="summary-context"><span>${icon("workflow")} ${esc(data.default_branch)}</span><span>${esc(data.language || "Language not specified")}</span>${link(data.html_url, "Open source")}</div></section>`
+    : panel("Repository inspection", metadataUnavailable());
+  return `${summary}<div class="split">${panel("Recent executions", runs.status === "rejected" ? empty("Executions unavailable", runs.reason.message) : executions.length ? table(["Workflow / execution", "Outcome", "Branch", "Started", "Trigger"], runRows(executions.slice(0, 6))) : empty("No workflow executions", "GitHub returned no runs for the selected repository."), "Observed GitHub Actions history · outcomes are not simulated", '<a href="/workbench/runs">All executions ' + icon("arrow") + "</a>")}${panel("Build a pipeline", `<div class="panel-body steps"><a class="step" href="/workbench/editor"><div><h3>Configure</h3><p>Compose a typed source, transform and destination.</p></div></a><a class="step" href="/workbench/validation"><div><h3>Validate</h3><p>Check schedule, resources and connector compatibility.</p></div></a><a class="step" href="/workbench/manifests"><div><h3>Inspect the artifact</h3><p>Copy or download the rendered Kubernetes bundle.</p></div></a><a class="step" href="/workbench/plans"><div><h3>Preview a plan</h3><p>Compare recorded state through the protected control plane.</p></div></a></div>`, "Configuration is a draft until the runtime validates it.")}</div><dl class="metrics">${metric("Workflow definitions", workflows.status === "fulfilled" ? definitions.length : "Unavailable", "Up to 50 definitions")}${metric("Recent executions", runs.status === "fulfilled" ? executions.length : "Unavailable", "Latest 30 returned runs")}${metric("Open issues", data ? data.open_issues_count : "Unavailable", "Repository observation")}${metric("Last push", data ? new Date(data.pushed_at).toLocaleDateString() : "Unavailable", "See the source observation time", true)}</dl><div class="split equal">${panel(
     "Repository details",
-    `<div class="panel-body">${facts([
+    data ? `<div class="panel-body">${facts([
       ["Default branch", data.default_branch],
       ["Primary language", data.language],
       ["License", data.license?.name || "Not specified"],
       ["Last updated", fmt(data.updated_at)],
-    ])}</div>`,
+    ])}</div>` : metadataUnavailable(),
     "Public metadata, with dated cache fallback when needed.",
     '<a href="/workbench/repository">Inspect repository ' +
       icon("arrow") +

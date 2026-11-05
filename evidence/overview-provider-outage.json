@@ -1,0 +1,89 @@
+{
+  "verified_at_utc": "2026-11-05T06:20:01Z",
+  "target": "https://rohith-pipefoundry.vercel.app/workbench/overview",
+  "live_observations": [
+    {
+      "width": 390,
+      "metrics_present": true,
+      "page_errors": [],
+      "github_requests": [
+        {
+          "view": "workflows",
+          "status": 200,
+          "elapsed_ms": 3576,
+          "observed_at": "2026-11-05T06:19:57.614697+00:00",
+          "cache_status": "live"
+        },
+        {
+          "view": "repository",
+          "status": 200,
+          "elapsed_ms": 3778,
+          "observed_at": "2026-11-05T06:19:57.860621+00:00",
+          "cache_status": "live"
+        },
+        {
+          "view": "runs",
+          "status": 200,
+          "elapsed_ms": 5168,
+          "observed_at": "2026-11-05T06:19:58.945477+00:00",
+          "cache_status": "live"
+        }
+      ]
+    },
+    {
+      "width": 1440,
+      "metrics_present": true,
+      "page_errors": [],
+      "github_requests": [
+        {
+          "view": "runs",
+          "status": 429,
+          "elapsed_ms": 1530,
+          "detail": "GitHub rate limit reached and no usable cached evidence exists. Try again in 1820 seconds."
+        },
+        {
+          "view": "workflows",
+          "status": 200,
+          "elapsed_ms": 1647,
+          "observed_at": "2026-11-05T06:20:01.331347+00:00",
+          "cache_status": "live"
+        },
+        {
+          "view": "repository",
+          "status": 200,
+          "elapsed_ms": 1651,
+          "observed_at": "2026-11-05T06:20:01.355063+00:00",
+          "cache_status": "live"
+        }
+      ]
+    }
+  ],
+  "controlled_outage_regression": {
+    "mode": "Browser route interception of GitHub failure responses only; public validator and manifest requests execute against local FastAPI.",
+    "statuses": [
+      429,
+      502
+    ],
+    "widths": [
+      390,
+      1440
+    ],
+    "before_fix": "Observed error response applied to metadata caused the entire content area to be replaced: 0 metrics and 0 workspace editor links.",
+    "after_fix": "All four combinations passed: 4 DT/DD metrics labeled Unavailable, visible provider error, working configure/validate/manifest journey, no uncaught page errors or horizontal overflow."
+  },
+  "source_boundary": "No successful source responses were invented; cache maximum age remains 24 hours. Controlled errors are regression inputs, not production data.",
+  "verification": {
+    "pytest": {
+      "passed": 107,
+      "skipped": 23,
+      "elapsed_seconds": 100.74,
+      "skip_scope": "Optional PostgreSQL metadata/races/workloads (including durable-root variants), container image opt-in, Spark runtime opt-in were not enabled."
+    },
+    "workbench_api_tests": 14,
+    "node_ui_tests": 6,
+    "browser_outage_scenarios": 4,
+    "ruff": "passed",
+    "bandit": "passed",
+    "javascript_syntax": "passed"
+  }
+}
