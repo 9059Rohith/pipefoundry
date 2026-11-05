@@ -1,17 +1,38 @@
 # Requirements traceability and interview notes
 
+## Current interview demonstration
+
+Open the [workbench](https://rohith-pipefoundry.vercel.app/workbench/overview).
+Validate a draft, inspect its concrete CronJob manifest and run a release review.
+This public path validates and reviews; it does not submit workloads to a cluster.
+Inspect actual GitHub run/job evidence, including failures and dated-cache notices.
+
+Next show [Kubernetes release/rollback](kubernetes-release-proof.md): three real
+Jobs ran in disposable K3s, each verifying 12 captured NYC fares. Contrast that
+dated execution with the current public static review. Then show the executed
+[Airflow/PySpark DAG](airflow-spark-proof.md), its 1,000 verified source tuples
+and independent DuckDB readback. `Dag.test()` execution does not establish an
+always-running scheduler, and local K3s is not AWS EKS.
+
+For Data Engineering, explain exact cents, Python versus Spark duplicate policy,
+partitioned Parquet and bounded ingestion. For DevOps, explain revision identity,
+lease ownership/fencing, retry receipts, rejected stale plans and the difference
+between reverting configuration and undoing committed data. The shared GitHub
+cache is another concrete example: coordinated refresh, provider cooldown,
+bounded retained evidence and an explicit freshness boundary.
+
 | Requirement | Implementation | Evidence / limitation |
 |---|---|---|
 | Self-service config | `models.py`, CLI validate, API Pydantic request models | Injection/traversal/cron/resources/compatibility tests |
 | CLI + control plane | `cli.py`, `api.py` | Real CLI subprocess and FastAPI lifecycle tests |
 | Versioned deployment | `render.py`, `engine.py` | Numbered artifacts, checksums, monotonic rollback tests |
-| Helm/Kubernetes | Concrete CronJob+ConfigMap, generated Helm revision, control-plane chart | Helm lint/template and kubeconform; live cluster acceptance is separate |
-| Airflow | Generated Airflow 3.3.2 DAG with public SDK, standard provider, fixed callable, dates/retries/timeout | Python compile/AST; Airflow scheduler not installed locally |
-| Deploy/status/logs | Local execution, kubectl apply/get and bounded pod logs | Local execution real; cluster subprocess argument-boundary test uses a controlled external-tool double |
+| Helm/Kubernetes | Concrete CronJob+ConfigMap, generated Helm revision, control-plane chart | Helm/schema checks plus actual local K3s create/update/rollback and three completed Jobs; no EKS execution claimed |
+| Airflow | Generated Airflow 3.3.2 DAG with public SDK, standard provider, fixed callable, dates/retries/timeout | Actual generated DAG completed through Dag.test with PySpark 4.0.1; continuous scheduler operation unverified |
+| Deploy/status/logs | Local execution, kubectl apply/get and bounded pod logs | Local and K3s execution evidence; argument-boundary tests separately use a controlled external-tool double |
 | Backfill/rollback/teardown | Inclusive bounded dates, forward config revisions, label-scoped deletion | Real SQL partition counts and preserved artifacts/audit tests |
 | Audit and concurrency | SQLite audit, checksum anchor, cross-process operation rows | Integrity, locking and connection-close regressions |
 | Python API → PostgreSQL | HTTPS fetch, bounded retries, normalization, parameterized upsert, SQL quality | Real TLS503→success source, worker subprocess, PostgreSQL integration |
-| PySpark JSON → Parquet | Explicit schema, validation, normalized currency partitions, read-after-write | Optional runtime test; exact observed status in verification.md |
+| PySpark JSON → Parquet | Explicit schema, validation, normalized currency partitions, read-after-write | Actual 1,000-fare DAG run and independent exact-tuple DuckDB readback in airflow-spark-proof.md |
 | AWS IaC | Two-AZ network, private EKS, IAM/IRSA, encrypted disks/secrets, logs | fmt/init/validate evidence when provider available; no AWS apply |
 | Container hardening | Non-root Docker; probes/security/resources/NetworkPolicy in Helm | Docker smoke + rendered schema validation |
 | API security | Fail-closed bearer auth, size limit, safe paths, connector allowlist | Negative tests and security.md residual boundaries |

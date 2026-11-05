@@ -1,0 +1,155 @@
+{
+  "project": "pipefoundry",
+  "verified_at": "2026-11-05T09:54:29.331744+00:00",
+  "evidence_base": "https://github.com/9059Rohith/pipefoundry/blob/main/evidence/",
+  "test_profiles": {
+    "tests": {
+      "cases": 141,
+      "passed": 118,
+      "skipped": 23,
+      "failed": 0,
+      "errors": 0
+    },
+    "postgres": {
+      "cases": 28,
+      "passed": 25,
+      "skipped": 3,
+      "failed": 0,
+      "errors": 0
+    }
+  },
+  "profiles_overlap": true,
+  "unique_test_cases": 141,
+  "unique_cases_passed": 137,
+  "remaining_skips": {
+    "tests.test_release_races::test_postgres_plan_survives_cold_scratch_root[sqlite]": "cold scratch roots require durable metadata",
+    "tests.test_release_races::test_demo_auto_recovery_cannot_steal_a_protected_release_lease[sqlite]": "demo recovery requires PostgreSQL",
+    "tests.test_runtime_image::test_runtime_retains_python_sql_tls_but_removes_shells_and_mount_tools": "container opt in",
+    "tests.test_workloads::test_spark_real_json_to_parquet": "Spark runtime opt in"
+  },
+  "runtime_dependency_audit": {
+    "dependencies_checked": 24,
+    "known_vulnerabilities": 0,
+    "scope": "Pinned runtime graph only; not a new remote-container scan"
+  },
+  "live_api": {
+    "project": "pipefoundry",
+    "checks": [
+      {
+        "url": "https://rohith-pipefoundry.vercel.app/health/ready",
+        "method": "GET",
+        "expected_status": 200,
+        "status": 200,
+        "elapsed_ms": 2562.0,
+        "passed": true,
+        "body_sha256": "31bf75f4c0a97cc1f7b60df824fa390b3be9ba014f29b63c87c698ba63d9a9fd"
+      },
+      {
+        "url": "https://rohith-pipefoundry.vercel.app/workbench/api/review",
+        "method": "POST",
+        "expected_status": 200,
+        "status": 200,
+        "elapsed_ms": 485.0,
+        "passed": true,
+        "body_sha256": "10c1af7a7cd8b9fccdfc9dad1094b5136f3c2f77bf15180d2904521542be2ebf"
+      },
+      {
+        "url": "https://rohith-pipefoundry.vercel.app/releases/apply",
+        "method": "POST",
+        "expected_status": 401,
+        "status": 401,
+        "elapsed_ms": 343.0,
+        "passed": true,
+        "body_sha256": "ab8fc6cf92b3c2ec0e49303b46c9c71d50f00f2139868b728f95363d1d5f054c"
+      }
+    ],
+    "passed": true
+  },
+  "live_browser": {
+    "file_written_at": "2026-11-05T09:51:38.430969+00:00",
+    "checks": [
+      {
+        "width": 390,
+        "verified": "Valid metric definitions, typed validation, CronJob manifest, and rollback evidence",
+        "errors": [],
+        "consoleErrors": [],
+        "expectedProviderErrors": [],
+        "providerFailures": [],
+        "title": "Release review \u00b7 PipeFoundry",
+        "url": "https://rohith-pipefoundry.vercel.app/workbench/review",
+        "screenshot": "interview-audit-390-20261105.png",
+        "browser": "Chromium 1248",
+        "browserPlugin": "Browser plugin not available"
+      },
+      {
+        "width": 1440,
+        "verified": "Valid metric definitions, typed validation, CronJob manifest, and rollback evidence",
+        "errors": [],
+        "consoleErrors": [],
+        "expectedProviderErrors": [],
+        "providerFailures": [],
+        "title": "Release review \u00b7 PipeFoundry",
+        "url": "https://rohith-pipefoundry.vercel.app/workbench/review",
+        "screenshot": "interview-audit-1440-20261105.png",
+        "browser": "Chromium 1248",
+        "browserPlugin": "Browser plugin not available"
+      }
+    ]
+  },
+  "live_ai": {
+    "checked_at": "2026-11-05T09:51:03.371637+00:00",
+    "check": {
+      "name": "pipefoundry",
+      "url": "https://rohith-pipefoundry.vercel.app/workbench/api/demo-agent",
+      "status": 200,
+      "elapsed_ms": 4657.0,
+      "question": "Inspect this repository's workflow runs and explain the observed outcomes and their observation time.",
+      "response_sha256": "082408179632ddf1854ae04dca4f7fbf4d1d9bbc26fb08a5922550a9178e1095",
+      "response": {
+        "answer": "Based on the inspection of repository workflow runs (observed at `2026-11-05T09:50:54.654816+00:00`):\n\n* **Workflow Name / Event:** `verify` workflow (`.github/workflows/ci.yml`) triggered by a `push` event on the `main` branch.\n* **Run Number & Title:** Run #29, titled *\"Publish verified public demo and rate-limit recovery evidence\"* (Commit: `3ba8e6d09ccee97d054f58503c04ce1acfd9f214`).\n* **Outcome:** **Failure** (completed with a failure conclusion on `2026-11-05T08:07:01Z`).\n\nSource URL: [GitHub Workflow Run #41992016943](https://github.com/9059Rohith/pipefoundry/actions/runs/41992016943)",
+        "trace": [
+          {
+            "tool": "inspect_github",
+            "view": "runs",
+            "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs?per_page=30",
+            "observed_at": "2026-11-05T09:50:54.654816+00:00",
+            "validated_at": "2026-11-05T09:50:54.916306+00:00",
+            "stale": false,
+            "cache_status": "live"
+          }
+        ],
+        "provider": "gemini",
+        "model": "gemini-3.5-flash-lite",
+        "usage": {
+          "completion_tokens": 238,
+          "prompt_tokens": 5689,
+          "total_tokens": 5927
+        },
+        "request_id": "f1HsaujxA7mM1sgP5_SWgAw",
+        "public_demo": true,
+        "repository": "9059Rohith/pipefoundry",
+        "limits": {
+          "client": "3 per 10 minutes",
+          "shared": "2 per minute / 30 per day"
+        }
+      },
+      "passed": true
+    }
+  },
+  "deployment": {
+    "id": "dpl_J3TWbtZPbCkqCo1TTg8EBj4zjVkW",
+    "runtime_commit": "baf34f88c3be",
+    "changed": false
+  },
+  "limits": [
+    "No percentile rank is established",
+    "No AWS apply or successful hosted CI run is established",
+    "PostgreSQL-focused data paths were tested before the later AI-only transport changes; those data implementations did not change"
+  ],
+  "workflow_hardening": {
+    "status": "prepared_not_applied",
+    "reason": "GitHub rejected workflow file updates because the connected OAuth app lacks workflow scope",
+    "patch": "docs/workflow-hardening.patch",
+    "local_backup_branch": "codex/openfx-workflow-hardening-20261105"
+  }
+}

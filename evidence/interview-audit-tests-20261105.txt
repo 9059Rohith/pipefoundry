@@ -1,0 +1,9 @@
+........ssssssssssss.................................................... [ 51%]
+............ss.sssss...................s..........................sss    [100%]
+============================= slowest 5 durations =============================
+17.92s call     tests/test_platform.py::test_revision_render_local_run_backfill_rollback_and_audit
+12.92s call     tests/test_benchmark.py::test_benchmark_measures_each_stage_and_persists_samples
+9.60s call     tests/test_platform.py::test_api_fails_closed_and_lifecycle
+8.90s call     tests/test_platform.py::test_cli_real_deploy_and_invalid_config
+7.86s call     tests/test_releases.py::test_failed_worker_is_terminal_and_new_plan_is_required
+118 passed, 23 skipped in 133.70s (0:02:13)

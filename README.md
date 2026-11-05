@@ -1,5 +1,7 @@
 # PipeFoundry
 
+[OpenFX readiness audit](https://github.com/9059Rohith/settlement-recon/blob/main/docs/openfx-interview-readiness.md) · [Interview demonstration](docs/requirements.md)
+
 The public [Release review workspace](https://rohith-pipefoundry.vercel.app/workbench/review)
 now audits the actual server-rendered ConfigMap/CronJob from your typed editor draft.
 Inspect 12 selected controls with exact field evidence, capture or paste a validated
