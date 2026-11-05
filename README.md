@@ -28,6 +28,8 @@ The public workbench has fifteen useful pages for actual GitHub repository and w
 
 GitHub inspection uses a shared PostgreSQL cache, refresh lease, conditional requests and a provider-wide cooldown. Repository metadata, workflows, runs, releases, commits and 26 run-job responses have genuine dated cold-start captures. Evidence can remain readable for at most 24 hours after validation, with original observation times and explicit stale notices. Actual empty collections and failed runs remain visible. [Rate-limit recovery and verification](docs/github-rate-limit-recovery.md) · [Capture provenance](docs/github-evidence-capture.md).
 
+**Public demos verified 5 November 2026:** all 31 GitHub views returned HTTP 200 through the shared PostgreSQL cache during real upstream rate limiting. All four portfolio apps passed mobile/desktop workflows and public AI calls without operator tokens. [Deployment and verification evidence](docs/public-release-20261105.md).
+
 ![PipeFoundry blueprint workbench — desktop browser QA](evidence/blueprint-desktop.png)
 
 The industrial blueprint design adds 24 original technical plates across
