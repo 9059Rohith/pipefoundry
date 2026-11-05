@@ -1,3 +1,4 @@
+import hashlib
 import importlib.util
 import json
 import sys
@@ -85,3 +86,15 @@ def test_success_exit_requires_junit_and_nonempty_tests(tmp_path):
     with pytest.raises(RuntimeError, match="JUnit"):
         gate_module().run_gate(tmp_path, output, [[sys.executable, "-c", "pass"]])
     assert not output.exists()
+
+
+def test_source_fingerprint_uses_portable_order_and_excludes_generated_metadata(tmp_path):
+    source = tmp_path / "src"
+    source.mkdir()
+    (source / "a.py").write_bytes(b"a\n")
+    (source / "Z.py").write_bytes(b"z\n")
+    metadata = source / "package.egg-info"
+    metadata.mkdir()
+    (metadata / "PKG-INFO").write_bytes(b"generated locally\n")
+    expected = hashlib.sha256(b"src/Z.py\0z\n\0src/a.py\0a\n\0").hexdigest()
+    assert gate_module().fingerprint(tmp_path, [source]) == expected

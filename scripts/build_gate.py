@@ -20,8 +20,12 @@ def fingerprint(root, paths):
             files.append(path)
         elif path.is_dir():
             files.extend(p for p in path.rglob("*") if p.is_file())
-    for path in sorted(set(files)):
-        if "__pycache__" in path.parts or path.suffix == ".pyc":
+    for path in sorted(set(files), key=lambda item: item.relative_to(root).as_posix()):
+        if (
+            "__pycache__" in path.parts
+            or any(part.endswith(".egg-info") for part in path.parts)
+            or path.suffix == ".pyc"
+        ):
             continue
         digest.update(path.relative_to(root).as_posix().encode() + b"\0")
         digest.update(path.read_bytes() + b"\0")
