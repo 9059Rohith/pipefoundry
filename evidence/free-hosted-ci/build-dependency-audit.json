@@ -1,0 +1,70 @@
+{
+  "dependencies": [
+    {
+      "name": "bandit",
+      "version": "1.9.4",
+      "vulns": []
+    },
+    {
+      "name": "httpcore2",
+      "version": "2.16.0",
+      "vulns": []
+    },
+    {
+      "name": "httpx2",
+      "version": "2.16.0",
+      "vulns": []
+    },
+    {
+      "name": "iniconfig",
+      "version": "2.3.1",
+      "vulns": []
+    },
+    {
+      "name": "markdown-it-py",
+      "version": "4.2.0",
+      "vulns": []
+    },
+    {
+      "name": "mdurl",
+      "version": "0.1.2",
+      "vulns": []
+    },
+    {
+      "name": "packaging",
+      "version": "26.3",
+      "vulns": []
+    },
+    {
+      "name": "pluggy",
+      "version": "1.7.0",
+      "vulns": []
+    },
+    {
+      "name": "pygments",
+      "version": "2.21.0",
+      "vulns": []
+    },
+    {
+      "name": "pytest",
+      "version": "9.2.0",
+      "vulns": []
+    },
+    {
+      "name": "rich",
+      "version": "15.0.0",
+      "vulns": []
+    },
+    {
+      "name": "ruff",
+      "version": "0.17.3",
+      "vulns": []
+    },
+    {
+      "name": "stevedore",
+      "version": "5.9.1",
+      "vulns": []
+    }
+  ],
+  "fixes": []
+}

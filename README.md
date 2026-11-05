@@ -1,5 +1,7 @@
 # PipeFoundry
 
+**Free hosted release verification (5 Nov 2026):** 126 tests passed, 23 explicit optional skips on the actual Linux builder. Every release image depends on a successful verification receipt. [Build logs, public retests and exact GitHub/AWS blockers](docs/free-hosted-ci.md).
+
 [OpenFX readiness audit](https://github.com/9059Rohith/settlement-recon/blob/main/docs/openfx-interview-readiness.md) · [Interview demonstration](docs/requirements.md)
 
 The public [Release review workspace](https://rohith-pipefoundry.vercel.app/workbench/review)

@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-05",
+  "project": "pipefoundry",
+  "source_commit": "5d6598b33468a2cd6f67ec5631252f5649938959",
+  "deployment_id": "dpl_3tHkEJoKNrFTgfqPQvRhbbHxLqS4",
+  "deployment_status": "READY",
+  "promoted": true,
+  "public_url": "https://rohith-pipefoundry.vercel.app/",
+  "alias_verification": {
+    "alias": "rohith-pipefoundry.vercel.app",
+    "deployment_id": "dpl_3tHkEJoKNrFTgfqPQvRhbbHxLqS4",
+    "project_id": "prj_l5pzpLwb7GbdKDglS0CKn6dtNL52"
+  },
+  "provider": "Vercel Hobby Linux container build",
+  "hosted_tests_passed": 126,
+  "hosted_tests_skipped": 23,
+  "build_log_sha256": "1a133f77d1645bd6f9516e954858118387dd1b4eef18f20eb636bf601ad09d22",
+  "public_api_checks_passed": 14,
+  "latest_public_ai_checks_passed": 4,
+  "known_initial_provider_failures": "Settlement Recon and FluxLake AI503; next bounded requests after cooldown passed",
+  "github_actions": "Blocked before execution by account billing lock; workflow writes unauthorized",
+  "aws": "No credentials or profile; no AWS apply or deployment",
+  "browser_retest": "Not executed this task: browser automation unavailable"
+}
