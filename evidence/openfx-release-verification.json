@@ -1,0 +1,79 @@
+{
+  "verified_at_utc": "2026-11-05T05:46:59.966544+00:00",
+  "project_id": "prj_l5pzpLwb7GbdKDglS0CKn6dtNL52",
+  "team_id": "team_WkR0cDVyRzw7XTRitQwgfgJc",
+  "commit": "8c639e6cf740ed228916ba49e1eb8d704f6f7094",
+  "deployment_id": "dpl_AjeLRBPrUebQXV4W2BJLDkvGQfth",
+  "target": "production",
+  "state": "READY",
+  "url": "https://rohith-pipefoundry.vercel.app",
+  "deployment_url": "https://pipefoundry-6szb0dp9m-rohiths-projects-5e14931b.vercel.app",
+  "image_digest": "sha256:8a3ca1f01a09477ef243a312cd878125f635ae78fac252414adfd007c1abdd19",
+  "staged_readiness": 200,
+  "staged_review_digest_verified": true,
+  "production_review": {
+    "url": "https://rohith-pipefoundry.vercel.app",
+    "checks": [
+      {
+        "route": "/workbench/review",
+        "method": "GET",
+        "status": 200,
+        "elapsed_ms": 2462.46
+      },
+      {
+        "route": "/workbench/assets/app.js",
+        "method": "GET",
+        "status": 200,
+        "elapsed_ms": 563.12
+      },
+      {
+        "route": "/workbench/api/review",
+        "method": "POST",
+        "status": 200,
+        "elapsed_ms": 422.35
+      },
+      {
+        "route": "/workbench/api/review",
+        "method": "POST",
+        "status": 422,
+        "elapsed_ms": 328.57
+      },
+      {
+        "route": "/workbench/api/review",
+        "method": "POST",
+        "status": 413,
+        "elapsed_ms": 781.68
+      },
+      {
+        "route": "/releases/apply",
+        "method": "POST",
+        "status": 401,
+        "elapsed_ms": 555.78
+      },
+      {
+        "route": "/workbench/api/agent",
+        "method": "POST",
+        "status": 401,
+        "elapsed_ms": 411.8
+      }
+    ],
+    "summary": {
+      "pass": 10,
+      "warn": 1,
+      "fail": 0,
+      "na": 1
+    },
+    "evidence_sha256": "55dbd4d724450270c77e1c878a966546351578bcaf78febd99f00b0e072a7089",
+    "risk_escalations": 2,
+    "model_requests": 0,
+    "cluster_actions": 0
+  },
+  "error_log_query": {
+    "window": "15m",
+    "level": "error",
+    "limit": 20,
+    "cli_exit_code": 0,
+    "returned_json_records": 0
+  },
+  "scope": "Verified public manifest review, bounded invalid requests, and authentication boundaries. Airflow and Kubernetes execution proofs are separate local drills."
+}

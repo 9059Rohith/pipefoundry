@@ -257,3 +257,7 @@ Useful next exercises are adding an asynchronous operation receipt, an optimisti
 The current operational feature also has [actual public HTTPS verification](evidence/review-public-feature.json) and a [fresh all-severity runtime image scan](evidence/signature-image-scan.json). These complement the dated local experiments; they do not establish a production SLA.
 
 Current signature release: [actual protected HTTPS checks](evidence/signature-public-feature.json), [all-severity runtime scan](evidence/signature-image-scan.json), and [measured code changes](evidence/signature-code-metrics.json). Application, test and operational-script lines are counted separately; documentation, comments and docstrings are excluded.
+
+### OpenFX execution and release verification
+
+The generated Airflow/PySpark DAG and both independent readbacks are documented with their public source capture. The later PostgreSQL-backed full suite passed 126 tests with four documented skips, and the production release passed public manifest-review and request-boundary checks. [Execution, tests, and production evidence](docs/airflow-spark-proof.md)

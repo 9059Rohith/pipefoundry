@@ -66,3 +66,9 @@ The operator can set `PIPEFOUNDRY_AIRFLOW_STATE_DIR` for a writable worker
 root. The generated DAG retains `/opt/airflow/pipeline-state` as its default.
 The existing [Kubernetes release proof](kubernetes-release-proof.md) records
 the separate deployed workload run and rollback.
+
+## PostgreSQL and production release follow-up
+
+A full Windows suite against an isolated native PostgreSQL 18.2 cluster passed 126 tests in 266.22 seconds. Four cases were skipped. Two require a durable backend and are inapplicable to their SQLite parameter variants. The container identity and Windows Spark tests are opt-in. The Linux Airflow/Spark runs above exercised the actual Spark workload separately. [Full suite output](../evidence/openfx-postgres-suite.txt) · [JUnit report](../evidence/openfx-postgres-suite-junit.xml)
+
+Commit `8c639e6cf740ed228916ba49e1eb8d704f6f7094` was built as a production Vercel container, verified in staging, and promoted. The public manifest workflow passed evidence digest checks, bad input returned 422, oversized input returned 413, and protected execution endpoints returned 401. [Production verification](../evidence/openfx-release-verification.json)
