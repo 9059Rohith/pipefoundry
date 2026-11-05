@@ -79,10 +79,7 @@ async function request(url, options = {}) {
           : `Request failed (${r.status}). Try again later.`,
       );
       failure.status = r.status;
-      failure.retryAfter = Math.min(
-        86400,
-        Math.max(1, Number(r.headers.get("Retry-After")) || 60),
-      );
+      failure.retryAfter = FoundryUI.retryAfterSeconds(r.headers.get("Retry-After"));
       throw failure;
     }
     return data;
@@ -857,7 +854,7 @@ async function agent() {
           "Analysis not completed",
           error.message,
         );
-        if (error.status === 429) {
+        if (error.status === 429 || error.status === 503) {
           cooling = true;
           const until = Date.now() + error.retryAfter * 1000;
           const tick = () => {

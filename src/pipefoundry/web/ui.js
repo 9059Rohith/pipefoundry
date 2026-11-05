@@ -26,6 +26,18 @@
       return null;
     }
   }
+  function retryAfterSeconds(header, now = Date.now()) {
+    const value = String(header ?? "").trim();
+    const seconds = Number(value);
+    if (/^\d+$/.test(value) && Number.isFinite(seconds) && seconds > 0)
+      return seconds;
+    if (/^[A-Za-z]{3}, \d{2} [A-Za-z]{3} \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(value)) {
+      const deadline = Date.parse(value);
+      if (Number.isFinite(deadline))
+        return Math.max(1, Math.ceil((deadline - now) / 1000));
+    }
+    return 60;
+  }
   function inline(value) {
     const expression =
       /`([^`\n]+)`|\*\*([^*\n]+)\*\*|\[([^\]\n]+)\]\(([^)\s]+)\)|(https:\/\/[^\s<>]+)/g;
@@ -193,6 +205,7 @@
     reviewChecks,
     escape,
     safeURL,
+    retryAfterSeconds,
     markdown,
     highlightJSON,
     filterCommands,

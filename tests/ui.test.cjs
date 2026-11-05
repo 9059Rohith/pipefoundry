@@ -2,6 +2,22 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const ui = require("../src/pipefoundry/web/ui.js");
 
+test("retry delays preserve long seconds and HTTP dates without early retries", () => {
+  const now = Date.parse("2026-11-05T12:00:00.500Z");
+  for (const [header, expected] of [
+    ["120", 120],
+    ["172800", 172800],
+    ["Thu, 05 Nov 2026 12:02:00 GMT", 120],
+    ["Sun, 08 Nov 2026 12:00:00 GMT", 259200],
+    ["Thu, 05 Nov 2026 11:00:00 GMT", 1],
+    [null, 60], ["", 60], ["garbage", 60], ["0", 60], ["-1", 60],
+    ["Infinity", 60], ["NaN", 60], ["1.5", 60], ["1e6", 60],
+    ["9".repeat(400), 60],
+  ]) {
+    assert.equal(ui.retryAfterSeconds(header, now), expected, String(header));
+  }
+});
+
 test("manifest review cards escape evidence and filter findings", () => {
   const checks = [
     { id: "safe", title: "Non-root", status: "pass", evidence: [], source: "https://kubernetes.io/docs/" },
