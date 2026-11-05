@@ -1,0 +1,23 @@
+✔ 429 respects the entire 172800 cooldown without resubmitting (16.252ms)
+✔ 429 respects the entire Sat, 07 Nov 2026 12:00:00 GMT cooldown without resubmitting (4.4723ms)
+✔ 503 respects the entire 172800 cooldown without resubmitting (6.1723ms)
+✔ 503 respects the entire Sat, 07 Nov 2026 12:00:00 GMT cooldown without resubmitting (7.3009ms)
+✔ other provider errors keep the normal manual retry button (5.0753ms)
+✔ successful analysis still renders and enables another manual question (6.5431ms)
+✔ public agent identifies the public preferred model independently of operator settings (5.8406ms)
+✔ unavailable public configuration disables public analysis despite configured operator AI (6.7727ms)
+✔ retry delays preserve long seconds and HTTP dates without early retries (1.8725ms)
+✔ manifest review cards escape evidence and filter findings (1.4105ms)
+✔ pipeline drafts reject JSON primitives and arrays before saving (2.7952ms)
+✔ AI markdown escapes HTML and rejects unsafe citation destinations (1.2752ms)
+✔ source links cannot impersonate GitHub or embed credentials (1.6733ms)
+✔ code highlighting preserves escaped content and separates keys (0.7873ms)
+✔ command search matches all query words without inventing destinations (0.4685ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 229.9735
