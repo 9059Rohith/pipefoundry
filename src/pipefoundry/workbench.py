@@ -24,6 +24,7 @@ from pipefoundry.github_cache import GitHubCache, read_cached_evidence
 from pipefoundry.manifest_review import ReviewRequest, review
 from pipefoundry.models import Pipeline, StrictModel
 from pipefoundry.public_demo import (
+    PUBLIC_FREE_FALLBACK_MODEL,
     PUBLIC_MODEL,
     PUBLIC_REPOSITORY,
     DemoLimiter,
@@ -171,6 +172,8 @@ class _GeminiBudget:
     requests: int = 0
     retries: int = 0
     quota_retries: int = 0
+    model: str | None = None
+    allow_free_fallback: bool = False
 
 
 def _gemini_unavailable():
@@ -204,24 +207,46 @@ def _gemini_request(client, *, key, payload, budget):
             raise _gemini_unavailable()
         budget.requests += 1
         retry_header, retry_after, status = None, None, None
+        safe_model = (
+            budget.model
+            if budget.model in {PUBLIC_MODEL, PUBLIC_FREE_FALLBACK_MODEL}
+            else "configured"
+        )
+        initial_turn = not any(
+            message.get("role") in {"assistant", "tool"} for message in payload.get("messages", [])
+        )
+        phase = "initial" if initial_turn else "followup"
         try:
             response = client.post(
                 "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
                 headers={"Authorization": f"Bearer {key}"},
-                json=payload,
+                json={**payload, "model": budget.model} if budget.model else payload,
                 timeout=min(25, remaining),
             )
         except httpx.TransportError as exc:
             # Provider responses, exception messages and request data may contain secrets.
-            _logger.warning("Gemini transport failure type=%s", type(exc).__name__)
+            _logger.warning(
+                "Gemini transport failure type=%s model=%s attempt=%s phase=%s",
+                type(exc).__name__,
+                safe_model,
+                budget.requests,
+                phase,
+            )
             failure = _gemini_unavailable()
         else:
             status = response.status_code
             if status == 200:
+                budget.allow_free_fallback = False
                 if time.monotonic() >= budget.deadline:
                     raise _gemini_unavailable()
                 return response.json()
-            _logger.warning("Gemini provider failure status=%s", status)
+            _logger.warning(
+                "Gemini provider failure status=%s model=%s attempt=%s phase=%s",
+                status,
+                safe_model,
+                budget.requests,
+                phase,
+            )
             if status not in {429, 500, 502, 503, 504}:
                 raise HTTPException(502, "Gemini rejected the request. Check server configuration.")
             failure = _gemini_unavailable()
@@ -248,6 +273,17 @@ def _gemini_request(client, *, key, payload, budget):
         budget.retries += 1
         if status == 429:
             budget.quota_retries += 1
+        if (
+            budget.allow_free_fallback
+            and initial_turn
+            and budget.model == PUBLIC_MODEL
+            and budget.retries == 2
+            and not budget.quota_retries
+            and status in {500, 502, 503, 504}
+        ):
+            # No assistant response/signature exists yet. This is the last existing
+            # retry, on the same billing-disabled Google project and endpoint.
+            budget.model = PUBLIC_FREE_FALLBACK_MODEL
         time.sleep(delay)
 
 
@@ -289,10 +325,12 @@ def dated_answer(answer, trace):
     return answer
 
 
-def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tokens=1200):
+def run_gemini_agent(
+    body: AgentRequest, key: str, model: str, *, max_output_tokens=1200, allow_free_fallback=False
+):
     if not REPO.fullmatch(body.repo):
         raise HTTPException(422, "Use a GitHub owner/repository name")
-    budget = _GeminiBudget()
+    budget = _GeminiBudget(model=model, allow_free_fallback=allow_free_fallback)
     messages = [
         {
             "role": "system",
@@ -332,7 +370,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tok
                     key=key,
                     budget=budget,
                     payload={
-                        "model": model,
+                        "model": budget.model,
                         "messages": messages,
                         "tools": tools,
                         "tool_choice": "required" if step == 0 else "auto",
@@ -353,7 +391,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tok
                         "answer": dated_answer(answer, trace),
                         "trace": trace,
                         "provider": "gemini",
-                        "model": model,
+                        "model": budget.model,
                         "usage": result.get("usage", {}),
                         "request_id": result.get("id"),
                     }
@@ -539,6 +577,8 @@ def router(authorize):
             "ai_model": model,
             "ai_fallback": "none",
             "public_ai": {
+                "preferred_model": PUBLIC_MODEL,
+                "fallback_model": PUBLIC_FREE_FALLBACK_MODEL,
                 "repository": PUBLIC_REPOSITORY,
                 "access": "anonymous",
                 "limiter_backend": "postgresql"
@@ -574,6 +614,7 @@ def router(authorize):
             key,
             PUBLIC_MODEL,
             max_output_tokens=600,
+            allow_free_fallback=True,
         )
         return {
             **result,

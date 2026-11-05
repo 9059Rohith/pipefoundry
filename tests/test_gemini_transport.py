@@ -57,11 +57,12 @@ def transport(monkeypatch):
     return outcomes, requests, waits, now
 
 
-def analyze():
+def analyze(**kwargs):
     return workbench.run_gemini_agent(
         workbench.AgentRequest(repo="a/b", question="Inspect repository metadata"),
         "test-secret-do-not-log",
         "gemini-3.5-flash-lite",
+        **kwargs,
     )
 
 
@@ -197,3 +198,88 @@ def test_http_request_ceiling_applies_even_if_turn_loop_grows(transport):
             workbench._gemini_request(client, key="test-only", payload={}, budget=budget)
     assert error.value.status_code == 503
     assert len(requests) == 6
+
+
+@pytest.mark.parametrize("status", [500, 502, 503, 504])
+def test_first_turn_final_retry_uses_fixed_free_model_for_rest_of_conversation(transport, status):
+    outcomes, requests, waits, _ = transport
+    outcomes.extend([httpx.Response(status), httpx.Response(status), TOOL, ANSWER])
+    result = analyze(allow_free_fallback=True)
+    assert result["model"] == "gemini-3.1-flash-lite"
+    assert result["trace"] and result["answer"].startswith("**Dated evidence:**")
+    assert [request[1]["json"]["model"] for request in requests] == [
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite",
+    ]
+    assert waits == [1, 2]
+    assert len({request[0] for request in requests}) == 1
+    assert len({request[1]["headers"]["Authorization"] for request in requests}) == 1
+
+
+def test_fallback_failure_exhausts_same_retry_budget_and_logs_actual_model(transport, caplog):
+    outcomes, requests, waits, _ = transport
+    outcomes.extend([httpx.Response(503, text="private body")] * 3)
+    with caplog.at_level(logging.WARNING), pytest.raises(HTTPException) as error:
+        analyze(allow_free_fallback=True)
+    assert error.value.status_code == 503
+    assert waits == [1, 2] and len(requests) == 3
+    assert "model=gemini-3.1-flash-lite" in caplog.text
+    assert "attempt=3" in caplog.text and "phase=initial" in caplog.text
+    assert "private body" not in caplog.text and "test-secret" not in caplog.text
+
+
+def test_no_model_switch_after_first_assistant_tool_call(transport, caplog):
+    outcomes, requests, _, _ = transport
+    signed_tool = {**TOOL, "extra_content": {"thought_signature": "opaque-test-only"}}
+    outcomes.extend([signed_tool, httpx.Response(503), httpx.Response(503), ANSWER])
+    with caplog.at_level(logging.WARNING):
+        result = analyze(allow_free_fallback=True)
+    assert result["model"] == "gemini-3.5-flash-lite"
+    assert all(request[1]["json"]["model"] == "gemini-3.5-flash-lite" for request in requests)
+    assert requests[-1][1]["json"]["messages"][2] == signed_tool
+    assert "phase=followup" in caplog.text
+    assert "opaque-test-only" not in caplog.text
+
+
+@pytest.mark.parametrize("first", [429, "network"])
+def test_quota_or_network_failures_do_not_trigger_model_fallback(transport, first):
+    outcomes, requests, _, _ = transport
+    first_failure = httpx.Response(429) if first == 429 else httpx.ConnectError("test-only")
+    second_failure = httpx.Response(503) if first == 429 else httpx.ConnectError("test-only")
+    outcomes.extend([first_failure, second_failure, TOOL, ANSWER])
+    assert analyze(allow_free_fallback=True)["model"] == "gemini-3.5-flash-lite"
+    assert all(request[1]["json"]["model"] == "gemini-3.5-flash-lite" for request in requests)
+
+
+def test_long_retry_after_stops_before_free_fallback(transport):
+    outcomes, requests, waits, _ = transport
+    outcomes.extend([httpx.Response(503), httpx.Response(503, headers={"Retry-After": "120"})])
+    with pytest.raises(HTTPException) as error:
+        analyze(allow_free_fallback=True)
+    assert error.value.headers["Retry-After"] == "120"
+    assert waits == [1] and len(requests) == 2
+    assert all(request[1]["json"]["model"] == "gemini-3.5-flash-lite" for request in requests)
+
+
+def test_operator_agent_does_not_enable_model_fallback_by_default(transport):
+    outcomes, requests, _, _ = transport
+    outcomes.extend([httpx.Response(503), httpx.Response(503), TOOL, ANSWER])
+    assert analyze()["model"] == "gemini-3.5-flash-lite"
+    assert all(request[1]["json"]["model"] == "gemini-3.5-flash-lite" for request in requests)
+
+
+def test_fallback_cannot_change_an_arbitrary_configured_model(transport, caplog):
+    outcomes, requests, _, _ = transport
+    outcomes.extend([httpx.Response(503), httpx.Response(503), TOOL, ANSWER])
+    with caplog.at_level(logging.WARNING):
+        result = workbench.run_gemini_agent(
+            workbench.AgentRequest(repo="a/b", question="Inspect repository metadata"),
+            "test-only-key",
+            "configured-secret-model",
+            allow_free_fallback=True,
+        )
+    assert result["model"] == "configured-secret-model"
+    assert all(request[1]["json"]["model"] == "configured-secret-model" for request in requests)
+    assert "configured-secret-model" not in caplog.text

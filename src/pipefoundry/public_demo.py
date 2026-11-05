@@ -13,6 +13,7 @@ from fastapi import HTTPException, Request
 
 PUBLIC_REPOSITORY = "9059Rohith/pipefoundry"
 PUBLIC_MODEL = "gemini-3.5-flash-lite"
+PUBLIC_FREE_FALLBACK_MODEL = "gemini-3.1-flash-lite"
 CANONICAL_ORIGIN = "https://rohith-pipefoundry.vercel.app"
 DDL = """CREATE TABLE IF NOT EXISTS pf_public_ai_limits (
     bucket_key TEXT NOT NULL, window_start BIGINT NOT NULL, used INTEGER NOT NULL,

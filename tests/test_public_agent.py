@@ -87,6 +87,7 @@ def test_anonymous_demo_stops_inference_at_quota_and_protects_private_api(public
     assert len(calls) == 2
     assert all(call[0].repo == "9059Rohith/pipefoundry" for call in calls)
     assert calls[0][1]["max_output_tokens"] == 600
+    assert calls[0][1]["allow_free_fallback"] is True
     assert client.post("/workbench/api/agent", json={**body, "repo": "a/b"}).status_code == 401
     assert client.post("/pipelines", json={}).status_code == 401
     assert client.post("/releases/apply", json={}).status_code == 401
@@ -175,12 +176,17 @@ def test_database_failure_stops_public_inference(public_client, monkeypatch):
     assert "not-a-real-dsn" not in result.text
 
 
-def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(public_client, monkeypatch):
+@pytest.mark.parametrize("initial_failures", [0, 2])
+def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(
+    public_client, monkeypatch, initial_failures
+):
     import httpx
 
     from pipefoundry import workbench
 
     client, _ = public_client
+    monkeypatch.setenv("PIPEFOUNDRY_AI_MODEL", "paid-model-must-not-reach-public-route")
+    monkeypatch.setattr(workbench.time, "sleep", lambda seconds: None)
     monkeypatch.setattr(workbench, "run_gemini_agent", real_gemini_agent)
     messages = []
 
@@ -188,7 +194,9 @@ def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(public_client, m
         assert "generativelanguage.googleapis.com" in url
         messages.append(kwargs["json"])
         assert kwargs["json"]["max_tokens"] == 600
-        if len(messages) == 1:
+        if len(messages) <= initial_failures:
+            return httpx.Response(503)
+        if len(messages) == initial_failures + 1:
             message = {
                 "role": "assistant",
                 "tool_calls": [
@@ -225,4 +233,11 @@ def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(public_client, m
     )
     assert result.status_code == 200 and result.json()["public_demo"]
     assert result.json()["trace"][0]["stale"] is True
-    assert len(messages) == 2
+    assert len(messages) == initial_failures + 2
+    expected_model = "gemini-3.1-flash-lite" if initial_failures else "gemini-3.5-flash-lite"
+    assert result.json()["model"] == expected_model
+    assert messages[-1]["model"] == expected_model
+    assert all("paid-model" not in item["model"] for item in messages)
+    public_status = client.get("/workbench/api/integrations").json()["public_ai"]
+    assert public_status["preferred_model"] == "gemini-3.5-flash-lite"
+    assert public_status["fallback_model"] == "gemini-3.1-flash-lite"
