@@ -176,7 +176,7 @@ def test_database_failure_stops_public_inference(public_client, monkeypatch):
     assert "not-a-real-dsn" not in result.text
 
 
-@pytest.mark.parametrize("initial_failures", [0, 2])
+@pytest.mark.parametrize("initial_failures", [0, 1, 2])
 def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(
     public_client, monkeypatch, initial_failures
 ):
@@ -237,6 +237,9 @@ def test_anonymous_endpoint_runs_genuine_provider_tool_protocol(
     expected_model = "gemini-3.1-flash-lite" if initial_failures else "gemini-3.5-flash-lite"
     assert result.json()["model"] == expected_model
     assert messages[-1]["model"] == expected_model
+    assert [item["model"] for item in messages] == (
+        ["gemini-3.5-flash-lite"] + [expected_model] * (initial_failures + 1)
+    )
     assert all("paid-model" not in item["model"] for item in messages)
     public_status = client.get("/workbench/api/integrations").json()["public_ai"]
     assert public_status["preferred_model"] == "gemini-3.5-flash-lite"

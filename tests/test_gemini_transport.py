@@ -201,7 +201,7 @@ def test_http_request_ceiling_applies_even_if_turn_loop_grows(transport):
 
 
 @pytest.mark.parametrize("status", [500, 502, 503, 504])
-def test_first_turn_final_retry_uses_fixed_free_model_for_rest_of_conversation(transport, status):
+def test_first_initial_5xx_retry_selects_free_model_for_rest_of_conversation(transport, status):
     outcomes, requests, waits, _ = transport
     outcomes.extend([httpx.Response(status), httpx.Response(status), TOOL, ANSWER])
     result = analyze(allow_free_fallback=True)
@@ -209,13 +209,51 @@ def test_first_turn_final_retry_uses_fixed_free_model_for_rest_of_conversation(t
     assert result["trace"] and result["answer"].startswith("**Dated evidence:**")
     assert [request[1]["json"]["model"] for request in requests] == [
         "gemini-3.5-flash-lite",
-        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
         "gemini-3.1-flash-lite",
         "gemini-3.1-flash-lite",
     ]
     assert waits == [1, 2]
     assert len({request[0] for request in requests}) == 1
     assert len({request[1]["headers"]["Authorization"] for request in requests}) == 1
+
+
+def test_initial_503_moves_tool_call_and_final_answer_to_free_model(transport):
+    outcomes, requests, waits, _ = transport
+    outcomes.extend([httpx.Response(503), TOOL, ANSWER])
+    assert analyze(allow_free_fallback=True)["model"] == "gemini-3.1-flash-lite"
+    assert [request[1]["json"]["model"] for request in requests] == [
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite",
+    ]
+    assert waits == [1]
+
+
+def test_free_model_followup_retry_shares_original_budget(transport):
+    outcomes, requests, waits, _ = transport
+    outcomes.extend([httpx.Response(503), TOOL, httpx.Response(503), ANSWER])
+    assert analyze(allow_free_fallback=True)["model"] == "gemini-3.1-flash-lite"
+    assert [request[1]["json"]["model"] for request in requests] == [
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite",
+    ]
+    assert waits == [1, 2]
+
+
+def test_initial_5xx_after_network_retry_can_still_select_free_model(transport):
+    outcomes, requests, waits, _ = transport
+    outcomes.extend([httpx.ConnectError("test-only"), httpx.Response(503), TOOL, ANSWER])
+    assert analyze(allow_free_fallback=True)["model"] == "gemini-3.1-flash-lite"
+    assert [request[1]["json"]["model"] for request in requests] == [
+        "gemini-3.5-flash-lite",
+        "gemini-3.5-flash-lite",
+        "gemini-3.1-flash-lite",
+        "gemini-3.1-flash-lite",
+    ]
+    assert waits == [1, 2]
 
 
 def test_fallback_failure_exhausts_same_retry_budget_and_logs_actual_model(transport, caplog):
@@ -253,14 +291,22 @@ def test_quota_or_network_failures_do_not_trigger_model_fallback(transport, firs
     assert all(request[1]["json"]["model"] == "gemini-3.5-flash-lite" for request in requests)
 
 
-def test_long_retry_after_stops_before_free_fallback(transport):
+@pytest.mark.parametrize("initial_failures", [0, 1])
+def test_long_retry_after_stops_on_current_model_without_another_attempt(
+    transport, initial_failures
+):
     outcomes, requests, waits, _ = transport
-    outcomes.extend([httpx.Response(503), httpx.Response(503, headers={"Retry-After": "120"})])
+    outcomes.extend([httpx.Response(503)] * initial_failures)
+    outcomes.append(httpx.Response(503, headers={"Retry-After": "120"}))
     with pytest.raises(HTTPException) as error:
         analyze(allow_free_fallback=True)
     assert error.value.headers["Retry-After"] == "120"
-    assert waits == [1] and len(requests) == 2
-    assert all(request[1]["json"]["model"] == "gemini-3.5-flash-lite" for request in requests)
+    assert waits == ([1] if initial_failures else [])
+    assert [request[1]["json"]["model"] for request in requests] == (
+        ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite"]
+        if initial_failures
+        else ["gemini-3.5-flash-lite"]
+    )
 
 
 def test_operator_agent_does_not_enable_model_fallback_by_default(transport):

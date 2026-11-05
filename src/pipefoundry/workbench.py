@@ -277,12 +277,11 @@ def _gemini_request(client, *, key, payload, budget):
             budget.allow_free_fallback
             and initial_turn
             and budget.model == PUBLIC_MODEL
-            and budget.retries == 2
             and not budget.quota_retries
             and status in {500, 502, 503, 504}
         ):
-            # No assistant response/signature exists yet. This is the last existing
-            # retry, on the same billing-disabled Google project and endpoint.
+            # No assistant response/signature exists yet. Use this eligible retry
+            # on the same billing-disabled Google project and endpoint.
             budget.model = PUBLIC_FREE_FALLBACK_MODEL
         time.sleep(delay)
 
