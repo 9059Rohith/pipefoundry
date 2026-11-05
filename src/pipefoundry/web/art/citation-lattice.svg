@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" role="img">
+<title>Source evidence panel</title>
+<defs>
+ <radialGradient id="light" cx="57%" cy="49%" r="73%">
+  <stop stop-color="#273b36"/><stop offset=".49" stop-color="#182622"/>
+  <stop offset="1" stop-color="#151917"/>
+ </radialGradient>
+ <linearGradient id="copper" x1="0" x2="760" y1="0" y2="340" gradientUnits="userSpaceOnUse">
+  <stop stop-color="#4f3125"/><stop offset=".35" stop-color="#a76f48"/>
+  <stop offset=".54" stop-color="#f2bc84"/>
+  <stop offset=".69" stop-color="#a46741"/><stop offset="1" stop-color="#4d2f22"/>
+ </linearGradient>
+ <linearGradient id="teal" x1="0" x2="760" y1="0" y2="340" gradientUnits="userSpaceOnUse">
+  <stop stop-color="#203d3d"/><stop offset=".48" stop-color="#80bcb0"/>
+  <stop offset="1" stop-color="#30534f"/>
+ </linearGradient>
+ <linearGradient id="surface" x2="100%" y2="100%">
+  <stop stop-color="#304841"/><stop offset="1" stop-color="#1c2924"/>
+ </linearGradient>
+ <pattern id="draft" width="28" height="28" patternUnits="userSpaceOnUse">
+  <path d="M28 0H0v28" fill="none" stroke="#8cab9e" stroke-opacity=".17" stroke-width=".8"/>
+  <path d="M13 14h2m-1-1v2" stroke="#8cab9e" stroke-opacity=".13" stroke-width=".8"/>
+ </pattern>
+</defs>
+<rect width="760" height="340" fill="url(#light)"/>
+<rect width="760" height="340" fill="url(#draft)"/>
+<path d="M22 53V22h31m654 0h31v31M22 287v31h31m654 0h31v-31"
+      fill="none" stroke="#769188" opacity=".65"/>
+<text x="39" y="36" fill="#e8a26b" font-size="9" font-family="monospace" letter-spacing="1.3">PF / 24</text><text x="39" y="307" fill="#acc3b7" font-size="9" font-family="monospace" letter-spacing="1.3">CITATION LATTICE</text>
+<text x="647" y="307" fill="#acc3b7" font-size="9" font-family="monospace" letter-spacing="1.3">DRAWING</text>
+<path d="M109 82h120l17 17v85h-137z" fill="url(#surface)" stroke="#83c7bc" stroke-width="1.6" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M229 82v17h17" fill="none" stroke="#83c7bc" stroke-width="1.5" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M128 116h84" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M128 131h61" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M128 146h100" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M128 161h75" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M128 170h120l17 17v85h-137z" fill="url(#surface)" stroke="#e8a26b" stroke-width="1.6" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M248 170v17h17" fill="none" stroke="#e8a26b" stroke-width="1.5" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M147 204h84" fill="none" stroke="#e8a26b" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M147 219h61" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M147 234h100" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M147 249h75" fill="none" stroke="#e8a26b" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M247 127h91l63 51m-136 45h78l58-45m0 0h108" fill="none" stroke="#83c7bc" stroke-width="3" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><circle cx="406" cy="183" r="37" fill="#2a2420" stroke="#4b3b2b" stroke-width="2"/><circle cx="401" cy="178" r="37" fill="#192421" stroke="#e8a26b" stroke-width="2.2"/><circle cx="401" cy="178" r="19.61" fill="#0d1717" stroke="#e8a26b" stroke-width="1.4"/><circle cx="430.23" cy="178.0" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="421.67" cy="198.67" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="401.0" cy="207.23" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="380.33" cy="198.67" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="371.77" cy="178.0" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="380.33" cy="157.33" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="401.0" cy="148.77" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><circle cx="421.67" cy="157.33" r="2.6" fill="#141e1d" stroke="#e8a26b" stroke-width="1.4"/><rect x="506" y="116" width="132" height="124" rx="9" fill="url(#surface)" stroke="#83c7bc" stroke-width="1.3"/><path d="M530 145h78m-78 25h48m-48 25h69" fill="none" stroke="#e8a26b" stroke-width="2" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><text x="506" y="265" fill="#83c7bc" font-size="9" font-family="monospace" letter-spacing="1.3">CITATION RECORD</text>
+</svg>

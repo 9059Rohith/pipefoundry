@@ -17,6 +17,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import Field
 
+from pipefoundry.blueprints import ARTWORK_PATHS
 from pipefoundry.console import CSP, render_console
 from pipefoundry.demo import DEMO_KEY, DEMO_NAME, demo_ready, demo_receipt, seed_demo
 from pipefoundry.engine import Platform
@@ -159,9 +160,11 @@ def create_app(
         # Reject unknown credentials without consuming an attacker-controlled
         # stream. Route dependencies still recheck before executing an action.
         path = request.url.path
+        public_artwork = request.method in {"GET", "HEAD"} and path in ARTWORK_PATHS
         workbench_pages = {"/", "/workbench"} | {f"/workbench/{page}" for page in PAGES}
         public_read = request.method in {"GET", "HEAD"} and (
-            path in workbench_pages
+            public_artwork
+            or path in workbench_pages
             or path
             in {
                 "/workbench/assets/app.css",
@@ -214,7 +217,10 @@ def create_app(
             )
         request._body = bytes(body)
         response = await call_next(request)
-        return secure_response(response)
+        secure_response(response)
+        if public_artwork and response.status_code in {200, 304}:
+            response.headers["Cache-Control"] = "public, max-age=86400"
+        return response
 
     @app.exception_handler(ValueError)
     async def invalid(request, exc):

@@ -28,7 +28,12 @@ The public workbench has fifteen useful pages for actual GitHub repository and w
 
 GitHub rate limits can use genuine cached public evidence for at most 24 hours, with the original observation time and an explicit stale warning in the agent answer and trace. The default repository has an actual public metadata capture for cold starts; it is historical evidence and does not establish current repository counts. [Capture provenance](evidence/github-cache-seed.json).
 
-![Redesigned pipeline editor — canonical production Browser QA](evidence/premium-editor-desktop.jpg)
+![PipeFoundry blueprint workbench — desktop browser QA](evidence/blueprint-desktop.png)
+
+The industrial blueprint design adds 24 original technical plates across
+all 16 views, a three-step overview and native scroll motion that respects
+reduced-motion preferences. [Design and browser checks](docs/blueprint-design.md) ·
+[Artwork inventory](docs/blueprint-assets.md).
 
 The developer workbench now has a connected configuration → validation → artifact → plan journey, a numbered syntax-highlighted editor with real inline validation, manifest copy/download, searchable records and inspection dialogs, a keyboard command palette, a focus-managed mobile menu, and safely formatted AI answers with dated source evidence. [Design and verification](docs/ui-redesign.md).
 

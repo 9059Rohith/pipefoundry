@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 340" role="img">
+<title>Audit ledger</title>
+<defs>
+ <radialGradient id="light" cx="57%" cy="49%" r="73%">
+  <stop stop-color="#273b36"/><stop offset=".49" stop-color="#182622"/>
+  <stop offset="1" stop-color="#151917"/>
+ </radialGradient>
+ <linearGradient id="copper" x1="0" x2="760" y1="0" y2="340" gradientUnits="userSpaceOnUse">
+  <stop stop-color="#4f3125"/><stop offset=".35" stop-color="#a76f48"/>
+  <stop offset=".54" stop-color="#f2bc84"/>
+  <stop offset=".69" stop-color="#a46741"/><stop offset="1" stop-color="#4d2f22"/>
+ </linearGradient>
+ <linearGradient id="teal" x1="0" x2="760" y1="0" y2="340" gradientUnits="userSpaceOnUse">
+  <stop stop-color="#203d3d"/><stop offset=".48" stop-color="#80bcb0"/>
+  <stop offset="1" stop-color="#30534f"/>
+ </linearGradient>
+ <linearGradient id="surface" x2="100%" y2="100%">
+  <stop stop-color="#304841"/><stop offset="1" stop-color="#1c2924"/>
+ </linearGradient>
+ <pattern id="draft" width="28" height="28" patternUnits="userSpaceOnUse">
+  <path d="M28 0H0v28" fill="none" stroke="#8cab9e" stroke-opacity=".17" stroke-width=".8"/>
+  <path d="M13 14h2m-1-1v2" stroke="#8cab9e" stroke-opacity=".13" stroke-width=".8"/>
+ </pattern>
+</defs>
+<rect width="760" height="340" fill="url(#light)"/>
+<rect width="760" height="340" fill="url(#draft)"/>
+<path d="M22 53V22h31m654 0h31v31M22 287v31h31m654 0h31v-31"
+      fill="none" stroke="#769188" opacity=".65"/>
+<text x="39" y="36" fill="#e8a26b" font-size="9" font-family="monospace" letter-spacing="1.3">PF / 14</text><text x="39" y="307" fill="#acc3b7" font-size="9" font-family="monospace" letter-spacing="1.3">LEDGER STRIPS</text>
+<text x="647" y="307" fill="#acc3b7" font-size="9" font-family="monospace" letter-spacing="1.3">DRAWING</text>
+<rect x="127" y="67" width="449" height="36" rx="3" fill="#142021" stroke="#e8a26b" stroke-width="1.3"/><rect x="140" y="116" width="432" height="36" rx="3" fill="#142021" stroke="#83c7bc" stroke-width="1.3"/><rect x="153" y="165" width="415" height="36" rx="3" fill="#142021" stroke="#e8a26b" stroke-width="1.3"/><rect x="166" y="214" width="398" height="36" rx="3" fill="#142021" stroke="#83c7bc" stroke-width="1.3"/><rect x="179" y="263" width="381" height="36" rx="3" fill="#142021" stroke="#e8a26b" stroke-width="1.3"/><path d="M156 86h32m14 0h145m15 0h41" fill="none" stroke="#54726d" stroke-width="2" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M169 135h32m14 0h145m15 0h41" fill="none" stroke="#54726d" stroke-width="2" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M182 184h32m14 0h145m15 0h41" fill="none" stroke="#54726d" stroke-width="2" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M195 233h32m14 0h145m15 0h41" fill="none" stroke="#54726d" stroke-width="2" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M208 282h32m14 0h145m15 0h41" fill="none" stroke="#54726d" stroke-width="2" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><path d="M624 79v191M613 81h23m-23 48h23m-23 47h23m-23 48h23m-23 46h23" fill="none" stroke="#83c7bc" stroke-width="1.1" opacity="1" stroke-linejoin="round" stroke-linecap="round"/><text x="457" y="56" fill="#83c7bc" font-size="9" font-family="monospace" letter-spacing="1.3">SESSION RECORDS</text>
+</svg>

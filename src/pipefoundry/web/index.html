@@ -3,12 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#101214" />
+    <meta name="theme-color" content="#171a18" />
     <meta
       name="description"
-      content="A deliberate path from typed pipeline configuration to validated deployment artifacts. Inspect real GitHub evidence with PipeFoundry."
+      content="__DESCRIPTION__"
     />
     <title>__TITLE__ · PipeFoundry</title>
+    <link rel="canonical" href="https://rohith-pipefoundry.vercel.app/workbench/__PAGE__" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='8' fill='%23121714'/%3E%3Cpath d='M9 27h8V13h14M9 23v8m22-22v8' stroke='%23a3ebd6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"
+    />
     <link rel="stylesheet" href="/workbench/assets/app.css" />
     <script src="/workbench/assets/ui.js" defer></script>
     <script src="/workbench/assets/app.js" defer></script>
@@ -92,7 +97,7 @@
           <a href="/">Workspace</a><span>/</span><strong>__TITLE__</strong>
         </div>
         <div class="top-actions">
-          <button class="command-trigger" id="command-trigger">
+          <button class="command-trigger" id="command-trigger" aria-label="Search commands and pages">
             <span data-icon="search"></span><span>Search commands, pages…</span
             ><kbd>Ctrl K</kbd></button
           ><a
@@ -106,14 +111,25 @@
           ></a>
         </div>
       </header>
-      <main id="main">
-        <div class="page-heading">
-          <div>
-            <h1>__TITLE__</h1>
-            <p id="description"></p>
+      <main id="main" tabindex="-1">
+        <section class="page-heading art-mast" aria-labelledby="page-title">
+          <div class="mast-copy">
+            <h1 id="page-title">__HEADING__</h1>
+            <p id="description">__DESCRIPTION__</p>
+            <div id="page-actions" class="mast-actions">__ACTIONS__</div>
           </div>
-          <div id="page-actions"></div>
-        </div>
+          <figure class="mast-plate">
+            <img
+              src="/workbench/art/__ART__.svg"
+              alt=""
+              width="760"
+              height="340"
+              decoding="async"
+              fetchpriority="high"
+            />
+            <figcaption>__ART_TITLE__</figcaption>
+          </figure>
+        </section>
         <div id="journey"></div>
         <form id="repository-form" class="repo-bar">
           <span data-icon="repo"></span
@@ -124,14 +140,16 @@
             value="9059Rohith/pipefoundry"
             placeholder="owner/repository"
             required
-            pattern="[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+"
+            pattern="[A-Za-z0-9_.\-]+\/[A-Za-z0-9_.\-]+"
             maxlength="201"
           /><button type="submit">
             Inspect repository<span data-icon="arrow"></span></button
           ><span id="source-status">Public GitHub API</span>
         </form>
+        __CHAPTERS__
         <div id="notice" role="status" aria-live="polite"></div>
         <div id="content"><div class="loading">Loading workspace…</div></div>
+        <noscript><p class="notice">Enable JavaScript to use the editor and inspection tools.</p></noscript>
       </main>
       <footer>
         <span

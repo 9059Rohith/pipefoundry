@@ -16,6 +16,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import Field, ValidationError
 
+from pipefoundry.blueprints import ARTWORK, PAGE_ARTWORK, SECTION_ARTWORK
 from pipefoundry.github_cache import read_cached_evidence
 from pipefoundry.manifest_review import ReviewRequest, review
 from pipefoundry.models import Pipeline, StrictModel
@@ -48,6 +49,35 @@ PAGES = {
     "integrations": "Integrations",
     "agent": "Foundry agent",
 }
+DESCRIPTIONS = {
+    "overview": "Define a typed pipeline, validate the workload, and keep the evidence for review.",
+    "repository": "The repository, dependencies and signals behind your pipeline.",
+    "workflows": "Inspect the automation defined in your public GitHub repository.",
+    "runs": "Real workflow executions, read directly from GitHub Actions.",
+    "run": "Inspect the steps, outcomes and timestamps for a workflow run.",
+    "releases": "Published versions and downloadable assets from your repository.",
+    "commits": "Trace changes to their authors, commits and source.",
+    "editor": "Compose typed configuration. Validate before execution.",
+    "validation": "Check your draft against the same schema used by the runtime.",
+    "manifests": "Render a concrete Kubernetes bundle from validated configuration.",
+    "review": "Inspect the rendered workload. Understand the change. Keep the evidence.",
+    "plans": "Compare your draft with recorded deployment state, without executing.",
+    "policy": "Inspect the execution boundaries built into every rendered workload.",
+    "audit": "A local record of the actions you take in this browser session.",
+    "integrations": "Know what is connected, what is available and what needs credentials.",
+    "agent": "Ask about this public repository and inspect the source evidence.",
+}
+OVERVIEW_ACTIONS = """
+    <a class="button primary" href="/workbench/editor">
+      Build a release <span data-icon="arrow"></span>
+    </a>
+    <a class="button" href="#build-sequence">Explore the workbench</a>
+"""
+CHAPTERS = (
+    ("Configure", "Compose a typed source, transform and destination.", "/workbench/editor"),
+    ("Validate", "Check the schema, schedule and resource limits.", "/workbench/validation"),
+    ("Review", "Compare the manifest and inspect release evidence.", "/workbench/review"),
+)
 CSP = (
     "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; "
     "img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
@@ -421,6 +451,17 @@ def router(authorize):
     def asset(asset: Literal["app.js", "app.css", "ui.js"]):
         return FileResponse(STATIC / asset)
 
+    @routes.get("/workbench/art/{asset}")
+    @routes.head("/workbench/art/{asset}")
+    def artwork(asset: str):
+        if asset not in ARTWORK:
+            raise HTTPException(404, "Artwork not found")
+        return FileResponse(
+            STATIC / "art" / asset,
+            media_type="image/svg+xml",
+            headers={"Content-Security-Policy": "default-src 'none'; sandbox"},
+        )
+
     @routes.get("/workbench/api/github")
     def inspect(
         repo: str = Query(max_length=201),
@@ -499,8 +540,36 @@ def router(authorize):
         if page not in PAGES:
             raise HTTPException(404, "Workbench page not found")
         html = (STATIC / "index.html").read_text(encoding="utf-8")
+        artwork_name, artwork_title = PAGE_ARTWORK[page]
+        overview = page == "overview"
+        chapters = ""
+        if overview:
+            links = "".join(
+                f'<a class="chapter" href="{url}">'
+                f'<img src="/workbench/art/{name}.svg" alt="" width="760" height="340" '
+                'loading="lazy" decoding="async" />'
+                f'<div class="chapter-copy"><span class="chapter-number">0{number}</span>'
+                f"<div><h3>{title}</h3><p>{description}</p></div>"
+                '<span data-icon="arrow"></span></div></a>'
+                for number, ((name, _), (title, description, url)) in enumerate(
+                    zip(SECTION_ARTWORK["overview"], CHAPTERS, strict=True), 1
+                )
+            )
+            chapters = (
+                '<section id="build-sequence" class="build-sequence" '
+                'aria-labelledby="build-title"><header><h2 id="build-title">Build sequence</h2>'
+                "<p>Move from a typed draft to reviewable evidence.</p></header>"
+                f'<div class="chapter-grid">{links}</div></section>'
+            )
         return HTMLResponse(
-            html.replace("__PAGE__", page).replace("__TITLE__", PAGES[page]),
+            html.replace("__PAGE__", page)
+            .replace("__TITLE__", PAGES[page])
+            .replace("__HEADING__", "Build the release." if overview else PAGES[page])
+            .replace("__DESCRIPTION__", DESCRIPTIONS[page])
+            .replace("__ART__", artwork_name)
+            .replace("__ART_TITLE__", artwork_title)
+            .replace("__ACTIONS__", OVERVIEW_ACTIONS if overview else "")
+            .replace("__CHAPTERS__", chapters),
             headers={"Content-Security-Policy": CSP},
         )
 

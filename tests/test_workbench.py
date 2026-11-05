@@ -1,9 +1,11 @@
+import hashlib
 import json
 
 import httpx
 import pytest
 from fastapi.testclient import TestClient
 
+from pipefoundry.blueprints import ARTWORK, PAGE_ARTWORK, SECTION_ARTWORK
 from pipefoundry.workbench import PAGES, AgentRequest, github, run_agent
 
 
@@ -180,10 +182,30 @@ def test_every_workbench_route_is_public_and_has_security_headers(client):
         assert response.status_code == 200
         assert f'data-page="{page}"' in response.text
         assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+        assert f"/workbench/art/{PAGE_ARTWORK[page][0]}.svg" in response.text
     assert client.get("/").status_code == 200
     assert client.get("/workbench/assets/app.css").status_code == 200
     assert client.get("/workbench/assets/app.js").status_code == 200
     assert client.get("/workbench/assets/ui.js").status_code == 200
+
+
+def test_public_blueprints_are_distinct_bounded_and_cannot_expose_other_files(client):
+    artwork_hashes = set()
+    for asset in ARTWORK:
+        response = client.get(f"/workbench/art/{asset}")
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "image/svg+xml"
+        assert "sandbox" in response.headers["content-security-policy"]
+        assert response.headers["cache-control"] == "public, max-age=86400"
+        assert len(response.content) < 16000
+        artwork_hashes.add(hashlib.sha256(response.content).hexdigest())
+    assert len(artwork_hashes) == len(ARTWORK) >= 20
+    markup = client.get("/workbench/overview").text
+    for name, _ in SECTION_ARTWORK["overview"]:
+        assert f"/workbench/art/{name}.svg" in markup
+    assert client.get("/workbench/art/app.js").status_code == 401
+    assert client.get("/workbench/art/%2e%2e%2fapi.py").status_code == 401
+    assert client.post("/workbench/art/pipe-manifold.svg").status_code == 401
 
 
 def test_gemini_roundtrips_original_tool_signatures_and_evidence(monkeypatch, client):

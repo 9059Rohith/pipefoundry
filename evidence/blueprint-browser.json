@@ -1,0 +1,1163 @@
+{
+  "base": "http://127.0.0.1:8125",
+  "assets": [
+    "/workbench/art/artifact-rack.svg",
+    "/workbench/art/automation-junction.svg",
+    "/workbench/art/branch-engraving.svg",
+    "/workbench/art/bundle-seal.svg",
+    "/workbench/art/citation-lattice.svg",
+    "/workbench/art/configuration-die.svg",
+    "/workbench/art/connector-board.svg",
+    "/workbench/art/evidence-chain.svg",
+    "/workbench/art/evidence-receiver.svg",
+    "/workbench/art/execution-raceway.svg",
+    "/workbench/art/exploded-bundle.svg",
+    "/workbench/art/inspection-optics.svg",
+    "/workbench/art/ledger-strips.svg",
+    "/workbench/art/perimeter-mesh.svg",
+    "/workbench/art/pipe-manifold.svg",
+    "/workbench/art/revision-comparator.svg",
+    "/workbench/art/rollback-rail.svg",
+    "/workbench/art/run-oscillograph.svg",
+    "/workbench/art/schema-gate.svg",
+    "/workbench/art/sealed-boundary.svg",
+    "/workbench/art/source-inlet.svg",
+    "/workbench/art/source-stack.svg",
+    "/workbench/art/test-bench.svg",
+    "/workbench/art/transform-cutaway.svg"
+  ],
+  "layout": [
+    {
+      "page": "overview",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        159
+      ]
+    },
+    {
+      "page": "overview",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        194
+      ]
+    },
+    {
+      "page": "overview",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        267,
+        341
+      ]
+    },
+    {
+      "page": "overview",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        406,
+        370
+      ]
+    },
+    {
+      "page": "overview",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        526,
+        348
+      ]
+    },
+    {
+      "page": "overview",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        731,
+        413
+      ]
+    },
+    {
+      "page": "overview",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        866,
+        413
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "repository",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "workflows",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "runs",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "run",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "run",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "run",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "run",
+      "width": 1024,
+      "dimensions": [
+        1024,
+        1024,
+        334,
+        155
+      ]
+    },
+    {
+      "page": "run",
+      "width": 1280,
+      "dimensions": [
+        1280,
+        1280,
+        431,
+        155
+      ]
+    },
+    {
+      "page": "run",
+      "width": 1672,
+      "dimensions": [
+        1672,
+        1672,
+        597,
+        155
+      ]
+    },
+    {
+      "page": "run",
+      "width": 1920,
+      "dimensions": [
+        1920,
+        1920,
+        706,
+        155
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 768,
+      "dimensions": [
+        768,
+        768,
+        222,
+        155
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 1024,
+      "dimensions": [
+        1024,
+        1024,
+        334,
+        155
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 1280,
+      "dimensions": [
+        1280,
+        1280,
+        431,
+        155
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 1672,
+      "dimensions": [
+        1672,
+        1672,
+        597,
+        155
+      ]
+    },
+    {
+      "page": "releases",
+      "width": 1920,
+      "dimensions": [
+        1920,
+        1920,
+        706,
+        155
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "commits",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "editor",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 1024,
+      "dimensions": [
+        1024,
+        1024,
+        334,
+        155
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 1280,
+      "dimensions": [
+        1280,
+        1280,
+        431,
+        155
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 1672,
+      "dimensions": [
+        1672,
+        1672,
+        597,
+        155
+      ]
+    },
+    {
+      "page": "validation",
+      "width": 1920,
+      "dimensions": [
+        1920,
+        1920,
+        706,
+        155
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "manifests",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "review",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "review",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "review",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        208
+      ]
+    },
+    {
+      "page": "review",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        205
+      ]
+    },
+    {
+      "page": "review",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        228
+      ]
+    },
+    {
+      "page": "review",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        212
+      ]
+    },
+    {
+      "page": "review",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        212
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "plans",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "policy",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "audit",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "integrations",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 320,
+      "dimensions": [
+        305,
+        305,
+        269,
+        103
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 390,
+      "dimensions": [
+        375,
+        375,
+        339,
+        103
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 768,
+      "dimensions": [
+        753,
+        753,
+        215,
+        155
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 1024,
+      "dimensions": [
+        1009,
+        1009,
+        328,
+        155
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 1280,
+      "dimensions": [
+        1265,
+        1265,
+        424,
+        155
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 1672,
+      "dimensions": [
+        1657,
+        1657,
+        590,
+        155
+      ]
+    },
+    {
+      "page": "agent",
+      "width": 1920,
+      "dimensions": [
+        1905,
+        1905,
+        699,
+        155
+      ]
+    }
+  ],
+  "motion": {
+    "before": "matrix(0, 0, 0, 1, 0, 0)",
+    "after": "matrix(0.477164, 0, 0, 1, 0, 0)",
+    "reduced": [
+      "none",
+      "none",
+      "none"
+    ]
+  },
+  "flow": "editor validation → actual CronJob manifest → release review and pinned execution proof",
+  "errors": [],
+  "failures": []
+}

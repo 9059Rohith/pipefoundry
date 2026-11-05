@@ -24,30 +24,6 @@ const fmt = (v) =>
     : "—";
 const status = (s) =>
   `<span class="status ${["success", "completed", "active", "configured"].includes(s) ? "good" : ["failure", "timed_out", "cancelled", "unavailable"].includes(s) ? "bad" : "muted"}">${esc(s || "unknown")}</span>`;
-const descriptions = {
-  overview: "Build with intent. Inspect the evidence before your next release.",
-  repository: "The repository, dependencies and signals behind your pipeline.",
-  workflows: "Inspect the automation defined in your public GitHub repository.",
-  runs: "Real workflow executions, read directly from GitHub Actions.",
-  run: "Inspect the steps, outcomes and timestamps for a workflow run.",
-  releases: "Published versions and downloadable assets from your repository.",
-  commits: "Trace changes to their authors, commits and source.",
-  editor: "Compose typed configuration. Validate before execution.",
-  validation: "Check your draft against the same schema used by the runtime.",
-  manifests:
-    "Render a concrete Kubernetes bundle from validated configuration.",
-  review: "Inspect the rendered workload. Understand the change. Keep the evidence.",
-  plans:
-    "Compare your draft with recorded deployment state, without executing.",
-  policy:
-    "Inspect the execution boundaries built into every rendered workload.",
-  audit: "A local record of the actions you take in this browser session.",
-  integrations:
-    "Know what is connected, what is available and what needs credentials.",
-  agent:
-    "Ask about this public repository. Inspect the evidence. No sign-in required.",
-};
-$("#description").textContent = descriptions[page] || "";
 document
   .querySelector(`[data-nav="${page === "run" ? "runs" : page}"]`)
   ?.classList.add("active");
@@ -134,6 +110,9 @@ async function inspect(view, extra = "") {
     );
   audit("Repository inspected", `${repo} · ${view}`);
   return result;
+}
+function sectionArt(name) {
+  return `<div class="section-plate"><img src="/workbench/art/${name}.svg" alt="" width="760" height="340" loading="lazy" decoding="async"></div>`;
 }
 function panel(title, body, subtitle = "", action = "") {
   return `<section class="panel"><div class="panel-head"><div><h2>${esc(title)}</h2>${subtitle ? `<p>${esc(subtitle)}</p>` : ""}</div>${action}</div>${body}</section>`;
@@ -226,8 +205,6 @@ async function overview() {
     workflows.status === "fulfilled"
       ? workflows.value.data.workflows || []
       : [];
-  $("#page-actions").innerHTML =
-    `<a class="button primary" href="/workbench/editor">${icon("plus")} New pipeline</a>`;
   return `<section class="repository-summary"><div><div class="summary-identity">${icon("repo")}<h2>${esc(data.full_name)}</h2></div><p>${esc(data.description || "Explore the repository and the evidence behind its workflows.")}</p></div><div class="summary-context"><span>${icon("workflow")} ${esc(data.default_branch)}</span><span>${esc(data.language || "Language not specified")}</span>${link(data.html_url, "Open source")}</div></section><div class="split">${panel("Recent executions", runs.status === "rejected" ? empty("Executions unavailable", runs.reason.message) : executions.length ? table(["Workflow / execution", "Outcome", "Branch", "Started", "Trigger"], runRows(executions.slice(0, 6))) : empty("No workflow executions", "GitHub returned no runs for the selected repository."), "Observed GitHub Actions history · outcomes are not simulated", '<a href="/workbench/runs">All executions ' + icon("arrow") + "</a>")}${panel("Build a pipeline", `<div class="panel-body steps"><a class="step" href="/workbench/editor"><div><h3>Configure</h3><p>Compose a typed source, transform and destination.</p></div></a><a class="step" href="/workbench/validation"><div><h3>Validate</h3><p>Check schedule, resources and connector compatibility.</p></div></a><a class="step" href="/workbench/manifests"><div><h3>Inspect the artifact</h3><p>Copy or download the rendered Kubernetes bundle.</p></div></a><a class="step" href="/workbench/plans"><div><h3>Preview a plan</h3><p>Compare recorded state through the protected control plane.</p></div></a></div>`, "Configuration is a draft until the runtime validates it.")}</div><dl class="metrics">${metric("Workflow definitions", workflows.status === "fulfilled" ? definitions.length : "Unavailable", "Up to 50 definitions")}${metric("Recent executions", runs.status === "fulfilled" ? executions.length : "Unavailable", "Latest 30 returned runs")}${metric("Open issues", data.open_issues_count, "Repository observation")}${metric("Last push", new Date(data.pushed_at).toLocaleDateString(), "See the source observation time", true)}</dl><div class="split equal">${panel(
     "Repository details",
     `<div class="panel-body">${facts([
@@ -569,7 +546,7 @@ function editor() {
     };
     paint(false);
   }, 0);
-  return `<div class="editor-layout"><section class="panel"><div class="editor-toolbar"><div class="editor-file">${icon("file")}pipeline.json <span class="draft-label">Draft</span></div><button id="format-json">Format JSON</button><button id="save-draft">Save draft</button><button id="editor-validate" class="primary">Validate configuration</button></div><div class="code-editor"><div id="line-numbers" class="line-numbers" aria-hidden="true"></div><div class="code-area"><pre id="syntax-view" class="syntax-view" aria-hidden="true"></pre><textarea id="config-editor" class="code-input" aria-label="Pipeline configuration JSON" spellcheck="false" wrap="off" autocomplete="off" autocapitalize="off"></textarea></div></div><div class="editor-status"><span>JSON · UTF-8</span><span id="editor-state">Session draft</span><span>Not executed</span></div></section><section class="panel inspector"><h2>Configuration</h2><div id="pipeline-flow" class="flow"></div><div id="draft-summary"></div><div class="inspector-result"><h3>Validation</h3><div id="inspector-validation">${empty("Not validated yet", "Run validation to inspect this draft.")}</div></div><div class="inspector-actions"><button id="download-draft">${icon("download")} Export JSON</button><button id="reset-draft">${icon("file")} Load starter</button></div></section></div><section class="panel editor-results"><div class="panel-head"><h2>Validation results</h2><a href="/workbench/validation">Open validation ${icon("arrow")}</a></div><div id="inline-results">${empty("Ready when you are", "Results appear after a real server validation.")}</div></section>`;
+  return `<div class="editor-layout"><section class="panel"><div class="editor-toolbar"><div class="editor-file">${icon("file")}pipeline.json <span class="draft-label">Draft</span></div><button id="format-json">Format JSON</button><button id="save-draft">Save draft</button><button id="editor-validate" class="primary">Validate configuration</button></div><div class="code-editor"><div id="line-numbers" class="line-numbers" aria-hidden="true"></div><div class="code-area"><pre id="syntax-view" class="syntax-view" aria-hidden="true"></pre><textarea id="config-editor" class="code-input" aria-label="Pipeline configuration JSON" spellcheck="false" wrap="off" autocomplete="off" autocapitalize="off"></textarea></div></div><div class="editor-status"><span>JSON · UTF-8</span><span id="editor-state">Session draft</span><span>Not executed</span></div></section><section class="panel inspector"><h2>Configuration</h2><div id="pipeline-flow" class="flow"></div><div id="draft-summary"></div>${sectionArt("transform-cutaway")}<div class="inspector-result"><h3>Validation</h3><div id="inspector-validation">${empty("Not validated yet", "Run validation to inspect this draft.")}</div></div><div class="inspector-actions"><button id="download-draft">${icon("download")} Export JSON</button><button id="reset-draft">${icon("file")} Load starter</button></div></section></div><section class="panel editor-results"><div class="panel-head"><h2>Validation results</h2><a href="/workbench/validation">Open validation ${icon("arrow")}</a></div><div id="inline-results">${empty("Ready when you are", "Results appear after a real server validation.")}</div></section>`;
 }
 async function validation() {
   const draft = getDraft();
@@ -618,7 +595,7 @@ async function manifests() {
   }, 0);
   return panel(
     "Kubernetes bundle",
-    `<div class="panel-body"><div class="toolbar"><span class="editor-file">${icon("file")}${esc(result.config.name)}-bundle.yaml</span><button id="copy-manifest">${icon("copy")} Copy YAML</button><button id="download-manifest" class="primary">${icon("download")} Download YAML</button><a class="button" href="/workbench/plans">Preview plan ${icon("arrow")}</a></div><div class="result-banner good">${icon("check")} Rendered from validated configuration · not deployed</div><pre class="terminal">${esc(result.manifest)}</pre><p class="mono wrap muted">Configuration SHA-256<br>${esc(result.sha256)}</p><details><summary>Validated configuration</summary><pre class="terminal">${esc(JSON.stringify(result.config, null, 2))}</pre></details></div>`,
+    `<div class="panel-body"><div class="toolbar"><span class="editor-file">${icon("file")}${esc(result.config.name)}-bundle.yaml</span><button id="copy-manifest">${icon("copy")} Copy YAML</button><button id="download-manifest" class="primary">${icon("download")} Download YAML</button><a class="button" href="/workbench/plans">Preview plan ${icon("arrow")}</a></div>${sectionArt("bundle-seal")}<div class="result-banner good">${icon("check")} Rendered from validated configuration · not deployed</div><pre class="terminal">${esc(result.manifest)}</pre><p class="mono wrap muted">Configuration SHA-256<br>${esc(result.sha256)}</p><details><summary>Validated configuration</summary><pre class="terminal">${esc(JSON.stringify(result.config, null, 2))}</pre></details></div>`,
     "The same object renderer used by the control plane. Copy or download the real artifact.",
   );
 }
@@ -697,7 +674,7 @@ function review() {
     });
     runReview();
   }, 0);
-  return `<section class="review-hero"><div><span class="review-eyebrow">MANIFEST SECURITY AUDITOR / 01</span><h2>A release deserves<br><em>a closer look.</em></h2><p>Follow the actual fields from your typed draft to the Kubernetes bundle. Catch risky changes before handing the artifact to your operator.</p><div class="review-scope"><span>${icon("shield")} 12 selected controls</span><span>${icon("code")} Structured inspection</span><span>${icon("file")} Verifiable export</span></div></div><div class="review-pipeline"><span>01 <strong>Typed configuration</strong><small>Strict fields · safe paths</small></span><i></i><span>02 <strong>Rendered workload</strong><small>ConfigMap + CronJob</small></span><i></i><span>03 <strong>Release evidence</strong><small>Checks · diff · SHA-256</small></span></div></section><div class="review-boundary">${icon("info")}<span><strong>Static review. Cluster validation not performed.</strong> Selected project controls only. Admission policies, RBAC, quota and runtime still need your cluster’s validation. ${link("https://kubernetes.io/docs/reference/using-api/api-concepts/#dry-run", "About server dry run")}</span></div><aside id="local-kubernetes-proof" class="review-boundary" aria-label="Local Kubernetes execution proof">${icon("check")}<span><strong>Local Kubernetes execution proof · November 4, 2026.</strong> Guarded create and update ran Jobs at revisions 1 and 2. Revision 3 restored the original configuration and ran a third Job. Each wrote 12 verified NYC taxi fares to SQLite. ${link("https://github.com/9059Rohith/pipefoundry/blob/576db9714cf252999af269b197768b9054ac461a/docs/kubernetes-release-proof.md", "View run evidence")}</span></aside><div class="review-workspace"><aside class="panel review-controls"><div class="panel-head"><div><span class="review-eyebrow">COMPARE & EXPORT</span><h2>Your review desk</h2></div></div><div class="panel-body"><h3>Candidate</h3><p>The saved draft from your pipeline editor.</p><a class="review-edit" href="/workbench/editor">Open pipeline editor ${icon("arrow")}</a><hr><h3>Baseline</h3><p id="review-baseline-state">No baseline selected</p><button id="review-pin" disabled>${icon("save")} Capture candidate as baseline</button><p class="muted">Capture first, edit your candidate, then return here to compare. Both versions are validated on the server.</p><details><summary>Paste baseline configuration</summary><label class="sr-only" for="review-baseline-json">Baseline pipeline JSON</label><textarea id="review-baseline-json" rows="10" spellcheck="false" placeholder='{"name":"orders-hourly","schedule":"0 * * * *"}'></textarea><small>Typed JSON only · no arbitrary YAML</small><button id="review-clear">Clear baseline</button></details><button class="primary" id="review-run">Run release review</button><hr><h3>Keep the evidence</h3><button id="review-export" disabled>${icon("download")} Export review JSON</button><button id="review-yaml" disabled>${icon("file")} Download reviewed YAML</button><p class="muted">A fingerprint proves content consistency. It is not a signature or a deployment approval.</p></div></aside><div id="review-results" aria-live="polite"></div></div>`;
+  return `<section class="review-hero"><div><span class="review-eyebrow">MANIFEST SECURITY AUDITOR / 01</span><h2>A release deserves<br><em>a closer look.</em></h2><p>Follow the actual fields from your typed draft to the Kubernetes bundle. Catch risky changes before handing the artifact to your operator.</p><div class="review-scope"><span>${icon("shield")} 12 selected controls</span><span>${icon("code")} Structured inspection</span><span>${icon("file")} Verifiable export</span></div></div><div class="review-pipeline"><span>01 <strong>Typed configuration</strong><small>Strict fields · safe paths</small></span><i></i><span>02 <strong>Rendered workload</strong><small>ConfigMap + CronJob</small></span><i></i><span>03 <strong>Release evidence</strong><small>Checks · diff · SHA-256</small></span></div></section><div class="review-boundary">${icon("info")}<span><strong>Static review. Cluster validation not performed.</strong> Selected project controls only. Admission policies, RBAC, quota and runtime still need your cluster’s validation. <a href="https://kubernetes.io/docs/reference/using-api/api-concepts/#dry-run" target="_blank" rel="noopener noreferrer">About server dry run ${icon("external")}</a></span></div><aside id="local-kubernetes-proof" class="review-boundary" aria-label="Local Kubernetes execution proof">${icon("check")}<span><strong>Local Kubernetes execution proof · November 4, 2026.</strong> Guarded create and update ran Jobs at revisions 1 and 2. Revision 3 restored the original configuration and ran a third Job. Each wrote 12 verified NYC taxi fares to SQLite. ${link("https://github.com/9059Rohith/pipefoundry/blob/576db9714cf252999af269b197768b9054ac461a/docs/kubernetes-release-proof.md", "View run evidence")}</span>${sectionArt("rollback-rail")}</aside><div class="review-workspace"><aside class="panel review-controls"><div class="panel-head"><div><span class="review-eyebrow">COMPARE & EXPORT</span><h2>Your review desk</h2></div></div><div class="panel-body"><h3>Candidate</h3><p>The saved draft from your pipeline editor.</p><a class="review-edit" href="/workbench/editor">Open pipeline editor ${icon("arrow")}</a><hr><h3>Baseline</h3><p id="review-baseline-state">No baseline selected</p><button id="review-pin" disabled>${icon("save")} Capture candidate as baseline</button><p class="muted">Capture first, edit your candidate, then return here to compare. Both versions are validated on the server.</p><details><summary>Paste baseline configuration</summary><label class="sr-only" for="review-baseline-json">Baseline pipeline JSON</label><textarea id="review-baseline-json" rows="10" spellcheck="false" placeholder='{"name":"orders-hourly","schedule":"0 * * * *"}'></textarea><small>Typed JSON only · no arbitrary YAML</small><button id="review-clear">Clear baseline</button></details><button class="primary" id="review-run">Run release review</button><hr><h3>Keep the evidence</h3><button id="review-export" disabled>${icon("download")} Export review JSON</button><button id="review-yaml" disabled>${icon("file")} Download reviewed YAML</button><p class="muted">A fingerprint proves content consistency. It is not a signature or a deployment approval.</p></div></aside><div id="review-results" aria-live="polite"></div></div>`;
 }
 function plans() {
   setTimeout(() => {
@@ -767,7 +744,7 @@ async function policy() {
   return (
     panel(
       "Generated workload controls",
-      `<div class="result-banner good">✓ Inspected the rendered manifest for ${esc(result.config.name)}</div><ul class="checks">${rules.map(([a, b]) => `<li><span>✓</span><div>${esc(a)}<small class="mono">${esc(b)}</small></div></li>`).join("")}</ul>`,
+      `${sectionArt("perimeter-mesh")}<div class="result-banner good">✓ Inspected the rendered manifest for ${esc(result.config.name)}</div><ul class="checks">${rules.map(([a, b]) => `<li><span>✓</span><div>${esc(a)}<small class="mono">${esc(b)}</small></div></li>`).join("")}</ul>`,
       "These controls describe the generated configuration, not a live cluster audit.",
     ) +
     panel(
@@ -906,7 +883,7 @@ async function agent() {
       ],
     )}<p class="note">No sign-in required. Every accepted attempt uses an allowance. Dated cached evidence may be used. No deployment permissions or paid fallback.</p></div></div>`,
     "Real Gemini analysis, with an inspectable source trail.",
-  )}${panel("Analysis", `<div id="agent-output">${empty("Evidence comes first", "Ask a question to see a real model answer and the source records it inspected.")}</div>`, "Answers appear only after an actual provider request.")}</div><p class="agent-warning">${icon("shield")}Read-only tools. Fixed repository scope. Free-tier and shared demo limits apply.</p>`;
+  )}${panel("Analysis", `${sectionArt("citation-lattice")}<div id="agent-output">${empty("Evidence comes first", "Ask a question to see a real model answer and the source records it inspected.")}</div>`, "Answers appear only after an actual provider request.")}</div><p class="agent-warning">${icon("shield")}Read-only tools. Fixed repository scope. Free-tier and shared demo limits apply.</p>`;
 }
 function renderIcons(root) {
   root.querySelectorAll("[data-icon]").forEach((element) => {
