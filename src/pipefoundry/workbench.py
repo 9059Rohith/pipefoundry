@@ -2,10 +2,14 @@
 
 import hashlib
 import json
+import logging
+import math
 import os
 import re
 import threading
 import time
+from dataclasses import dataclass, field
+from email.utils import parsedate_to_datetime
 from pathlib import Path
 from typing import Literal
 
@@ -91,6 +95,7 @@ VIEWS = {
 }
 _cache = {}
 _lock = threading.Lock()
+_logger = logging.getLogger(__name__)
 
 
 def github(repo: str, view: str, run_id: int | None = None):
@@ -160,31 +165,90 @@ def ai_settings():
     return provider, os.getenv(key_name), os.getenv("PIPEFOUNDRY_AI_MODEL", default_model)
 
 
-def _gemini_request(client, *, key, payload):
-    for attempt in range(2):
-        response = client.post(
-            "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
-            headers={"Authorization": f"Bearer {key}"},
-            json=payload,
-        )
-        if response.status_code != 429:
-            break
+@dataclass
+class _GeminiBudget:
+    deadline: float = field(default_factory=lambda: time.monotonic() + 60)
+    requests: int = 0
+    retries: int = 0
+    quota_retries: int = 0
+
+
+def _gemini_unavailable():
+    return HTTPException(
+        503,
+        "Gemini analysis is temporarily unavailable. Retry later; no paid fallback was used.",
+        headers={"Retry-After": "60"},
+    )
+
+
+def _retry_after(value):
+    if value is None:
+        return None
+    try:
+        seconds = float(value)
+    except ValueError:
         try:
-            retry_after = float(response.headers.get("retry-after", "1"))
-        except ValueError:
-            retry_after = 1
-        if attempt == 0 and 0 <= retry_after <= 2:
-            time.sleep(retry_after)
-            continue
-        raise HTTPException(
-            429,
-            "Gemini free-tier quota is temporarily exhausted. Retry later; "
-            "no paid fallback was used.",
-            headers={"Retry-After": "60"},
-        )
-    if response.status_code != 200:
-        raise HTTPException(502, "Gemini rejected the request. Check server configuration.")
-    return response.json()
+            parsed = parsedate_to_datetime(value)
+            if parsed.tzinfo is None:
+                return None
+            seconds = max(0, parsed.timestamp() - time.time())
+        except (ValueError, TypeError, OverflowError):
+            return None
+    return seconds if math.isfinite(seconds) and seconds >= 0 else None
+
+
+def _gemini_request(client, *, key, payload, budget):
+    while True:
+        remaining = budget.deadline - time.monotonic()
+        if remaining <= 0 or budget.requests >= 6:
+            raise _gemini_unavailable()
+        budget.requests += 1
+        retry_header, retry_after, status = None, None, None
+        try:
+            response = client.post(
+                "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions",
+                headers={"Authorization": f"Bearer {key}"},
+                json=payload,
+                timeout=min(25, remaining),
+            )
+        except httpx.TransportError as exc:
+            # Provider responses, exception messages and request data may contain secrets.
+            _logger.warning("Gemini transport failure type=%s", type(exc).__name__)
+            failure = _gemini_unavailable()
+        else:
+            status = response.status_code
+            if status == 200:
+                if time.monotonic() >= budget.deadline:
+                    raise _gemini_unavailable()
+                return response.json()
+            _logger.warning("Gemini provider failure status=%s", status)
+            if status not in {429, 500, 502, 503, 504}:
+                raise HTTPException(502, "Gemini rejected the request. Check server configuration.")
+            failure = _gemini_unavailable()
+            if status == 429:
+                failure = HTTPException(
+                    429,
+                    "Gemini free-tier quota is temporarily exhausted. Retry later; "
+                    "no paid fallback was used.",
+                    headers={"Retry-After": "60"},
+                )
+            retry_header = response.headers.get("retry-after")
+            retry_after = _retry_after(retry_header)
+            if retry_after is not None:
+                failure.headers = {"Retry-After": retry_header}
+        delay = max(1 + budget.retries, retry_after or 0)
+        if (
+            budget.retries >= 2
+            or budget.requests >= 6
+            or (status == 429 and budget.quota_retries >= 1)
+            or delay > 2
+            or delay >= budget.deadline - time.monotonic()
+        ):
+            raise failure
+        budget.retries += 1
+        if status == 429:
+            budget.quota_retries += 1
+        time.sleep(delay)
 
 
 def agent_evidence(evidence):
@@ -228,6 +292,7 @@ def dated_answer(answer, trace):
 def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tokens=1200):
     if not REPO.fullmatch(body.repo):
         raise HTTPException(422, "Use a GitHub owner/repository name")
+    budget = _GeminiBudget()
     messages = [
         {
             "role": "system",
@@ -265,6 +330,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tok
                 result = _gemini_request(
                     client,
                     key=key,
+                    budget=budget,
                     payload={
                         "model": model,
                         "messages": messages,
