@@ -258,6 +258,39 @@ def test_gemini_roundtrips_original_tool_signatures_and_evidence(monkeypatch, cl
     assert "unit-test-only" not in json.dumps(state)
 
 
+def test_large_agent_evidence_keeps_valid_json_and_freshness_metadata():
+    from pipefoundry.workbench import agent_evidence, dated_answer
+
+    evidence = {
+        "data": {
+            "total_count": 30,
+            "workflow_runs": [{"id": i, "name": "x" * 2000} for i in range(30)],
+        },
+        "source": "https://api.github.com/repos/a/b/actions/runs?per_page=30",
+        "observed_at": "2026-11-05T07:09:00Z",
+        "validated_at": "2026-11-05T07:09:00Z",
+        "stale": True,
+        "cache_status": "stale-cooldown",
+    }
+    encoded = agent_evidence(evidence)
+    decoded = json.loads(encoded)
+    assert len(encoded) <= 18000
+    assert decoded["source"] == evidence["source"]
+    assert decoded["observed_at"] == evidence["observed_at"]
+    assert decoded["stale"] is True
+    assert decoded["data_truncated"] is True
+    assert decoded["data"]["total_count"] == 30
+    assert (
+        decoded["data"]["workflow_runs"]
+        == evidence["data"]["workflow_runs"][: len(decoded["data"]["workflow_runs"])]
+    )
+    assert len(evidence["data"]["workflow_runs"]) == 30
+    answer = dated_answer("There are 30 recorded runs.", [evidence])
+    assert evidence["observed_at"] in answer
+    assert "fresh GitHub check" in answer
+    assert dated_answer("Current metadata.", [{"stale": False}]) == "Current metadata."
+
+
 def test_gemini_free_quota_retries_once_without_paid_fallback(monkeypatch):
     from fastapi import HTTPException
 

@@ -33,12 +33,21 @@ uncontrolled upstream request: a usable dated capture is returned, or HTTP 503.
 The hosted cache requires PIPEFOUNDRY_METADATA_DSN; local development can use
 PIPEFOUNDRY_GITHUB_CACHE_DB or in-process SQLite. Credentials remain server-side.
 
+Agent tool messages keep valid JSON and all freshness metadata within an
+18,000-character budget. Large collections are explicitly partial, retaining
+unchanged source records and reported totals. Stale answers receive a server-added
+observation-time notice, independent of whether the model repeats that warning.
+
 Verification on 2026-11-05:
 
 - Full regression run: 135 passed, four documented environment-specific skips.
 - After increasing the initial bucket from four to eight, the affected workbench
   and cache suite passed all 24 tests, including the new eight-page first-visit
   regression. The regression first failed against the smaller bucket.
+- A subsequent live AI check exposed raw-string truncation hiding metadata on large
+  run lists. The fix has a regression for valid bounded JSON, source preservation,
+  unchanged included records and a deterministic dated-answer notice.
+  All 33 cache, workbench and public-agent tests passed after that change.
 - Six JavaScript tests passed; Ruff checking/formatting, Bandit high-severity scan
   and all 31 source capture hash checks passed.
 - Native PostgreSQL proof exercises eight independent cache instances, a real

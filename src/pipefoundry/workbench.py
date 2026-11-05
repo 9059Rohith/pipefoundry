@@ -187,6 +187,44 @@ def _gemini_request(client, *, key, payload):
     return response.json()
 
 
+def agent_evidence(evidence):
+    """Bound record collections without truncating JSON or losing source metadata."""
+    data = dict(evidence["data"]) if isinstance(evidence["data"], dict) else evidence["data"]
+    payload = {key: value for key, value in evidence.items() if key != "data"}
+    payload["data"] = data
+    while len(encoded := json.dumps(payload)) > 18000:
+        payload["data_truncated"] = True
+        payload["data_scope"] = "Partial source response; omitted records/fields are not evidence."
+        if isinstance(data, list) and data:
+            data = data[: len(data) // 2]
+            payload["data"] = data
+        elif isinstance(data, dict) and data:
+            collections = [key for key, value in data.items() if isinstance(value, list) and value]
+            if collections:
+                key = max(collections, key=lambda key: len(json.dumps(data[key])))
+                data[key] = data[key][: len(data[key]) // 2]
+            else:
+                key = max(data, key=lambda key: len(json.dumps(data[key])))
+                data.pop(key)
+                payload.setdefault("omitted_fields", []).append(key)
+        else:
+            raise ValueError("Evidence metadata exceeds the agent budget")
+    return encoded
+
+
+def dated_answer(answer, trace):
+    dates = sorted({item["observed_at"] for item in trace if item.get("stale")})
+    if dates:
+        return (
+            "**Dated evidence:** A fresh GitHub check was unavailable. "
+            "The following analysis uses retained observations captured at "
+            + ", ".join(dates)
+            + ".\n\n"
+            + answer
+        )
+    return answer
+
+
 def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tokens=1200):
     if not REPO.fullmatch(body.repo):
         raise HTTPException(422, "Use a GitHub owner/repository name")
@@ -246,7 +284,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tok
                     if not isinstance(answer, str) or not answer.strip() or not trace:
                         raise HTTPException(502, "Gemini returned no grounded analysis")
                     return {
-                        "answer": answer,
+                        "answer": dated_answer(answer, trace),
                         "trace": trace,
                         "provider": "gemini",
                         "model": model,
@@ -280,7 +318,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tok
                         {
                             "role": "tool",
                             "tool_call_id": call["id"],
-                            "content": json.dumps(evidence)[:18000],
+                            "content": agent_evidence(evidence),
                         }
                     )
     except (httpx.HTTPError, ValueError, KeyError, TypeError, IndexError) as exc:
@@ -356,7 +394,7 @@ def run_agent(body: AgentRequest):
                     )
                     if not answer:
                         raise HTTPException(502, "AI provider returned no text")
-                    return {"answer": answer, "trace": trace, "model": model}
+                    return {"answer": dated_answer(answer, trace), "trace": trace, "model": model}
                 if len(calls) > 2 or len(trace) + len(calls) > 4:
                     raise HTTPException(422, "Agent stopped at its read-only tool budget")
                 for call in calls:
@@ -379,7 +417,7 @@ def run_agent(body: AgentRequest):
                         {
                             "type": "function_call_output",
                             "call_id": call["call_id"],
-                            "output": json.dumps(evidence)[:18000],
+                            "output": agent_evidence(evidence),
                         }
                     )
     except (httpx.HTTPError, ValueError, KeyError, TypeError) as exc:
