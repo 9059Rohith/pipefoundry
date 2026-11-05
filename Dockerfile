@@ -14,12 +14,30 @@ RUN --mount=type=cache,target=/root/.cache/pip /opt/venv/bin/python -m pip insta
     && mkdir /state && chown 10001:10001 /state \
     && /opt/venv/bin/python -m pip uninstall -y pip setuptools wheel
 
+FROM ${BUILDER_IMAGE} AS verify
+USER 0
+WORKDIR /verification
+COPY --from=build /opt/venv /opt/venv
+COPY requirements-ci.lock ./
+RUN --mount=type=cache,target=/root/.cache/pip python -m pip install \
+    --no-deps --target=/test-tools -r requirements-ci.lock
+COPY src/ ./src/
+COPY tests/ ./tests/
+COPY scripts/ ./scripts/
+COPY examples/ ./examples/
+COPY docs/ ./docs/
+COPY pyproject.toml Dockerfile requirements*.lock ./
+ENV PYTHONPATH=/test-tools PATH=/opt/venv/bin:/usr/bin \
+    PYTHONDONTWRITEBYTECODE=1 PIPEFOUNDRY_STATE_DIR=/tmp/build-gate
+RUN python scripts/build_gate.py --output=/verification/build-receipt.json
+
 FROM ${RUNTIME_IMAGE}
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PATH=/opt/venv/bin:/usr/bin \
     PIPEFOUNDRY_STATE_DIR=/state
 WORKDIR /app
 COPY --from=build /opt/venv /opt/venv
 COPY --from=build --chown=10001:10001 /state /state
+COPY --from=verify /verification/build-receipt.json /app/build-receipt.json
 USER 10001:10001
 EXPOSE 8080
 ENTRYPOINT []

@@ -6,7 +6,6 @@
 .vercel
 .pipefoundry
 evidence
-tests
 data
 dist
 build
@@ -14,4 +13,15 @@ build
 .env*
 **/.env*
 **/*.key
+**/*.pem
 **/*.pfx
+**/*.tfstate*
+**/*.tfplan
+**/*.tfvars*
+**/.terraform
+**/*.tar
+**/*.tar.gz
+**/*.whl
+**/*.zip
+**/*.egg-info
+results.xml

@@ -1,0 +1,15 @@
+# Build-only tools; runtime dependencies come from the installed runtime venv.
+# --no-deps avoids rebuilding runtime PyYAML on the Python 3.15 image.
+bandit==1.9.4
+httpcore2==2.16.0
+httpx2==2.16.0
+iniconfig==2.3.1
+markdown-it-py==4.2.0
+mdurl==0.1.2
+packaging==26.3
+pluggy==1.7.0
+pygments==2.21.0
+pytest==9.2.0
+rich==15.0.0
+ruff==0.17.3
+stevedore==5.9.1
