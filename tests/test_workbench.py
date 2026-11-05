@@ -303,7 +303,7 @@ def test_gemini_rejects_unsupported_tools_and_ungrounded_answers(monkeypatch):
             run_agent(AgentRequest(repo="a/b", question="Inspect repository metadata"))
 
 
-@pytest.mark.parametrize("age,expect_stale", [(30, False), (300, True)])
+@pytest.mark.parametrize("age,expect_stale", [(30, False), (900, True)])
 def test_real_cached_github_evidence_survives_rate_limits(monkeypatch, age, expect_stale):
     from datetime import UTC, datetime, timedelta
 

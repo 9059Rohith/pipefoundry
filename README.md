@@ -26,7 +26,7 @@ The public workbench has fifteen useful pages for actual GitHub repository and w
 
 **Real hosted AI verified on 2026-11-02 IST:** HTTP 200, Gemini `gemini-3.5-flash-lite`, one `inspect_github(repository)` call and an answer identifying `main` / Python with a source link. Unauthenticated AI calls still return 401. The AI change passed **77 tests**, with 23 optional integration skips; the earlier PostgreSQL/Spark/container evidence below retains its separate scope. [Hosted AI evidence](evidence/gemini-hosted-verification.json).
 
-GitHub rate limits can use genuine cached public evidence for at most 24 hours, with the original observation time and an explicit stale warning in the agent answer and trace. The default repository has an actual public metadata capture for cold starts; it is historical evidence and does not establish current repository counts. [Capture provenance](evidence/github-cache-seed.json).
+GitHub inspection uses a shared PostgreSQL cache, refresh lease, conditional requests and a provider-wide cooldown. Repository metadata, workflows, runs, releases, commits and 26 run-job responses have genuine dated cold-start captures. Evidence can remain readable for at most 24 hours after validation, with original observation times and explicit stale notices. Actual empty collections and failed runs remain visible. [Rate-limit recovery and verification](docs/github-rate-limit-recovery.md) · [Capture provenance](docs/github-evidence-capture.md).
 
 ![PipeFoundry blueprint workbench — desktop browser QA](evidence/blueprint-desktop.png)
 

@@ -1,0 +1,360 @@
+{
+  "verified_at": "2026-11-05T07:55:46.151661+00:00",
+  "passed": true,
+  "database": {
+    "engine": "native PostgreSQL",
+    "version": "18.2",
+    "isolated_disposable_cluster": true,
+    "real_restart_completed": true,
+    "cluster_stopped_and_removed": true
+  },
+  "source_bundle": "src/pipefoundry/github_repository_cache.json",
+  "source_bundle_sha256": "1cc4964b9591fb4125b9cc9def5369e78e961442ce0ff83c7a9ffdd9d13e52db",
+  "network_github_requests": 0,
+  "clock": "Virtual cache clock anchored to latest real capture + 10s; advances 601s, 601s, 121s, 31s. PostgreSQL and parallel execution use real processes/time.",
+  "seed": {
+    "separate_cache_instances": 31,
+    "real_responses": 31,
+    "upstream_calls": 0
+  },
+  "parallel": {
+    "separate_cache_instances": 8,
+    "identical_requests": 8,
+    "upstream_calls": 1,
+    "statuses": [
+      "live",
+      "stale-busy",
+      "stale-busy",
+      "stale-busy",
+      "stale-busy",
+      "stale-busy",
+      "stale-busy",
+      "stale-busy"
+    ]
+  },
+  "cooldown": {
+    "controlled_response": 429,
+    "retry_after_seconds": 120,
+    "other_view_reads": 31,
+    "extra_upstream_calls": 0,
+    "cached_views_available_after_real_restart": 31
+  },
+  "lease": {
+    "virtual_expiry_seconds": 31,
+    "old_owner_completion_fenced": true,
+    "new_owner_completed": true,
+    "late_provider_cooldown_preserved": true
+  },
+  "upstream_adapter_calls": [
+    {
+      "kind": "recorded-200-replay",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry"
+    },
+    {
+      "kind": "controlled-429",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/workflows?per_page=50",
+      "retry_after": 120
+    }
+  ],
+  "native_sql_observations": [
+    {
+      "label": "seed_inventory",
+      "sql": "SELECT count(*),count(DISTINCT request_key) FROM pf_github_cache",
+      "rows": [
+        [
+          31,
+          31
+        ]
+      ]
+    },
+    {
+      "label": "one_active_lease",
+      "sql": "SELECT count(*),count(*) FILTER (WHERE owner<>''),min(tokens) FROM pf_github_refresh",
+      "rows": [
+        [
+          1,
+          1,
+          7.0
+        ]
+      ]
+    },
+    {
+      "label": "shared_cooldown",
+      "sql": "SELECT count(*),max(cooldown_until),max(lease_until),max(tokens) FROM pf_github_refresh",
+      "rows": [
+        [
+          1,
+          1793863899.30388,
+          0.0,
+          7.0
+        ]
+      ]
+    },
+    {
+      "label": "expired_owner_fenced",
+      "sql": "SELECT owner,cooldown_until,lease_until FROM pf_github_refresh",
+      "rows": [
+        [
+          "new-owner",
+          1793863899.30388,
+          1793863961.30388
+        ]
+      ]
+    },
+    {
+      "label": "old_owner_did_not_write",
+      "sql": "SELECT checked_at FROM pf_github_cache WHERE request_key=%s",
+      "rows": [
+        [
+          1793862546.133116
+        ]
+      ]
+    },
+    {
+      "label": "late_rate_limit_preserved",
+      "sql": "SELECT owner,cooldown_until,lease_until FROM pf_github_refresh",
+      "rows": [
+        [
+          "new-owner",
+          1793864930.30388,
+          1793863961.30388
+        ]
+      ]
+    },
+    {
+      "label": "owner_released",
+      "sql": "SELECT owner,lease_until,cooldown_until FROM pf_github_refresh",
+      "rows": [
+        [
+          "",
+          0.0,
+          1793864930.30388
+        ]
+      ]
+    }
+  ],
+  "provenance": [
+    {
+      "request_key": "9059rohith/pipefoundry",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry",
+      "source_observed_at": "2026-11-05T07:09:04.669772+00:00",
+      "source_content_sha256": "60590996d552b4f03919b0559c5cdf83cf15bae57c0f81a6e6b8fc29d131a505",
+      "persisted_content_sha256": "60590996d552b4f03919b0559c5cdf83cf15bae57c0f81a6e6b8fc29d131a505"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41063740126/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41063740126/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:27.303880+00:00",
+      "source_content_sha256": "71242ed423f592eb7a2986d40651d5c16643681e3874eb2c2c7d88cf4be13b75",
+      "persisted_content_sha256": "71242ed423f592eb7a2986d40651d5c16643681e3874eb2c2c7d88cf4be13b75"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41065119501/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41065119501/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:26.523858+00:00",
+      "source_content_sha256": "80a84eae0d666a30949575bf1de88d2bb309d444db656a3972d63a7ee93bbda6",
+      "persisted_content_sha256": "80a84eae0d666a30949575bf1de88d2bb309d444db656a3972d63a7ee93bbda6"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41076232110/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41076232110/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:25.669273+00:00",
+      "source_content_sha256": "4ce6c30f8b87bc93613e300c8999a119376b979f324dd48011f46c94710b5da4",
+      "persisted_content_sha256": "4ce6c30f8b87bc93613e300c8999a119376b979f324dd48011f46c94710b5da4"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41077989600/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41077989600/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:24.844709+00:00",
+      "source_content_sha256": "f91197eb582cfa3f6bc9a5ec2454ecf8f3a9a82894aac152262cad99ec80d7e9",
+      "persisted_content_sha256": "f91197eb582cfa3f6bc9a5ec2454ecf8f3a9a82894aac152262cad99ec80d7e9"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41082195057/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41082195057/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:24.009589+00:00",
+      "source_content_sha256": "f7fee40f82b875bea0cf19197237e10fa5c36bcfd174f2dcc05ce5251c2e5efe",
+      "persisted_content_sha256": "f7fee40f82b875bea0cf19197237e10fa5c36bcfd174f2dcc05ce5251c2e5efe"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41082751012/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41082751012/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:23.219401+00:00",
+      "source_content_sha256": "e01bc7e8e2c0ffdbb6c86313f81b91ea9c2800c37f3ef72c2c4685c221b0ffdc",
+      "persisted_content_sha256": "e01bc7e8e2c0ffdbb6c86313f81b91ea9c2800c37f3ef72c2c4685c221b0ffdc"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41088531511/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41088531511/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:22.501755+00:00",
+      "source_content_sha256": "33e8a796398a2207f358dd5124a70b96d3d224e694d63cf179bc3e9cd7b7a6e7",
+      "persisted_content_sha256": "33e8a796398a2207f358dd5124a70b96d3d224e694d63cf179bc3e9cd7b7a6e7"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41335464956/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41335464956/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:21.779332+00:00",
+      "source_content_sha256": "7bf5a33c177b8b40dbdf719a16547b7a9fb46a42385fe8197845d19cd638ff5c",
+      "persisted_content_sha256": "7bf5a33c177b8b40dbdf719a16547b7a9fb46a42385fe8197845d19cd638ff5c"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41335651605/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41335651605/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:21.085421+00:00",
+      "source_content_sha256": "a331b2718c3939aa829bc6aac70736b267e36714a0e921f8200cd2d9fce55155",
+      "persisted_content_sha256": "a331b2718c3939aa829bc6aac70736b267e36714a0e921f8200cd2d9fce55155"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41336564399/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41336564399/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:20.305556+00:00",
+      "source_content_sha256": "7957aeccd4e4591a0383575832e3b19d58f34dde32f0cfaf769d36ab5590e0d7",
+      "persisted_content_sha256": "7957aeccd4e4591a0383575832e3b19d58f34dde32f0cfaf769d36ab5590e0d7"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41338055547/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41338055547/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:19.489313+00:00",
+      "source_content_sha256": "4c4e1887b7a6097d7644ee7385c013a7b5c8f5795358ce4cc716b45dec065254",
+      "persisted_content_sha256": "4c4e1887b7a6097d7644ee7385c013a7b5c8f5795358ce4cc716b45dec065254"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41338746979/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41338746979/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:18.697829+00:00",
+      "source_content_sha256": "d3039018f9aa8a6fed0e8c55b65dc5e743fe151b531c3490d8d3c183e3765b3b",
+      "persisted_content_sha256": "d3039018f9aa8a6fed0e8c55b65dc5e743fe151b531c3490d8d3c183e3765b3b"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41338878930/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41338878930/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:17.961811+00:00",
+      "source_content_sha256": "c65f891824691cc2c2121c6ede6e83e8d2392979eed26af500abe41dac24d6ec",
+      "persisted_content_sha256": "c65f891824691cc2c2121c6ede6e83e8d2392979eed26af500abe41dac24d6ec"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41338947203/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41338947203/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:17.162462+00:00",
+      "source_content_sha256": "23efe058124711f71d4713734b15e23b452cf8ea401ad42f95d3fbb5561b7675",
+      "persisted_content_sha256": "23efe058124711f71d4713734b15e23b452cf8ea401ad42f95d3fbb5561b7675"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41340498864/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41340498864/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:16.222769+00:00",
+      "source_content_sha256": "f934287219857769e71054198b9222b4167de00d068c5bbed707dae394423a3b",
+      "persisted_content_sha256": "f934287219857769e71054198b9222b4167de00d068c5bbed707dae394423a3b"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41346871979/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41346871979/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:15.499649+00:00",
+      "source_content_sha256": "971c8cf4b1fc3a1f4db9a7e69d795b446866fde90b0a8294180c03d36fa4c026",
+      "persisted_content_sha256": "971c8cf4b1fc3a1f4db9a7e69d795b446866fde90b0a8294180c03d36fa4c026"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41347543952/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41347543952/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:14.690547+00:00",
+      "source_content_sha256": "a4bc15698b69857d57bebae9a2696f65cf32d4bd2fa0b8cc49bfbed566a77499",
+      "persisted_content_sha256": "a4bc15698b69857d57bebae9a2696f65cf32d4bd2fa0b8cc49bfbed566a77499"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41382833986/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41382833986/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:13.887890+00:00",
+      "source_content_sha256": "8a846222a3aee81d21c85c638b2c2a3556d11b9b83512631f6cb7049de166944",
+      "persisted_content_sha256": "8a846222a3aee81d21c85c638b2c2a3556d11b9b83512631f6cb7049de166944"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41382973094/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41382973094/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:13.075214+00:00",
+      "source_content_sha256": "553bcf6fda66a9cff8deb79f36fc2a8710e299f448a9308b44b7c8745dc48f9d",
+      "persisted_content_sha256": "553bcf6fda66a9cff8deb79f36fc2a8710e299f448a9308b44b7c8745dc48f9d"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41383069779/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41383069779/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:12.362597+00:00",
+      "source_content_sha256": "d45b823388fa450015455bb5db807f4005f2b747bfca220c9e76e205372b16bb",
+      "persisted_content_sha256": "d45b823388fa450015455bb5db807f4005f2b747bfca220c9e76e205372b16bb"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41839744126/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41839744126/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:11.564155+00:00",
+      "source_content_sha256": "d322722c8738043880718b06f0b5c5de19a50de0a1db7584e46b460aff9c7203",
+      "persisted_content_sha256": "d322722c8738043880718b06f0b5c5de19a50de0a1db7584e46b460aff9c7203"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41962312543/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41962312543/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:10.798670+00:00",
+      "source_content_sha256": "497faaf34d82c99d0d57503f5493ed4fc5a29076edf9a1783c6188bbef2310b0",
+      "persisted_content_sha256": "497faaf34d82c99d0d57503f5493ed4fc5a29076edf9a1783c6188bbef2310b0"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41967691162/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41967691162/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:09.997120+00:00",
+      "source_content_sha256": "8843cb41466028ff8efc20297d23e2aa67aaeb125b32e0357749e7b9127b288d",
+      "persisted_content_sha256": "8843cb41466028ff8efc20297d23e2aa67aaeb125b32e0357749e7b9127b288d"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41975341168/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41975341168/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:09.181036+00:00",
+      "source_content_sha256": "329cbe2cf5557102aa1dfcbaebba71d23878b00d1cb6d8eb88e83931e33e4443",
+      "persisted_content_sha256": "329cbe2cf5557102aa1dfcbaebba71d23878b00d1cb6d8eb88e83931e33e4443"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41976808048/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41976808048/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:08.428049+00:00",
+      "source_content_sha256": "b3bfff4a3a1625e023d9fd4c197bbb76094344bfcbfbb74ef1423e9125ff4983",
+      "persisted_content_sha256": "b3bfff4a3a1625e023d9fd4c197bbb76094344bfcbfbb74ef1423e9125ff4983"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs/41980684789/jobs?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs/41980684789/jobs?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:07.663830+00:00",
+      "source_content_sha256": "1c97a11f9b3567de4e14b90a14bca77f93b1c3e2d6d2e856d263c5d71d2c0be4",
+      "persisted_content_sha256": "1c97a11f9b3567de4e14b90a14bca77f93b1c3e2d6d2e856d263c5d71d2c0be4"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/runs?per_page=30",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/runs?per_page=30",
+      "source_observed_at": "2026-11-05T07:09:06.133116+00:00",
+      "source_content_sha256": "84fca387bbbbb24f8e704f3535503b539b92dece534f959429c2003949fae340",
+      "persisted_content_sha256": "84fca387bbbbb24f8e704f3535503b539b92dece534f959429c2003949fae340"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/actions/workflows?per_page=50",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/actions/workflows?per_page=50",
+      "source_observed_at": "2026-11-05T07:09:05.192346+00:00",
+      "source_content_sha256": "b15f0076d02ed2e87961bd724f837fcec91152a0fd2c34260b8ed7d9fc9276f4",
+      "persisted_content_sha256": "b15f0076d02ed2e87961bd724f837fcec91152a0fd2c34260b8ed7d9fc9276f4"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/commits?per_page=30",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/commits?per_page=30",
+      "source_observed_at": "2026-11-05T07:09:07.010863+00:00",
+      "source_content_sha256": "03f5c5bae080e58e07fb79e9aa5ba38d37bdab7c718386c621bc698b15dea6e9",
+      "persisted_content_sha256": "03f5c5bae080e58e07fb79e9aa5ba38d37bdab7c718386c621bc698b15dea6e9"
+    },
+    {
+      "request_key": "9059rohith/pipefoundry/releases?per_page=30",
+      "source": "https://api.github.com/repos/9059Rohith/pipefoundry/releases?per_page=30",
+      "source_observed_at": "2026-11-05T07:09:06.515258+00:00",
+      "source_content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "persisted_content_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  ],
+  "limits": [
+    "Controlled recorded-200 replay and 429 response; no live provider fault.",
+    "Eight threads with distinct cache/store instances share one native database; this is not a multi-host load test.",
+    "Virtual-clock timestamps after seed admission are validation experiment times, not fresh GitHub captures. Original source capture times are retained above."
+  ]
+}

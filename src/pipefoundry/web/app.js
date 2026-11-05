@@ -100,9 +100,9 @@ async function inspect(view, extra = "") {
   const result = await request(
     `/workbench/api/github?repo=${encodeURIComponent(repo)}&view=${view}${extra}`,
   );
-  $("#source-status").textContent = result.stale
-    ? `Stale cache · observed ${new Date(result.observed_at).toLocaleString()}`
-    : `Observed ${new Date(result.observed_at).toLocaleString()} · ${result.cache_status === "live" ? "live response" : "fresh cache"}`;
+  const observed = new Date(result.observed_at).toLocaleString();
+  const validated = result.validated_at ? new Date(result.validated_at).toLocaleString() : observed;
+  $("#source-status").textContent = `${view} · captured ${observed} · checked ${validated} · ${result.stale ? "dated cache" : result.cache_status === "live" ? "live response" : "validated cache"}`;
   if (result.stale)
     notice(
       result.warning ||
@@ -816,7 +816,7 @@ async function integrations() {
 function agentResult(result) {
   const rows = result.trace.map(
     (item) =>
-      `<tr><td class="mono">${esc(item.tool)}</td><td>${esc(item.view)}</td><td><time>${esc(fmt(item.observed_at))}</time><span class="secondary">${item.stale ? "Stale cached evidence" : item.cache_status === "fresh-cache" ? "Fresh cache" : "Live response"}</span></td><td>${link(item.source, "GitHub API")}</td></tr>`,
+      `<tr><td class="mono">${esc(item.tool)}</td><td>${esc(item.view)}</td><td><time>${esc(fmt(item.observed_at))}</time><span class="secondary">${item.stale ? "Stale cached evidence" : item.cache_status === "live" ? "Live response" : "Validated cache"}</span></td><td>${link(item.source, "GitHub API")}</td></tr>`,
   );
   return `<div class="panel-body">${result.trace.some((item) => item.stale) ? '<div class="notice">GitHub rate limiting prevented a fresh check. This answer uses dated public evidence at the observation times below.</div>' : ""}<div class="agent-response">${FoundryUI.markdown(result.answer)}</div><p class="mono muted">Provider: ${esc(result.provider)} · ${esc(result.model)}</p><div class="evidence-section"><h3>Sources and tool evidence</h3>${table(["Tool", "Action", "Observed", "Source"], rows)}</div><p class="agent-warning">${icon("info")}A repository observation is not a deployment or live cluster check.</p></div>`;
 }

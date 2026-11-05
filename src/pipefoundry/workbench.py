@@ -6,7 +6,6 @@ import os
 import re
 import threading
 import time
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -17,7 +16,7 @@ from fastapi.responses import FileResponse, HTMLResponse
 from pydantic import Field, ValidationError
 
 from pipefoundry.blueprints import ARTWORK, PAGE_ARTWORK, SECTION_ARTWORK
-from pipefoundry.github_cache import read_cached_evidence
+from pipefoundry.github_cache import GitHubCache, read_cached_evidence
 from pipefoundry.manifest_review import ReviewRequest, review
 from pipefoundry.models import Pipeline, StrictModel
 from pipefoundry.public_demo import (
@@ -92,16 +91,6 @@ VIEWS = {
 }
 _cache = {}
 _lock = threading.Lock()
-MAX_STALE_SECONDS = 86400
-
-
-def _evidence_age(evidence):
-    try:
-        observed = datetime.fromisoformat(evidence["observed_at"])
-        age = (datetime.now(UTC) - observed).total_seconds()
-        return age if 0 <= age <= MAX_STALE_SECONDS else None
-    except (ValueError, KeyError, TypeError):
-        return None
 
 
 def github(repo: str, view: str, run_id: int | None = None):
@@ -113,62 +102,16 @@ def github(repo: str, view: str, run_id: int | None = None):
         suffix = VIEWS[view]
     else:
         raise HTTPException(422, "Unknown GitHub inspection")
-    key = (repo.lower(), suffix)
-    request_key = repo.lower() + suffix
+    configuration = (
+        os.getenv("PIPEFOUNDRY_METADATA_DSN"),
+        os.getenv("PIPEFOUNDRY_GITHUB_CACHE_DB"),
+        os.getenv("VERCEL"),
+    )
     with _lock:
-        cached = _cache.get(key)
-    if not cached:
-        stored = read_cached_evidence(request_key)
-        age = _evidence_age(stored) if stored else None
-        if age is not None:
-            cached = (time.monotonic() + 60 - age, stored)
-    if cached and cached[0] > time.monotonic():
-        return {**cached[1], "stale": False, "cache_status": "fresh-cache"}
-    try:
-        # Anonymous requests only: public pages cannot expose private repositories.
-        with httpx.Client(timeout=12, follow_redirects=False) as client:
-            response = client.get(
-                f"https://api.github.com/repos/{repo}{suffix}",
-                headers={"Accept": "application/vnd.github+json", "User-Agent": "PipeFoundry"},
-            )
-        if response.status_code == 404:
-            raise HTTPException(404, "Repository or resource is not publicly accessible")
-        if response.status_code in {403, 429}:
-            age = _evidence_age(cached[1]) if cached else None
-            if age is not None:
-                return {
-                    **cached[1],
-                    "stale": True,
-                    "cache_status": "stale-rate-limit",
-                    "stale_age_seconds": int(age),
-                    "warning": "GitHub rate limit reached. Using previously fetched public "
-                    "evidence; observed_at is the original observation time.",
-                }
-            reset = response.headers.get("x-ratelimit-reset", "")
-            retry = max(1, min(3600, int(reset) - int(time.time()))) if reset.isdecimal() else 60
-            raise HTTPException(
-                429,
-                f"GitHub rate limit reached and no usable cached evidence exists. "
-                f"Try again in {retry} seconds.",
-                headers={"Retry-After": str(retry)},
-            )
-        if response.status_code != 200:
-            raise HTTPException(502, "GitHub inspection is temporarily unavailable")
-        result = {
-            "data": response.json(),
-            "source": f"https://api.github.com/repos/{repo}{suffix}",
-            "observed_at": datetime.now(UTC).isoformat(),
-            "cache_seconds": 60,
-            "stale": False,
-            "cache_status": "live",
-        }
-    except (httpx.HTTPError, ValueError) as exc:
-        raise HTTPException(502, "Could not reach GitHub. Retry the inspection.") from exc
-    with _lock:
-        if len(_cache) >= 100:
-            _cache.clear()
-        _cache[key] = (time.monotonic() + 60, result)
-    return result
+        if configuration not in _cache:
+            _cache[configuration] = GitHubCache()
+        cache = _cache[configuration]
+    return cache.inspect(repo, suffix, read_cached_evidence)
 
 
 class ConfigRequest(StrictModel):
@@ -328,6 +271,7 @@ def run_gemini_agent(body: AgentRequest, key: str, model: str, *, max_output_tok
                             "view": args["view"],
                             "source": evidence["source"],
                             "observed_at": evidence["observed_at"],
+                            "validated_at": evidence.get("validated_at"),
                             "stale": evidence.get("stale", False),
                             "cache_status": evidence.get("cache_status", "live"),
                         }
@@ -426,6 +370,7 @@ def run_agent(body: AgentRequest):
                             "view": args["view"],
                             "source": evidence["source"],
                             "observed_at": evidence["observed_at"],
+                            "validated_at": evidence.get("validated_at"),
                             "stale": evidence.get("stale", False),
                             "cache_status": evidence.get("cache_status", "live"),
                         }
