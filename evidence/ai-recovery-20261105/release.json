@@ -1,0 +1,20 @@
+{
+  "deployment_id": "dpl_AhwTAB5En2yhJDExJkC1EQ7fMjpr",
+  "source_commit": "c6d7ec8abd1c219a95a0e486a1e63f2932b34c36",
+  "build_log": "hosted-build.log",
+  "receipt_marker": "BUILD GATE RECEIPT: ",
+  "public_url": "https://rohith-pipefoundry.vercel.app/",
+  "status": "READY",
+  "promoted": true,
+  "alias": {
+    "alias": "rohith-pipefoundry.vercel.app",
+    "deployment_id": "dpl_AhwTAB5En2yhJDExJkC1EQ7fMjpr",
+    "project_id": "prj_l5pzpLwb7GbdKDglS0CKn6dtNL52"
+  },
+  "hosted_passed": 169,
+  "hosted_skipped": 23,
+  "build_log_sha256": "84655114c9faab8454cd60a05a02ef41f550138895fc052d31d9d92a757d66ba",
+  "github_actions": "Account billing lock: jobs never started",
+  "aws": "No credentials or apply; existing free Vercel/Neon deployment used",
+  "retest": "14 public API checks; latest 4/4 real AI calls passed; earlier PipeFoundry503s retained; no new browser run"
+}

@@ -1,0 +1,21 @@
+✔ 429 respects the entire 172800 cooldown without resubmitting (22.193ms)
+✔ 429 respects the entire Sat, 07 Nov 2026 12:00:00 GMT cooldown without resubmitting (9.0716ms)
+✔ 503 respects the entire 172800 cooldown without resubmitting (8.7487ms)
+✔ 503 respects the entire Sat, 07 Nov 2026 12:00:00 GMT cooldown without resubmitting (6.3947ms)
+✔ other provider errors keep the normal manual retry button (7.1209ms)
+✔ successful analysis still renders and enables another manual question (9.1067ms)
+✔ retry delays preserve long seconds and HTTP dates without early retries (1.9954ms)
+✔ manifest review cards escape evidence and filter findings (2.0754ms)
+✔ pipeline drafts reject JSON primitives and arrays before saving (3.0931ms)
+✔ AI markdown escapes HTML and rejects unsafe citation destinations (1.7023ms)
+✔ source links cannot impersonate GitHub or embed credentials (2.5539ms)
+✔ code highlighting preserves escaped content and separates keys (1.5526ms)
+✔ command search matches all query words without inventing destinations (0.9099ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 325.0571
