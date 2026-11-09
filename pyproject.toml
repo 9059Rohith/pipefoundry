@@ -20,7 +20,7 @@ pipefoundry = "pipefoundry.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-pipefoundry = ["web/*.html", "web/*.css", "web/*.js", "web/art/*.svg", "github_repository_cache.json"]
+pipefoundry = ["web/*.html", "web/*.css", "web/*.js", "web/art/*.svg", "github_repository_cache.json", "samples/*.json"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

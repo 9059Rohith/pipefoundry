@@ -611,7 +611,7 @@ function rehearsal() {
     const form = $("#rehearsal-form");
     if (!form) return;
     const isCurrent = () => $("#rehearsal-form") === form;
-    let latest = null, generation = 0;
+    let latest = null, generation = 0, retainedSampleId = null;
     const exportButtons = ["#rehearsal-export", "#rehearsal-config", "#rehearsal-yaml", "#rehearsal-output"];
     const invalidate = () => {
       generation += 1;
@@ -619,8 +619,30 @@ function rehearsal() {
       exportButtons.forEach((selector) => { $(selector).disabled = true; });
       $("#rehearsal-result").innerHTML = empty("Sample ready for inspection", "Run rehearsal to validate these records and produce fresh evidence.");
     };
-    $("#rehearsal-rows").addEventListener("input", invalidate);
+    $("#rehearsal-rows").addEventListener("input", () => {
+      retainedSampleId = null;
+      $("#rehearsal-source").textContent = "Edited sample · no retained-source claim.";
+      invalidate();
+    });
     $("#rehearsal-partition").addEventListener("input", invalidate);
+    $("#rehearsal-load-source").onclick = async () => {
+      invalidate();
+      const version = generation;
+      const button = $("#rehearsal-load-source");
+      button.disabled = true;
+      try {
+        const sample = await request("/workbench/api/rehearsal/sample");
+        if (!isCurrent() || version !== generation) return;
+        $("#rehearsal-rows").value = JSON.stringify(sample.rows, null, 2);
+        retainedSampleId = sample.sample_id;
+        $("#rehearsal-source").innerHTML = FoundryUI.rehearsalSource(sample.provenance);
+      } catch (error) {
+        if (isCurrent() && version === generation)
+          $("#rehearsal-source").textContent = error.message;
+      } finally {
+        if (isCurrent()) button.disabled = false;
+      }
+    };
     form.onsubmit = async (event) => {
       event.preventDefault();
       invalidate();
@@ -634,6 +656,7 @@ function rehearsal() {
         if (!Array.isArray(rows) || rows.length < 1 || rows.length > 100)
           throw new Error("Paste a JSON array containing 1–100 order records.");
         const body = {config: getDraft(), partition: $("#rehearsal-partition").value, rows};
+        if (retainedSampleId) body.retained_sample_id = retainedSampleId;
         if (new TextEncoder().encode(JSON.stringify(body)).length > 32768)
           throw new Error("The complete request must fit within 32 KiB. Reduce the sample.");
         const result = await request("/workbench/api/rehearsal", {
@@ -668,7 +691,7 @@ function rehearsal() {
       if (latest?.evidence.accepted) download(`${latest.evidence.config.name}-output-preview.json`, JSON.stringify(latest.evidence.normalized_rows, null, 2), "application/json");
     };
   }, 0);
-  return `<div class="review-boundary">${icon("info")}<span><strong>Your records, the actual SQL transform.</strong> Paste a sample to test strict order validation, uppercase normalization and duplicate replacement. Connectors are never fetched; databases are never written. Spark is outside this rehearsal.</span></div><div class="split equal"><section class="panel"><div class="panel-head"><h2>Sample input</h2><span class="pill">1–100 records · 32 KiB</span></div><div class="panel-body">${facts([["Saved pipeline", draft.name], ["Input connector", draft.input?.connector || "fixture"], ["Destination", draft.output?.connector || "sqlite"]])}<a class="button" href="/workbench/editor">Edit pipeline ${icon("arrow")}</a><p>Each record requires <code>id</code> (1–80 letters, digits, _ or -), <code>amount_cents</code> (integer 0–1000000000) and <code>currency</code> (three letters). Unknown fields fail validation.</p><p class="muted">The sample starts blank. Use non-sensitive records you are allowed to submit. Samples are sent to this server for in-memory processing and are not saved by the application.</p><form id="rehearsal-form"><div class="form-field"><label for="rehearsal-partition">Partition date (UTC)</label><input id="rehearsal-partition" type="date" required value="${new Date().toISOString().slice(0, 10)}"></div><div class="form-field"><label for="rehearsal-rows">Your order sample (JSON array)</label><textarea id="rehearsal-rows" rows="13" required spellcheck="false" placeholder="Paste your JSON array here" aria-describedby="rehearsal-input-help"></textarea><small id="rehearsal-input-help">Whole-batch validation: any invalid row prevents output.</small></div><button class="primary" id="rehearsal-run" type="submit">Run sample rehearsal</button></form></div></section><section class="panel"><div class="panel-head"><h2>Transform evidence</h2></div><div class="panel-body"><div id="rehearsal-result" aria-live="polite">${empty("No sample submitted", "Paste your records to inspect the real transform behavior.")}</div><hr><div class="toolbar"><button id="rehearsal-export" disabled>${icon("download")} Evidence JSON</button><button id="rehearsal-output" disabled>Output preview JSON</button><button id="rehearsal-config" disabled>Config JSON</button><button id="rehearsal-yaml" disabled>Manifest YAML</button></div><p class="muted">The generated config and manifest keep your configured connector; sample rows are not packaged or deployed. Output preview is a diagnostic artifact, not a source file or execution receipt.</p><a class="button" href="/workbench/review">Continue to release review ${icon("arrow")}</a></div></section></div>`;
+  return `<div class="review-boundary">${icon("info")}<span><strong>Your records, the actual SQL transform.</strong> Paste a sample to test strict order validation, uppercase normalization and duplicate replacement. Connectors are never fetched; databases are never written. Spark is outside this rehearsal.</span></div><div class="split equal"><section class="panel"><div class="panel-head"><h2>Sample input</h2><span class="pill">1–100 records · 32 KiB</span></div><div class="panel-body">${facts([["Saved pipeline", draft.name], ["Input connector", draft.input?.connector || "fixture"], ["Destination", draft.output?.connector || "sqlite"]])}<a class="button" href="/workbench/editor">Edit pipeline ${icon("arrow")}</a><p>Each record requires <code>id</code> (1–80 letters, digits, _ or -), <code>amount_cents</code> (integer 0–1000000000) and <code>currency</code> (three letters). Unknown fields fail validation.</p><p class="muted">The sample starts blank. Use non-sensitive records you are allowed to submit. Samples are sent to this server for in-memory processing and are not saved by the application.</p><button id="rehearsal-load-source" type="button">Load retained NYC fare sample</button><div id="rehearsal-source" aria-live="polite"><p class="muted">Optional: load the first 100 of 1000 actual retained NYC fares. Capture date, original bytes fingerprint and exact mapping accompany the evidence. No live connector request.</p></div><form id="rehearsal-form"><div class="form-field"><label for="rehearsal-partition">Partition date (UTC)</label><input id="rehearsal-partition" type="date" required value="${new Date().toISOString().slice(0, 10)}"></div><div class="form-field"><label for="rehearsal-rows">Your order sample (JSON array)</label><textarea id="rehearsal-rows" rows="13" required spellcheck="false" placeholder="Paste your JSON array here" aria-describedby="rehearsal-input-help"></textarea><small id="rehearsal-input-help">Whole-batch validation: any invalid row prevents output.</small></div><button class="primary" id="rehearsal-run" type="submit">Run sample rehearsal</button></form></div></section><section class="panel"><div class="panel-head"><h2>Transform evidence</h2></div><div class="panel-body"><div id="rehearsal-result" aria-live="polite">${empty("No sample submitted", "Paste your records to inspect the real transform behavior.")}</div><hr><div class="toolbar"><button id="rehearsal-export" disabled>${icon("download")} Evidence JSON</button><button id="rehearsal-output" disabled>Output preview JSON</button><button id="rehearsal-config" disabled>Config JSON</button><button id="rehearsal-yaml" disabled>Manifest YAML</button></div><p class="muted">The generated config and manifest keep your configured connector; sample rows are not packaged or deployed. Output preview is a diagnostic artifact, not a source file or execution receipt.</p><a class="button" href="/workbench/review">Continue to release review ${icon("arrow")}</a></div></section></div>`;
 }
 
 function review() {

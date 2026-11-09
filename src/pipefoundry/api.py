@@ -173,6 +173,7 @@ def create_app(
                 "/workbench/assets/ui.js",
                 "/workbench/api/github",
                 "/workbench/api/integrations",
+                "/workbench/api/rehearsal/sample",
             }
         )
         public_validation = request.method == "POST" and path in {

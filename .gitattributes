@@ -2,3 +2,5 @@
 # Preserve captured log bytes and timestamp-only whitespace for auditable hashes.
 evidence/ai-recovery-20261105/*.log -text -whitespace
 evidence/backup-live-20261105/*.log -text -whitespace
+# Byte-pinned retained source and metadata must survive checkout unchanged.
+src/pipefoundry/samples/*.json -text -whitespace

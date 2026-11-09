@@ -2,13 +2,16 @@
 
 from collections import defaultdict
 from datetime import date
+from typing import Literal
 
 import yaml
+from fastapi import HTTPException
 from pydantic import Field, ValidationError, field_validator, model_validator
 
 from pipefoundry.manifest_review import canonical, fingerprint
 from pipefoundry.models import Pipeline, StrictModel
 from pipefoundry.render import objects
+from pipefoundry.retained_sample import SAMPLE_ID, retained_sample
 from pipefoundry.workloads import Order, normalize_orders
 
 
@@ -16,6 +19,7 @@ class RehearsalRequest(StrictModel):
     config: Pipeline
     partition: str = Field(pattern=r"^\d{4}-\d{2}-\d{2}$")
     rows: list[dict] = Field(min_length=1, max_length=100)
+    retained_sample_id: Literal["nyc-taxi-fares-v1"] | None = None
 
     @field_validator("partition")
     @classmethod
@@ -39,6 +43,12 @@ FIELD_RULES = {
 
 
 def rehearse(body: RehearsalRequest):
+    sample_source = None
+    if body.retained_sample_id == SAMPLE_ID:
+        sample = retained_sample()
+        if canonical(body.rows) != canonical(sample["rows"]):
+            raise HTTPException(422, "Edited records cannot claim the retained fare source")
+        sample_source = sample["provenance"]
     issues, invalid_rows = [], 0
     for index, row in enumerate(body.rows, 1):
         try:
@@ -76,6 +86,7 @@ def rehearse(body: RehearsalRequest):
         "config_json": canonical(config),
         "config_sha256": fingerprint(config),
         "sample_sha256": fingerprint(body.rows),
+        "sample_source": sample_source,
         "summary": {
             "input_rows": len(body.rows),
             "output_rows": len(normalized),

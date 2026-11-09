@@ -19,6 +19,10 @@ test("sample report exposes reject-all quality diagnostics without rendering unt
 test("sample report shows per-currency cents and duplicate winner rows", () => {
   const html = ui.rehearsalReport({evidence: {
     accepted: true, scope: "Sample only", invalid_rows: 0,
+    sample_source: {captured_at_utc: "2026-11-05T04:53:11.824138+00:00",
+      selected_record_count: 100, original_record_count: 1000,
+      mapping: "Mapped NYC fares", source_url: "https://data.cityofnewyork.us/resource/4b4i-vvec.json",
+      source_sha256: "source-hash", partition_note: "Storage date only"},
     summary: {input_rows: 3, output_rows: 2, replaced_rows: 1, currency_normalizations: 2},
     issues: [], issues_truncated: false,
     duplicates: [{id: "a", source_rows: [1, 3], winner_row: 3}],
@@ -33,4 +37,8 @@ test("sample report shows per-currency cents and duplicate winner rows", () => {
   assert.ok(html.includes("250"));
   assert.ok(html.includes("1, 3"));
   assert.ok(html.includes("2026-11-09"));
+  assert.ok(html.includes("2026-11-05T04:53:11.824138+00:00"));
+  assert.ok(html.includes("100 of 1000"));
+  assert.ok(html.includes("Mapped NYC fares"));
+  assert.ok(html.includes("Storage date only"));
 });

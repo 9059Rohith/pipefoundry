@@ -1,0 +1,8 @@
+{
+  "source_url": "https://data.cityofnewyork.us/resource/4b4i-vvec.json?%24select=%3Aid+as+row_id%2Ctpep_pickup_datetime%2Cfare_amount&%24where=tpep_pickup_datetime+%3E%3D+%272023-01-01T00%3A00%3A00%27+and+tpep_pickup_datetime+%3C+%272023-01-02T00%3A00%3A00%27+and+fare_amount+%3E+0&%24order=tpep_pickup_datetime%2C+%3Aid&%24limit=1000",
+  "captured_at_utc": "2026-11-05T04:53:11.824138+00:00",
+  "sha256": "942e7b07bf180803a934da9c05b5953a91ebf006696ffc72b8fdc783fb0385e2",
+  "size_bytes": 102746,
+  "rows": 1000,
+  "total_fare_cents": 1974145
+}

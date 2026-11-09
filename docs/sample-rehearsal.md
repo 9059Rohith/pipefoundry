@@ -5,6 +5,26 @@ JSON array of 1–100 order records, select a UTC partition date, and run the
 rehearsal. The form starts blank; no sample is presented as observed production
 data. Input is processed in memory and is not stored by this application.
 
+For real retained input, choose **Load retained NYC fare sample**. This optional
+action loads the first 100 of the 1,000 actual NYC Open Data fare observations
+retained on 5 November 2026. The default form remains blank. There is no external
+fetch: the original response and metadata bytes are packaged and verified against
+pinned SHA-256 fingerprints before use. Their original source URL and capture
+timestamp appear beside the input and in the evidence export.
+
+The mapping uses SHA-256 of each original UTF-8 `row_id` as the strict transform
+ID, exact `fare_amount × 100` as integer cents, and USD as currency. The selected
+fares sum to **232,603 cents**. These are mapped taxi fare observations, not
+customer orders. The report includes all 100 original selected records so the
+mapping can be inspected. The chosen partition is an output storage date; it does
+not replace or convert the original pickup timestamps.
+
+Editing the rows clears the retained-source claim. The server independently
+rejects an altered sample submitted with a retained-source identifier. Changing
+the partition preserves source provenance because the original rows remain
+unchanged. Reloading the workspace while a request is in flight cannot restore
+evidence or downloads into a new blank form.
+
 This runs the **same `normalize_orders` function as the SQL worker**:
 
 - Each record requires `id`, integer `amount_cents` and three-letter `currency`.
@@ -35,6 +55,12 @@ This is not an execution receipt, production data-quality certification, or a
 cluster admission check. Continue to Release review to inspect manifest policy.
 
 ## API
+
+`GET /workbench/api/rehearsal/sample` returns the fixed bounded projection,
+source provenance, original selected records and `sample_id`. Include that value
+as `retained_sample_id` in the rehearsal POST only when submitting the unchanged
+mapped `rows`. Both original files are hash-checked on every read; corrupted or
+missing packaged evidence returns a sanitized HTTP 503.
 
 Anonymous `POST /workbench/api/rehearsal` accepts the following envelope. These
 are illustrative, caller-authored records, not observed data:

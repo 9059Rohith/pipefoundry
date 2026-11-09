@@ -35,6 +35,7 @@ from pipefoundry.public_demo import (
 )
 from pipefoundry.rehearsal import RehearsalRequest, rehearse
 from pipefoundry.render import objects
+from pipefoundry.retained_sample import retained_sample
 
 STATIC = Path(__file__).with_name("web")
 PAGES = {
@@ -573,6 +574,10 @@ def router(authorize):
     @routes.post("/workbench/api/rehearsal")
     def sample_rehearsal(body: RehearsalRequest):
         return rehearse(body)
+
+    @routes.get("/workbench/api/rehearsal/sample")
+    def retained_fare_sample():
+        return retained_sample()
 
     @routes.get("/workbench/api/integrations")
     def integrations():

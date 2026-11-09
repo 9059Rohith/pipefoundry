@@ -3,7 +3,9 @@
 **Sample rehearsal:** `/workbench/rehearsal` runs the actual SQL order transform
 against your bounded pasted JSON, with row diagnostics, duplicate winner lineage,
 per-currency totals and fingerprinted exports. Samples start blank; no connector
-is fetched or output written. Download canonical configuration and the actual
+is fetched or output written. Optionally load 100 real retained NYC taxi fare
+observations with source date, byte fingerprints and explicit mapping provenance.
+Download canonical configuration and the actual
 rendered Kubernetes bundle, then continue to release review.
 [Workflow, API and limits](docs/sample-rehearsal.md).
 
