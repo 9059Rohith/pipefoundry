@@ -608,6 +608,9 @@ async function manifests() {
 function rehearsal() {
   const draft = getDraft();
   setTimeout(() => {
+    const form = $("#rehearsal-form");
+    if (!form) return;
+    const isCurrent = () => $("#rehearsal-form") === form;
     let latest = null, generation = 0;
     const exportButtons = ["#rehearsal-export", "#rehearsal-config", "#rehearsal-yaml", "#rehearsal-output"];
     const invalidate = () => {
@@ -618,7 +621,7 @@ function rehearsal() {
     };
     $("#rehearsal-rows").addEventListener("input", invalidate);
     $("#rehearsal-partition").addEventListener("input", invalidate);
-    $("#rehearsal-form").onsubmit = async (event) => {
+    form.onsubmit = async (event) => {
       event.preventDefault();
       invalidate();
       const version = generation;
@@ -636,18 +639,20 @@ function rehearsal() {
         const result = await request("/workbench/api/rehearsal", {
           method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body),
         });
-        if (version !== generation) return;
+        if (!isCurrent() || version !== generation) return;
         latest = result;
         $("#rehearsal-result").innerHTML = FoundryUI.rehearsalReport(result);
         $("#rehearsal-export").disabled = false;
         for (const selector of exportButtons.slice(1)) $(selector).disabled = !result.evidence.accepted;
         audit("Sample rehearsed", `${result.evidence.config.name} · ${rows.length} submitted rows · ${result.evidence.accepted ? "accepted" : "rejected"}`);
       } catch (error) {
-        if (version !== generation) return;
+        if (!isCurrent() || version !== generation) return;
         $("#rehearsal-result").innerHTML = empty("Rehearsal could not complete", error instanceof SyntaxError ? "Correct the sample JSON syntax and rerun." : error.message);
       } finally {
-        button.disabled = false;
-        button.textContent = "Run sample rehearsal";
+        if (isCurrent()) {
+          button.disabled = false;
+          button.textContent = "Run sample rehearsal";
+        }
       }
     };
     $("#rehearsal-export").onclick = () => {
