@@ -45,7 +45,7 @@ published NYC taxi fares. [Kubernetes execution proof](docs/kubernetes-release-p
 
 A data engineer should not have to hand-edit a CronJob, Helm chart and scheduler DAG every time an ingestion schedule changes. An operator should be able to identify which configuration ran, replay specific dates, and recover a previous configuration without losing the evidence of what happened. PipeFoundry implements that workflow with typed YAML, fixed Python workers, real SQL writes and versioned deployment artifacts.
 
-The public workbench has fifteen useful pages for actual GitHub repository and workflow inspection, pipeline authoring, server validation, manifest export, deployment previews, security controls, session audit and integration status. Public execution history comes from GitHub Actions. Draft configuration is explicitly unexecuted. The legacy synthetic demonstration receipts at `/demo` and `/demo/console` require authentication, as do all executor and release mutations. The default **public AI demo needs no sign-in or operator token** and uses **Gemini 3.5 Flash-Lite** on a billing-disabled free-tier project. It can inspect only this project's public repository and returns real GitHub source traces. Persistent PostgreSQL allowances limit each visitor to 3 requests per 10 minutes and the whole demo to 2 per minute / 30 per day. A database outage closes the public demo with 503 before inference. Provider keys stay on the server; no paid fallback exists. The separate authenticated agent and OpenAI adapter remain available for explicitly configured operators.
+The workbench implements seventeen page types for actual GitHub repository and workflow inspection, pipeline authoring, server validation, sample rehearsal, manifest export, deployment previews, security controls, session audit and integration status. See the current hosting restriction above before treating a demo URL as available. Public execution history comes from GitHub Actions. Draft configuration is explicitly unexecuted. The legacy synthetic demonstration receipts at `/demo` and `/demo/console` require authentication, as do all executor and release mutations. The default **public AI demo needs no sign-in or operator token** and uses **Gemini 3.5 Flash-Lite** on a billing-disabled free-tier project. It can inspect only this project's public repository and returns real GitHub source traces. Persistent PostgreSQL allowances limit each visitor to 3 requests per 10 minutes and the whole demo to 2 per minute / 30 per day. A database outage closes the public demo with 503 before inference. Provider keys stay on the server; no paid fallback exists. The separate authenticated agent and OpenAI adapter remain available for explicitly configured operators.
 
 **Real hosted AI verified on 2026-11-02 IST:** HTTP 200, Gemini `gemini-3.5-flash-lite`, one `inspect_github(repository)` call and an answer identifying `main` / Python with a source link. Unauthenticated AI calls still return 401. The AI change passed **77 tests**, with 23 optional integration skips; the earlier PostgreSQL/Spark/container evidence below retains its separate scope. [Hosted AI evidence](evidence/gemini-hosted-verification.json).
 
@@ -55,8 +55,8 @@ GitHub inspection uses a shared PostgreSQL cache, refresh lease, conditional req
 
 ![PipeFoundry blueprint workbench — desktop browser QA](evidence/blueprint-desktop.png)
 
-The industrial blueprint design adds 24 original technical plates across
-all 16 views, a three-step overview and native scroll motion that respects
+The industrial blueprint design uses original technical plates throughout
+the workbench, a three-step overview and native scroll motion that respects
 reduced-motion preferences. [Design and browser checks](docs/blueprint-design.md) ·
 [Artwork inventory](docs/blueprint-assets.md).
 
