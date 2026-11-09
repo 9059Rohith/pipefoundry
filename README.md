@@ -1,5 +1,11 @@
 # PipeFoundry
 
+> **9 November 2026 status:** the new upgrade is implemented and verified locally.
+> Vercel has blocked the hosting team for fair-use limits; all four existing demo
+> URLs currently return `402 DEPLOYMENT_DISABLED`. No new public release is claimed.
+> [Current feature, tests and precise hosting blocker](docs/upgrade-20261109.md).
+
+
 **Sample rehearsal:** `/workbench/rehearsal` runs the actual SQL order transform
 against your bounded pasted JSON, with row diagnostics, duplicate winner lineage,
 per-currency totals and fingerprinted exports. Samples start blank; no connector
