@@ -10,6 +10,7 @@ PAGE_ARTWORK = {
     "commits": ("branch-engraving", "Commit branches"),
     "editor": ("configuration-die", "Configuration tooling"),
     "validation": ("schema-gate", "Schema gate"),
+    "rehearsal": ("test-bench", "Sample transform test bench"),
     "manifests": ("exploded-bundle", "Exploded manifest bundle"),
     "review": ("inspection-optics", "Manifest inspection optics"),
     "plans": ("revision-comparator", "Revision comparator"),

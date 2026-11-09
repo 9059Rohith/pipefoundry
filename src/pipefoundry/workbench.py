@@ -33,6 +33,7 @@ from pipefoundry.public_demo import (
     public_model,
     unavailable,
 )
+from pipefoundry.rehearsal import RehearsalRequest, rehearse
 from pipefoundry.render import objects
 
 STATIC = Path(__file__).with_name("web")
@@ -46,6 +47,7 @@ PAGES = {
     "commits": "Commit history",
     "editor": "Pipeline editor",
     "validation": "Validation",
+    "rehearsal": "Sample rehearsal",
     "manifests": "Manifests",
     "review": "Release review",
     "plans": "Deployment plans",
@@ -64,6 +66,7 @@ DESCRIPTIONS = {
     "commits": "Trace changes to their authors, commits and source.",
     "editor": "Compose typed configuration. Validate before execution.",
     "validation": "Check your draft against the same schema used by the runtime.",
+    "rehearsal": "Rehearse the actual SQL transform with your sample before execution.",
     "manifests": "Render a concrete Kubernetes bundle from validated configuration.",
     "review": "Inspect the rendered workload. Understand the change. Keep the evidence.",
     "plans": "Compare your draft with recorded deployment state, without executing.",
@@ -566,6 +569,10 @@ def router(authorize):
     @routes.post("/workbench/api/review")
     def manifest_review(body: ReviewRequest):
         return review(body)
+
+    @routes.post("/workbench/api/rehearsal")
+    def sample_rehearsal(body: RehearsalRequest):
+        return rehearse(body)
 
     @routes.get("/workbench/api/integrations")
     def integrations():

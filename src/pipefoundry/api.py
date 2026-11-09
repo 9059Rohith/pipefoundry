@@ -147,6 +147,7 @@ def create_app(
             "/deployments/preview",
             "/workbench/api/validate",
             "/workbench/api/review",
+            "/workbench/api/rehearsal",
             "/workbench/api/agent",
             "/workbench/api/demo-agent",
         } or request.url.path.startswith("/releases/"):
@@ -177,6 +178,7 @@ def create_app(
         public_validation = request.method == "POST" and path in {
             "/workbench/api/validate",
             "/workbench/api/review",
+            "/workbench/api/rehearsal",
             "/workbench/api/demo-agent",
         }
         if (

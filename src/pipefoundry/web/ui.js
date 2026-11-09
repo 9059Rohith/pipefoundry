@@ -163,6 +163,12 @@
       return `<article class="review-check ${state}"><div class="review-check-heading"><span class="review-state ${state}">${state === "na" ? "N/A" : state.toUpperCase()}</span><h3>${escape(check.title)}</h3></div><p>${escape(check.explanation)}</p>${state === "warn" || state === "fail" ? `<div class="review-remedy">${escape(check.remediation)}</div>` : ""}<details><summary>Inspect ${check.evidence.length} field observation${check.evidence.length === 1 ? "" : "s"}</summary>${check.evidence.map((entry) => `<div class="review-observation"><code>${escape(entry.path)}</code><span class="review-state ${entry.passed ? "pass" : "warn"}">${entry.passed ? "MATCH" : "REVIEW"}</span><pre>${escape(JSON.stringify(entry.value, null, 2))}</pre></div>`).join("")}${!check.evidence.length ? '<p>No applicable resource in this bundle.</p>' : ""}</details>${source ? `<a class="review-source" href="${escape(source)}" target="_blank" rel="noopener noreferrer">Kubernetes documentation ↗</a>` : ""}</article>`;
     }).join("");
   }
+  function rehearsalReport(result) {
+    const e = result.evidence;
+    const grid = (headers, rows) => `<div class="table-wrap"><table><thead><tr>${headers.map((h) => `<th scope="col">${escape(h)}</th>`).join("")}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((value) => `<td>${escape(value)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    const metrics = [["Input rows", e.summary.input_rows], ["Output rows", e.summary.output_rows], ["Replaced rows", e.summary.replaced_rows], ["Currency normalizations", e.summary.currency_normalizations]];
+    return `<div class="result-banner ${e.accepted ? "good" : ""}"><strong>${e.accepted ? "Sample accepted" : "Batch rejected"}</strong> · ${e.accepted ? "Runtime normalization completed in memory" : `${escape(e.invalid_rows)} invalid rows; no partial output`}</div><p class="note">${escape(e.scope)}</p><dl class="review-metrics">${metrics.map(([label, count]) => `<div class="metric"><dt>${escape(label)}</dt><dd>${escape(count)}</dd></div>`).join("")}</dl>${e.issues.length ? `<h3>Repair these sample fields</h3>${grid(["Input row", "Field", "Required value"], e.issues.map((issue) => [issue.row, issue.field, issue.rule]))}${e.issues_truncated ? "<p>Showing the first 100 issues. Repair these fields and rerun for remaining diagnostics.</p>" : ""}` : ""}${e.duplicates.length ? `<h3>Last observation wins</h3><p>IDs are unique within a partition. Later observations replace earlier amounts and currencies.</p>${grid(["ID", "Input rows", "Winning row"], e.duplicates.map((d) => [d.id, d.source_rows.join(", "), d.winner_row]))}` : ""}${e.currency_totals.length ? `<h3>Totals by currency</h3><p>Integer cents after duplicate replacement. Different currencies are never added together.</p>${grid(["Currency", "Rows", "Amount (cents)"], e.currency_totals.map((t) => [t.currency, t.rows, t.amount_cents]))}` : ""}<h3>Normalized output preview</h3>${e.normalized_rows.length ? grid(["Partition (UTC date)", "ID", "Amount (cents)", "Currency"], e.normalized_rows.map((row) => [row.partition_date, row.id, row.amount_cents, row.currency])) : "<p>No output rows. The worker rejects the whole batch if any record fails validation.</p>"}<details><summary>Evidence fingerprint (SHA-256)</summary><p class="mono wrap">${escape(result.evidence_sha256)}</p><p>The export contains validated configuration, rendered YAML and the sample fingerprint. Rejected input values are excluded. This is content evidence, not an execution receipt.</p></details>`;
+  }
   const paths = {
     inspect:
       "M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0",
@@ -203,6 +209,7 @@
   const api = {
     parseDraft,
     reviewChecks,
+    rehearsalReport,
     escape,
     safeURL,
     retryAfterSeconds,

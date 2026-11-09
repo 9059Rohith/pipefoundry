@@ -605,6 +605,67 @@ async function manifests() {
     "The same object renderer used by the control plane. Copy or download the real artifact.",
   );
 }
+function rehearsal() {
+  const draft = getDraft();
+  setTimeout(() => {
+    let latest = null, generation = 0;
+    const exportButtons = ["#rehearsal-export", "#rehearsal-config", "#rehearsal-yaml", "#rehearsal-output"];
+    const invalidate = () => {
+      generation += 1;
+      latest = null;
+      exportButtons.forEach((selector) => { $(selector).disabled = true; });
+      $("#rehearsal-result").innerHTML = empty("Sample ready for inspection", "Run rehearsal to validate these records and produce fresh evidence.");
+    };
+    $("#rehearsal-rows").addEventListener("input", invalidate);
+    $("#rehearsal-partition").addEventListener("input", invalidate);
+    $("#rehearsal-form").onsubmit = async (event) => {
+      event.preventDefault();
+      invalidate();
+      const version = generation;
+      const button = $("#rehearsal-run");
+      button.disabled = true;
+      button.textContent = "Inspecting sample…";
+      $("#rehearsal-result").innerHTML = '<div class="loading">Validating your sample with the runtime transform…</div>';
+      try {
+        const rows = JSON.parse($("#rehearsal-rows").value);
+        if (!Array.isArray(rows) || rows.length < 1 || rows.length > 100)
+          throw new Error("Paste a JSON array containing 1–100 order records.");
+        const body = {config: getDraft(), partition: $("#rehearsal-partition").value, rows};
+        if (new TextEncoder().encode(JSON.stringify(body)).length > 32768)
+          throw new Error("The complete request must fit within 32 KiB. Reduce the sample.");
+        const result = await request("/workbench/api/rehearsal", {
+          method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body),
+        });
+        if (version !== generation) return;
+        latest = result;
+        $("#rehearsal-result").innerHTML = FoundryUI.rehearsalReport(result);
+        $("#rehearsal-export").disabled = false;
+        for (const selector of exportButtons.slice(1)) $(selector).disabled = !result.evidence.accepted;
+        audit("Sample rehearsed", `${result.evidence.config.name} · ${rows.length} submitted rows · ${result.evidence.accepted ? "accepted" : "rejected"}`);
+      } catch (error) {
+        if (version !== generation) return;
+        $("#rehearsal-result").innerHTML = empty("Rehearsal could not complete", error instanceof SyntaxError ? "Correct the sample JSON syntax and rerun." : error.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = "Run sample rehearsal";
+      }
+    };
+    $("#rehearsal-export").onclick = () => {
+      if (latest) download(`${latest.evidence.config.name}-sample-evidence.json`, JSON.stringify(latest, null, 2), "application/json");
+    };
+    $("#rehearsal-config").onclick = () => {
+      if (latest?.evidence.accepted) download(`${latest.evidence.config.name}-config.json`, latest.evidence.config_json, "application/json");
+    };
+    $("#rehearsal-yaml").onclick = () => {
+      if (latest?.evidence.accepted) download(`${latest.evidence.config.name}-bundle.yaml`, latest.evidence.manifest, "application/yaml");
+    };
+    $("#rehearsal-output").onclick = () => {
+      if (latest?.evidence.accepted) download(`${latest.evidence.config.name}-output-preview.json`, JSON.stringify(latest.evidence.normalized_rows, null, 2), "application/json");
+    };
+  }, 0);
+  return `<div class="review-boundary">${icon("info")}<span><strong>Your records, the actual SQL transform.</strong> Paste a sample to test strict order validation, uppercase normalization and duplicate replacement. Connectors are never fetched; databases are never written. Spark is outside this rehearsal.</span></div><div class="split equal"><section class="panel"><div class="panel-head"><h2>Sample input</h2><span class="pill">1–100 records · 32 KiB</span></div><div class="panel-body">${facts([["Saved pipeline", draft.name], ["Input connector", draft.input?.connector || "fixture"], ["Destination", draft.output?.connector || "sqlite"]])}<a class="button" href="/workbench/editor">Edit pipeline ${icon("arrow")}</a><p>Each record requires <code>id</code> (1–80 letters, digits, _ or -), <code>amount_cents</code> (integer 0–1000000000) and <code>currency</code> (three letters). Unknown fields fail validation.</p><p class="muted">The sample starts blank. Use non-sensitive records you are allowed to submit. Samples are sent to this server for in-memory processing and are not saved by the application.</p><form id="rehearsal-form"><div class="form-field"><label for="rehearsal-partition">Partition date (UTC)</label><input id="rehearsal-partition" type="date" required value="${new Date().toISOString().slice(0, 10)}"></div><div class="form-field"><label for="rehearsal-rows">Your order sample (JSON array)</label><textarea id="rehearsal-rows" rows="13" required spellcheck="false" placeholder="Paste your JSON array here" aria-describedby="rehearsal-input-help"></textarea><small id="rehearsal-input-help">Whole-batch validation: any invalid row prevents output.</small></div><button class="primary" id="rehearsal-run" type="submit">Run sample rehearsal</button></form></div></section><section class="panel"><div class="panel-head"><h2>Transform evidence</h2></div><div class="panel-body"><div id="rehearsal-result" aria-live="polite">${empty("No sample submitted", "Paste your records to inspect the real transform behavior.")}</div><hr><div class="toolbar"><button id="rehearsal-export" disabled>${icon("download")} Evidence JSON</button><button id="rehearsal-output" disabled>Output preview JSON</button><button id="rehearsal-config" disabled>Config JSON</button><button id="rehearsal-yaml" disabled>Manifest YAML</button></div><p class="muted">The generated config and manifest keep your configured connector; sample rows are not packaged or deployed. Output preview is a diagnostic artifact, not a source file or execution receipt.</p><a class="button" href="/workbench/review">Continue to release review ${icon("arrow")}</a></div></section></div>`;
+}
+
 function review() {
   $("#page-actions").innerHTML = '<a class="button" href="/workbench/editor">Edit candidate ' + icon("code") + '</a>';
   setTimeout(() => {
@@ -945,6 +1006,7 @@ function initializeWorkbench() {
   const steps = [
     ["editor", "Configure"],
     ["validation", "Validate"],
+    ["rehearsal", "Rehearse"],
     ["review", "Review"],
     ["manifests", "Manifests"],
     ["plans", "Plan"],
@@ -1201,6 +1263,7 @@ function preserveJourneyDraft(href) {
     page !== "editor" ||
     ![
       "/workbench/validation",
+      "/workbench/rehearsal",
       "/workbench/manifests",
       "/workbench/review",
       "/workbench/plans",
@@ -1232,6 +1295,7 @@ const controllers = {
   commits,
   editor,
   validation,
+  rehearsal,
   manifests,
   review,
   plans,
