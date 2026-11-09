@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "status": "passed",
+  "python": "3.15.1",
+  "checks": [
+    {
+      "command": [
+        "/opt/venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/opt/venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/opt/venv/bin/python",
+        "-m",
+        "bandit",
+        "-r",
+        "src",
+        "-q"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/opt/venv/bin/python",
+        "-m",
+        "pytest",
+        "-q",
+        "-rs",
+        "--junitxml=results.xml",
+        "-p",
+        "no:cacheprovider"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "pytest": {
+    "tests": 222,
+    "passed": 199,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 23
+  },
+  "skips": [
+    {
+      "reason": "PostgreSQL DSN required",
+      "count": 19
+    },
+    {
+      "reason": "Spark runtime opt in",
+      "count": 1
+    },
+    {
+      "reason": "cold scratch roots require durable metadata",
+      "count": 1
+    },
+    {
+      "reason": "container opt in",
+      "count": 1
+    },
+    {
+      "reason": "demo recovery requires PostgreSQL",
+      "count": 1
+    }
+  ],
+  "fingerprints": {
+    "source": "9420ca5fa4078353b3f60bdffe3f63900b8789f766505d72397354512d1dc320",
+    "tests": "78b9cb89c967db3b06d52294e005b89302d699579f8a3135fdab0ffc43b052c9",
+    "locks": "d433a0b2a6323a2680eb466f50b678dc07297621d5cabab1aefff24dc43faea2",
+    "build": "9cf345ff63e831a0abf85fe74e4bf7b4c867828eaffa4e9003a14571fc6723ce"
+  },
+  "tools": {
+    "pytest": "9.2.0",
+    "ruff": "0.17.3",
+    "bandit": "1.9.4"
+  }
+}
